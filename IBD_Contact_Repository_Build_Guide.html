@@ -123,6 +123,45 @@
   team. The app is strictly for finding and viewing.</div>
 </section>
 
+<section class="section" id="sec-2">
+  <h2>2 · Prerequisites &amp; verify your columns</h2>
+  <h3>What you need before starting</h3>
+  <ul>
+    <li>A Power Apps license that allows SharePoint connections (standard Microsoft 365 is enough — no premium connectors are used).</li>
+    <li><strong>Read access</strong> to the BMO SharePoint site: <code>https://bbkonline.sharepoint.com/sites/BMO</code>.</li>
+    <li>The four lists below already created on that site, with at least a few rows of real or sample data in each (you cannot verify the app against empty lists).</li>
+  </ul>
+  <div class="callout warn"><strong>Do this step — do not skip it.</strong> Every formula
+  in this guide uses the column names from the specification document. If your real
+  SharePoint columns are named differently, the formulas will error until you substitute
+  your names. Names marked with an <span class="verify">verify</span> chip throughout the
+  guide are the ones to check. To see a column's real name: open the list in SharePoint
+  → gear icon → <em>List settings</em> → click the column → the <code>Field=</code> part
+  of the URL is the internal name. In Power Apps formulas you use the
+  <em>display name</em>, wrapped in single quotes if it contains spaces.</div>
+  <h3>Column verification checklist</h3>
+  <table class="checklist-table">
+    <tr><th>List</th><th>Column the guide assumes</th><th>Assumed type</th><th>Your actual name</th></tr>
+    <tr><td rowspan="2">Master List of Exposures</td><td>Title <em>(borrower name)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td>Borrower RIM</td><td>Single line of text <em>or</em> Number — Section 6 gives a formula for each</td><td></td></tr>
+    <tr><td rowspan="8">Borrower Contact Directory</td><td>Title <em>(contact full name)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td>Contact Email</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Mobile Number</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Office Number</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Job Title</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Active Status</td><td>Yes/No <em>or</em> Choice — Section 8 gives a formula for each</td><td></td></tr>
+    <tr><td>Preferred Language</td><td>Choice</td><td></td></tr>
+    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
+    <tr><td>Communication Purpose Master</td><td>Title <em>(purpose name — six seeded values: Audit Confirmations, Daily Transaction Advices, Legal Notices, Facility Documentation, Covenant Reporting, Business Matters)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td rowspan="4">Contact Communication Matrix</td><td>Borrower RIM</td><td>Lookup → Master List of Exposures — Section 6 notes the plain-text alternative</td><td></td></tr>
+    <tr><td>Contact</td><td>Lookup → Borrower Contact Directory</td><td></td></tr>
+    <tr><td>Purpose</td><td>Choice <em>or</em> Lookup → Communication Purpose Master (both work with the guide's formulas)</td><td></td></tr>
+    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
+  </table>
+  <p>Print or copy this table and fill in the <em>Your actual name</em> column now.
+  Wherever a name differs, substitute yours when pasting formulas later.</p>
+</section>
+
 <!-- /sections -->
 
 </div>
