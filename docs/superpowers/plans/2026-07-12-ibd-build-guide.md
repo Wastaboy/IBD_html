@@ -1,0 +1,829 @@
+# IBD Client Contact Repository Build Guide — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Produce `IBD_Contact_Repository_Build_Guide.html` — a single, self-contained, step-by-step HTML guide for building the IBD Client Contact Repository as a view-only, single-screen Power Apps canvas app over four existing SharePoint lists.
+
+**Architecture:** One standalone HTML file built up section by section (11 sections + TOC), styled with inline CSS defined once in Task 1. Every build step in the guide follows a fixed pattern: where to click → control name to use → exact formula to paste → "you should now see…" checkpoint. All Power Fx formulas and control names come from the registry in this plan's Global Constraints so sections stay consistent.
+
+**Tech Stack:** Plain HTML + inline CSS (no JS, no external resources). Content domain: Power Apps canvas apps, SharePoint Online lists, Power Fx.
+
+**Source spec:** `docs/superpowers/specs/2026-07-12-ibd-contact-repository-design.md` (read it before starting any task).
+
+## Global Constraints
+
+- Output file: `IBD_Contact_Repository_Build_Guide.html` at the repository root. ONE file, fully self-contained: no external CSS, JS, fonts, or images (inline SVG/CSS diagrams only).
+- The app being described is **view-only**: the guide must never instruct creating forms, Patch, SubmitForm, or any write operation. No Power Automate anywhere.
+- SharePoint site: `https://bbkonline.sharepoint.com/sites/BMO`. The four lists already exist; the guide never creates or modifies lists.
+- List/column names are **spec placeholders** — the guide's Section 2 requires the builder to verify them and marks every name that needs verification with a `<span class="verify">` chip.
+- Canvas app: tablet/landscape format, named `IBD Client Contact Repository`.
+- Escape `>` as `&gt;`, `<` as `&lt;`, and `&&` as `&amp;&amp;` inside all `<code>`/`<pre>` formula blocks.
+- Guide voice: imperative, second person ("Click…", "Rename it to…"), no filler.
+
+**Control-name registry** (every section must use exactly these names):
+
+| Control | Name |
+|---|---|
+| Screen | `scrMain` |
+| Root container | `conRoot` |
+| Header container / app title label | `conHeader` / `lblAppTitle` |
+| Body container | `conBody` |
+| Left panel container | `conLeft` |
+| Search input (Text input, modern) | `txtSearch` |
+| Borrower results gallery | `galBorrowers` |
+| "No borrowers found" label | `lblNoResults` |
+| Right panel container | `conRight` |
+| Borrower card container | `conBorrowerCard` |
+| Borrower name / RIM / meta labels | `lblBorrowerName` / `lblBorrowerRIM` / `lblBorrowerMeta` |
+| "Search for a borrower" placeholder | `lblPlaceholder` |
+| Loading spinner label | `lblLoading` |
+| Purpose (outer) gallery | `galPurposes` |
+| Purpose header label (inside galPurposes) | `lblPurposeHeader` |
+| Contacts (inner) gallery | `galContacts` |
+| Contact labels (inside galContacts) | `lblContactName` / `lblContactJob` / `lblContactEmail` / `lblContactPhones` |
+| "No contacts recorded" label | `lblNoContacts` |
+
+**Variables/collections registry:** `varBorrower` (selected borrower record), `varLoading` (boolean), `colMatrix` (enriched matrix rows for the selected borrower).
+
+**Canonical Power Fx formulas** (single source of truth — tasks embed these verbatim, HTML-escaped):
+
+- F1 `galBorrowers.Items` (text RIM):
+  ```
+  Filter('Master List of Exposures',
+      StartsWith(Title, txtSearch.Text)
+      || StartsWith('Borrower RIM', txtSearch.Text))
+  ```
+- F1b `galBorrowers.Items` (numeric RIM variant):
+  ```
+  Filter('Master List of Exposures',
+      StartsWith(Title, txtSearch.Text)
+      || (IsNumeric(txtSearch.Text) && 'Borrower RIM' = Value(txtSearch.Text)))
+  ```
+- F2 `galBorrowers.OnSelect`:
+  ```
+  Set(varBorrower, ThisItem);
+  Set(varLoading, true);
+  ClearCollect(colMatrix,
+      AddColumns(
+          Filter('Contact Communication Matrix', 'Borrower RIM'.Id = varBorrower.ID),
+          ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
+      )
+  );
+  Set(varLoading, false)
+  ```
+- F3 `galPurposes.Items`:
+  ```
+  Filter('Communication Purpose Master',
+      CountRows(Filter(colMatrix, Purpose.Value = Title)) > 0)
+  ```
+- F4 `galContacts.Items` (Active Status = Yes/No boolean):
+  ```
+  Filter(colMatrix,
+      Purpose.Value = lblPurposeHeader.Text
+      && ContactRec.'Active Status')
+  ```
+- F4b variant (Active Status is a Choice column):
+  ```
+  Filter(colMatrix,
+      Purpose.Value = lblPurposeHeader.Text
+      && ContactRec.'Active Status'.Value = "Active")
+  ```
+- F5 `lblPlaceholder.Visible`: `IsBlank(varBorrower)`
+- F6 `lblNoResults.Visible`: `!IsBlank(txtSearch.Text) && CountRows(galBorrowers.AllItems) = 0`
+- F7 `lblNoContacts.Visible`: `!IsBlank(varBorrower) && !varLoading && CountRows(colMatrix) = 0`
+- F8 `lblLoading.Visible`: `varLoading`
+- Note carried in Sections 6 and 8: `Purpose.Value` works whether Purpose is a Choice or a Lookup to Communication Purpose Master (a lookup's `.Value` is the target's Title). `'Borrower RIM'.Id` assumes a Lookup column; if the Matrix stores RIM as plain text, the alternative comparison is `'Borrower RIM' = varBorrower.'Borrower RIM'`.
+
+**CSS classes defined in Task 1 and reused by all sections:** `.step` (numbered build step), `.formula` (Power Fx block with property caption), `.checkpoint` ("you should now see…" box), `.callout` (info/warning box, variants `.warn`), `.verify` (amber chip marking a spec-placeholder name), `.checklist-table` (verification/test tables), `.section` (top-level section wrapper).
+
+---
+
+### Task 1: HTML skeleton, styles, header, TOC, and Section 1 (Overview)
+
+**Files:**
+- Create: `IBD_Contact_Repository_Build_Guide.html`
+
+**Interfaces:**
+- Produces: the complete `<style>` block and the section/step/formula/checkpoint/callout/verify CSS classes every later task uses; section anchor ids `sec-1` … `sec-11`; the closing marker comment `<!-- /sections -->` that later tasks insert new sections *before*.
+
+- [ ] **Step 1: Create the file with skeleton, CSS, page header, TOC, and Section 1**
+
+Write `IBD_Contact_Repository_Build_Guide.html` with exactly this structure (complete file — later tasks insert sections before `<!-- /sections -->`):
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IBD Client Contact Repository — Power Apps Build Guide</title>
+<style>
+  :root {
+    --ink: #1a1f2e; --muted: #5a6272; --line: #dfe3ea;
+    --brand: #b01116; /* BBK red */ --brand-dark: #7c0c10;
+    --accent: #0f6cbd; --bg: #f6f7f9; --card: #ffffff;
+    --ok-bg: #e8f5ee; --ok-line: #2e8b57;
+    --warn-bg: #fdf3e0; --warn-line: #c77700;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif;
+         color: var(--ink); background: var(--bg); line-height: 1.55; }
+  .page { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+  header.hero { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+         color: #fff; border-radius: 12px; padding: 32px 28px; margin-bottom: 24px; }
+  header.hero h1 { margin: 0 0 6px; font-size: 1.7rem; }
+  header.hero p { margin: 0; opacity: .85; }
+  nav.toc { background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 18px 22px; margin-bottom: 28px; }
+  nav.toc h2 { margin: 0 0 10px; font-size: 1.05rem; }
+  nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 40px; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  .section { background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 24px 28px; margin-bottom: 24px; }
+  .section > h2 { margin-top: 0; font-size: 1.3rem; color: var(--brand-dark);
+         border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+  .step { border-left: 3px solid var(--accent); padding: 10px 16px;
+         margin: 16px 0; background: #f9fbfd; border-radius: 0 8px 8px 0; }
+  .step h4 { margin: 0 0 6px; font-size: 1rem; }
+  .step .n { display: inline-block; background: var(--accent); color: #fff;
+         border-radius: 50%; width: 22px; height: 22px; text-align: center;
+         line-height: 22px; font-size: .8rem; margin-right: 8px; }
+  .formula { margin: 12px 0; }
+  .formula .prop { font-size: .8rem; font-weight: 600; color: var(--muted);
+         text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .formula pre { background: #101828; color: #e8eef9; padding: 14px 16px;
+         border-radius: 8px; overflow-x: auto; margin: 0; font-size: .88rem; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; }
+  p code, li code, td code { background: #eef1f6; padding: 1px 5px;
+         border-radius: 4px; font-size: .88em; }
+  .checkpoint { background: var(--ok-bg); border-left: 4px solid var(--ok-line);
+         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .checkpoint::before { content: "✓ You should now see: "; font-weight: 700; }
+  .callout { background: #eef4fb; border-left: 4px solid var(--accent);
+         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .callout.warn { background: var(--warn-bg); border-left-color: var(--warn-line); }
+  .verify { background: var(--warn-bg); border: 1px solid var(--warn-line);
+         color: #8a5200; border-radius: 999px; padding: 0 8px; font-size: .78rem;
+         font-weight: 600; white-space: nowrap; }
+  table.checklist-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  table.checklist-table th, table.checklist-table td { border: 1px solid var(--line);
+         padding: 8px 10px; text-align: left; font-size: .92rem; vertical-align: top; }
+  table.checklist-table th { background: #f0f2f6; }
+  .diagram { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+         justify-content: center; margin: 18px 0; }
+  .diagram .node { border: 2px solid var(--accent); border-radius: 10px;
+         padding: 10px 14px; background: #f4f9ff; font-size: .85rem;
+         font-weight: 600; text-align: center; }
+  .diagram .node small { display: block; font-weight: 400; color: var(--muted); }
+  .diagram .arrow { font-size: 1.3rem; color: var(--muted); }
+  .diagram .node.master { border-color: var(--brand); background: #fdf4f4; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <h1>IBD Client Contact Repository — Power Apps Build Guide</h1>
+  <p>View-only canvas app over SharePoint · Sponsor: Head of Credit Assessment · Owner: BMO · Spec v3.0</p>
+</header>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#sec-1">Overview &amp; architecture</a></li>
+    <li><a href="#sec-2">Prerequisites &amp; verify your columns</a></li>
+    <li><a href="#sec-3">Create the app</a></li>
+    <li><a href="#sec-4">Connect the data</a></li>
+    <li><a href="#sec-5">Build the layout</a></li>
+    <li><a href="#sec-6">Search panel</a></li>
+    <li><a href="#sec-7">Borrower info card</a></li>
+    <li><a href="#sec-8">Contacts grouped by purpose</a></li>
+    <li><a href="#sec-9">Polish</a></li>
+    <li><a href="#sec-10">Test checklist</a></li>
+    <li><a href="#sec-11">Publish &amp; share</a></li>
+  </ol>
+</nav>
+
+<section class="section" id="sec-1">
+  <h2>1 · Overview &amp; architecture</h2>
+  <p>You are building a <strong>view-only</strong> Power Apps canvas app that lets IBD staff
+  find a borrower by RIM or name and instantly see every operational contact for that
+  borrower, grouped by communication purpose (audit confirmations, legal notices, daily
+  transaction advices, and so on).</p>
+  <p>The core design principle from the specification: <strong>the Master List of Exposures
+  remains the single source of truth for borrower information.</strong> The app reads it,
+  never writes it, and never duplicates borrower data anywhere else.</p>
+  <div class="diagram">
+    <div class="node master">Master List of Exposures<small>existing borrower master (read-only)</small></div>
+    <div class="arrow">→</div>
+    <div class="node">Contact Communication Matrix<small>who · for which borrower · for what purpose</small></div>
+    <div class="arrow">←</div>
+    <div class="node">Borrower Contact Directory<small>people &amp; their details</small></div>
+  </div>
+  <div class="diagram">
+    <div class="node">Communication Purpose Master<small>drives the grouping</small></div>
+    <div class="arrow">→</div>
+    <div class="node master">Power Apps front end<small>single screen · search → detail</small></div>
+  </div>
+  <p>The app is a single screen: a search panel on the left, and on the right a borrower
+  info card above the borrower's contacts grouped by purpose. Because the purpose
+  grouping is driven by the <em>Communication Purpose Master</em> list rather than
+  hard-coded, new purposes — and new Wholesale Banking units later — appear in the app
+  with zero redesign.</p>
+  <div class="callout">This guide contains no Power Automate steps and no data-entry
+  screens: contacts and matrix rows are maintained directly in SharePoint by the BMO
+  team. The app is strictly for finding and viewing.</div>
+</section>
+
+<!-- /sections -->
+
+</div>
+</body>
+</html>
+```
+
+- [ ] **Step 2: Verify the skeleton renders and anchors exist**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html`
+Expected: `1` (only sec-1 exists so far)
+
+Run: `grep -c '<!-- /sections -->' IBD_Contact_Repository_Build_Guide.html`
+Expected: `1`
+
+Open the file in a browser (`Invoke-Item .\IBD_Contact_Repository_Build_Guide.html` in PowerShell, or the browse tool). Expected: red hero header, two-column TOC, Section 1 card with two diagram rows; no unstyled text.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: guide skeleton, styles, TOC, and overview section"
+```
+
+---
+
+### Task 2: Section 2 — Prerequisites & verify-your-columns checklist
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: CSS classes from Task 1 (`.section`, `.callout`, `.verify`, `.checklist-table`).
+- Produces: anchor `sec-2`; the verify-your-columns table that Sections 6–8 refer to as "the table in Section 2".
+
+- [ ] **Step 1: Insert Section 2 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-2">
+  <h2>2 · Prerequisites &amp; verify your columns</h2>
+  <h3>What you need before starting</h3>
+  <ul>
+    <li>A Power Apps license that allows SharePoint connections (standard Microsoft 365 is enough — no premium connectors are used).</li>
+    <li><strong>Read access</strong> to the BMO SharePoint site: <code>https://bbkonline.sharepoint.com/sites/BMO</code>.</li>
+    <li>The four lists below already created on that site, with at least a few rows of real or sample data in each (you cannot verify the app against empty lists).</li>
+  </ul>
+  <div class="callout warn"><strong>Do this step — do not skip it.</strong> Every formula
+  in this guide uses the column names from the specification document. If your real
+  SharePoint columns are named differently, the formulas will error until you substitute
+  your names. Names marked with an <span class="verify">verify</span> chip throughout the
+  guide are the ones to check. To see a column's real name: open the list in SharePoint
+  → gear icon → <em>List settings</em> → click the column → the <code>Field=</code> part
+  of the URL is the internal name. In Power Apps formulas you use the
+  <em>display name</em>, wrapped in single quotes if it contains spaces.</div>
+  <h3>Column verification checklist</h3>
+  <table class="checklist-table">
+    <tr><th>List</th><th>Column the guide assumes</th><th>Assumed type</th><th>Your actual name</th></tr>
+    <tr><td rowspan="2">Master List of Exposures</td><td>Title <em>(borrower name)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td>Borrower RIM</td><td>Single line of text <em>or</em> Number — Section 6 gives a formula for each</td><td></td></tr>
+    <tr><td rowspan="8">Borrower Contact Directory</td><td>Title <em>(contact full name)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td>Contact Email</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Mobile Number</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Office Number</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Job Title</td><td>Single line of text</td><td></td></tr>
+    <tr><td>Active Status</td><td>Yes/No <em>or</em> Choice — Section 8 gives a formula for each</td><td></td></tr>
+    <tr><td>Preferred Language</td><td>Choice</td><td></td></tr>
+    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
+    <tr><td>Communication Purpose Master</td><td>Title <em>(purpose name — six seeded values: Audit Confirmations, Daily Transaction Advices, Legal Notices, Facility Documentation, Covenant Reporting, Business Matters)</em></td><td>Single line of text</td><td></td></tr>
+    <tr><td rowspan="4">Contact Communication Matrix</td><td>Borrower RIM</td><td>Lookup → Master List of Exposures — Section 6 notes the plain-text alternative</td><td></td></tr>
+    <tr><td>Contact</td><td>Lookup → Borrower Contact Directory</td><td></td></tr>
+    <tr><td>Purpose</td><td>Choice <em>or</em> Lookup → Communication Purpose Master (both work with the guide's formulas)</td><td></td></tr>
+    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
+  </table>
+  <p>Print or copy this table and fill in the <em>Your actual name</em> column now.
+  Wherever a name differs, substitute yours when pasting formulas later.</p>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `2`
+Run: `grep -c 'class="verify"' IBD_Contact_Repository_Build_Guide.html` — Expected: `1` or more
+Reload in browser. Expected: Section 2 shows the warning callout and a 4-list checklist table with an empty "Your actual name" column.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: prerequisites and verify-your-columns section"
+```
+
+---
+
+### Task 3: Sections 3–4 — Create the app & connect the data
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: CSS classes from Task 1 (`.step`, `.checkpoint`, `.callout`).
+- Produces: anchors `sec-3`, `sec-4`; the app name `IBD Client Contact Repository` and the four connected data sources later sections assume.
+
+- [ ] **Step 1: Insert Sections 3 and 4 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-3">
+  <h2>3 · Create the app</h2>
+  <div class="step"><h4><span class="n">1</span>Start a blank tablet app</h4>
+    <p>Go to <code>make.powerapps.com</code> → make sure you are in the environment your
+    client uses → <em>Create</em> → <em>Blank app</em> → <em>Blank canvas app</em>.
+    Name it <code>IBD Client Contact Repository</code> and choose <strong>Tablet</strong>
+    format → <em>Create</em>.</p>
+    <div class="checkpoint">Power Apps Studio open on an empty screen called <code>Screen1</code>.</div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Rename the screen</h4>
+    <p>In the left <em>Tree view</em>, double-click <code>Screen1</code> and rename it to
+    <code>scrMain</code>.</p>
+    <div class="checkpoint"><code>scrMain</code> at the top of the tree view.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Set app settings</h4>
+    <p><em>Settings</em> (gear) → <em>Display</em> → turn <strong>Scale to fit</strong> off and
+    <strong>Lock aspect ratio</strong> off, so the container layout resizes with the window.
+    Close settings and save the app (Ctrl+S).</p>
+    <div class="checkpoint">App saved; title bar shows <em>IBD Client Contact Repository</em>.</div>
+  </div>
+</section>
+
+<section class="section" id="sec-4">
+  <h2>4 · Connect the data</h2>
+  <div class="step"><h4><span class="n">1</span>Add the SharePoint connection</h4>
+    <p>Left rail → <em>Data</em> → <em>Add data</em> → search <code>SharePoint</code> →
+    choose the SharePoint connector (sign in if prompted).</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Pick the site and the four lists</h4>
+    <p>Paste the site URL <code>https://bbkonline.sharepoint.com/sites/BMO</code> →
+    <em>Connect</em> → tick exactly these four lists → <em>Connect</em>:</p>
+    <ul>
+      <li>Master List of Exposures</li>
+      <li>Borrower Contact Directory</li>
+      <li>Communication Purpose Master</li>
+      <li>Contact Communication Matrix</li>
+    </ul>
+    <div class="checkpoint">All four lists under <em>Data</em> in the left rail.</div>
+    <div class="callout">If a list is missing from the picker, it doesn't exist on this
+    site under that name — go back to the Section 2 checklist before continuing.</div>
+  </div>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `4`
+Reload in browser; Sections 3–4 render with numbered steps and green checkpoints.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: create-app and connect-data sections"
+```
+
+---
+
+### Task 4: Section 5 — Build the layout
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: control registry names from Global Constraints.
+- Produces: anchor `sec-5`; containers `conRoot`, `conHeader`, `conBody`, `conLeft`, `conRight` and label `lblAppTitle` that Sections 6–8 place controls into.
+
+- [ ] **Step 1: Insert Section 5 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-5">
+  <h2>5 · Build the layout</h2>
+  <p>The whole screen is built from auto-layout containers, so it resizes cleanly.
+  Structure: a vertical root → header bar on top → horizontal body → left (search)
+  and right (detail) panels.</p>
+  <div class="step"><h4><span class="n">1</span>Root container</h4>
+    <p>With <code>scrMain</code> selected: <em>Insert</em> → <em>Layout</em> →
+    <em>Vertical container</em>. Rename it <code>conRoot</code> and set:</p>
+    <div class="formula"><div class="prop">conRoot — X / Y / Width / Height</div>
+    <pre><code>X: 0        Y: 0
+Width:  Parent.Width
+Height: Parent.Height</code></pre></div>
+    <p>In the right-hand panel set <em>Gap</em> to <code>0</code> and padding on all sides to <code>0</code>.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Header bar</h4>
+    <p>Inside <code>conRoot</code>: <em>Insert</em> → <em>Horizontal container</em>, rename
+    <code>conHeader</code>. Set <em>Flexible height</em> off and <code>Height: 64</code>.
+    Set its Fill to the bank's red:</p>
+    <div class="formula"><div class="prop">conHeader — Fill</div>
+    <pre><code>RGBA(176, 17, 22, 1)</code></pre></div>
+    <p>Inside it insert a <em>Text label</em>, rename <code>lblAppTitle</code>, set
+    <code>Text: "IBD Client Contact Repository"</code>, font size <code>18</code>, bold,
+    color white, vertical align center.</p>
+    <div class="checkpoint">A red bar across the top with the app title in white.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Body and the two panels</h4>
+    <p>Inside <code>conRoot</code> (below the header): <em>Insert</em> →
+    <em>Horizontal container</em>, rename <code>conBody</code>, leave <em>Flexible height</em>
+    on so it fills the rest of the screen. Set <em>Gap</em> to <code>12</code> and padding
+    <code>12</code> on all sides. Inside <code>conBody</code> insert two
+    <em>Vertical containers</em>:</p>
+    <ul>
+      <li><code>conLeft</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>1</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>8</code>, padding <code>12</code>.</li>
+      <li><code>conRight</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>2</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>12</code>, padding <code>16</code>.</li>
+    </ul>
+    <div class="checkpoint">A white ⅓-width panel on the left and ⅔-width panel on the
+    right, on a light-grey background, red bar on top. Nothing in the panels yet.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Save</h4><p>Ctrl+S.</p></div>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `5`
+Run: `grep -c 'conRoot' IBD_Contact_Repository_Build_Guide.html` — Expected: 3 or more
+Reload in browser; Section 5 renders.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: layout-containers section"
+```
+
+---
+
+### Task 5: Section 6 — Search panel
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: `conLeft` from Section 5; formulas F1, F1b, F2, F6 from Global Constraints (verbatim, HTML-escaped).
+- Produces: anchor `sec-6`; `txtSearch`, `galBorrowers`, `lblNoResults`, `varBorrower`, `varLoading`, `colMatrix` — everything Sections 7–8 read.
+
+- [ ] **Step 1: Insert Section 6 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-6">
+  <h2>6 · Search panel</h2>
+  <div class="step"><h4><span class="n">1</span>Search box</h4>
+    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Text input</em> (modern).
+    Rename <code>txtSearch</code>. Set <code>Placeholder</code> (or HintText on classic):
+    <code>"Search by RIM or borrower name"</code>. Set <em>Flexible height</em> off.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Borrower results gallery</h4>
+    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank
+    layout). Rename <code>galBorrowers</code>, turn <em>Flexible height</em> on so it
+    fills the panel. Set its Items — this is the delegable search that stays fast at any
+    list size:</p>
+    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(RIM stored as text <span class="verify">verify</span>)</div>
+    <pre><code>Filter('Master List of Exposures',
+    StartsWith(Title, txtSearch.Text)
+    || StartsWith('Borrower RIM', txtSearch.Text))</code></pre></div>
+    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(use this instead if RIM is a Number column)</div>
+    <pre><code>Filter('Master List of Exposures',
+    StartsWith(Title, txtSearch.Text)
+    || (IsNumeric(txtSearch.Text) &amp;&amp; 'Borrower RIM' = Value(txtSearch.Text)))</code></pre></div>
+    <p>Inside the gallery template add two labels: borrower name
+    (<code>Text: ThisItem.Title</code>, bold) and RIM
+    (<code>Text: "RIM: " &amp; ThisItem.'Borrower RIM'</code>, smaller, grey).</p>
+    <div class="checkpoint">Typing in the search box live-filters the borrower list.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Selection loads the contact matrix</h4>
+    <p>Set <code>galBorrowers.OnSelect</code>. This stores the selected borrower and pulls
+    <em>only that borrower's</em> matrix rows into a local collection, enriched with the
+    full contact record — one server call per selection, so the nested galleries in
+    Section 8 never query SharePoint:</p>
+    <div class="formula"><div class="prop">galBorrowers — OnSelect</div>
+    <pre><code>Set(varBorrower, ThisItem);
+Set(varLoading, true);
+ClearCollect(colMatrix,
+    AddColumns(
+        Filter('Contact Communication Matrix', 'Borrower RIM'.Id = varBorrower.ID),
+        ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
+    )
+);
+Set(varLoading, false)</code></pre></div>
+    <div class="callout"><strong>If your Matrix stores RIM as plain text</strong> instead of
+    a Lookup <span class="verify">verify</span>, replace the Filter condition with
+    <code>'Borrower RIM' = varBorrower.'Borrower RIM'</code>.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Empty-search state</h4>
+    <p>Insert a <em>Text label</em> into <code>conLeft</code> below the gallery, rename
+    <code>lblNoResults</code>, <code>Text: "No borrowers found"</code>, grey, centered.</p>
+    <div class="formula"><div class="prop">lblNoResults — Visible</div>
+    <pre><code>!IsBlank(txtSearch.Text) &amp;&amp; CountRows(galBorrowers.AllItems) = 0</code></pre></div>
+    <div class="checkpoint">Typing gibberish shows "No borrowers found"; clearing the box hides it.</div>
+  </div>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `6`
+Run: `grep -c 'ClearCollect(colMatrix' IBD_Contact_Repository_Build_Guide.html` — Expected: `1`
+Confirm no unescaped `&&` inside `<code>` blocks: `grep -n ' && ' IBD_Contact_Repository_Build_Guide.html` — Expected: no matches inside `<pre>`/`<code>` lines (all should be `&amp;&amp;`).
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: search-panel section with delegable search formulas"
+```
+
+---
+
+### Task 6: Section 7 — Borrower info card
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: `conRight` from Section 5; `varBorrower` from Section 6; formula F5.
+- Produces: anchor `sec-7`; `conBorrowerCard`, `lblBorrowerName`, `lblBorrowerRIM`, `lblBorrowerMeta`, `lblPlaceholder`.
+
+- [ ] **Step 1: Insert Section 7 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-7">
+  <h2>7 · Borrower info card</h2>
+  <div class="step"><h4><span class="n">1</span>Placeholder before any selection</h4>
+    <p>Select <code>conRight</code> → insert a <em>Text label</em>, rename
+    <code>lblPlaceholder</code>, <code>Text: "Search for a borrower to see their
+    contacts"</code>, grey, size 16, centered.</p>
+    <div class="formula"><div class="prop">lblPlaceholder — Visible</div>
+    <pre><code>IsBlank(varBorrower)</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Borrower card</h4>
+    <p>Select <code>conRight</code> → insert a <em>Vertical container</em>, rename
+    <code>conBorrowerCard</code>, <em>Flexible height</em> off, <code>Height: 92</code>,
+    Fill <code>RGBA(246, 247, 249, 1)</code>, padding <code>12</code>. Set
+    <code>Visible: !IsBlank(varBorrower)</code>. Inside it add three labels:</p>
+    <div class="formula"><div class="prop">lblBorrowerName — Text (size 20, bold)</div>
+    <pre><code>varBorrower.Title</code></pre></div>
+    <div class="formula"><div class="prop">lblBorrowerRIM — Text (size 13, grey)</div>
+    <pre><code>"RIM: " &amp; varBorrower.'Borrower RIM'</code></pre></div>
+    <div class="formula"><div class="prop">lblBorrowerMeta — Text (size 13, grey)</div>
+    <pre><code>/* Optional: append any other Master List display fields your client wants,
+   e.g. sector or status — read them from varBorrower the same way. */
+""</code></pre></div>
+    <div class="callout">Everything on this card reads from <code>varBorrower</code> — i.e.
+    straight from the Master List of Exposures. Nothing is copied to another list, which
+    is exactly the spec's single-source-of-truth rule.</div>
+    <div class="checkpoint">Selecting a borrower on the left shows their name and RIM on
+    the right; before any selection you see only the placeholder text.</div>
+  </div>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `7`
+Run: `grep -c 'varBorrower' IBD_Contact_Repository_Build_Guide.html` — Expected: several (≥6)
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: borrower-info-card section"
+```
+
+---
+
+### Task 7: Section 8 — Contacts grouped by purpose
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: `conRight` from Section 5; `colMatrix`, `varBorrower`, `varLoading` from Section 6; formulas F3, F4, F4b, F7, F8.
+- Produces: anchors `sec-8`; `galPurposes`, `lblPurposeHeader`, `galContacts`, `lblContactName`, `lblContactJob`, `lblContactEmail`, `lblContactPhones`, `lblNoContacts`, `lblLoading`.
+
+- [ ] **Step 1: Insert Section 8 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-8">
+  <h2>8 · Contacts grouped by purpose</h2>
+  <p>This is the heart of the app: an outer gallery of purposes, each row containing an
+  inner gallery of that borrower's contacts for that purpose. Both galleries read the
+  local <code>colMatrix</code> collection, so nothing here hits SharePoint.</p>
+  <div class="step"><h4><span class="n">1</span>Loading indicator</h4>
+    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename <code>lblLoading</code>,
+    <code>Text: "Loading contacts…"</code>, grey italic.</p>
+    <div class="formula"><div class="prop">lblLoading — Visible</div>
+    <pre><code>varLoading</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Outer gallery — purposes</h4>
+    <p>Select <code>conRight</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank),
+    rename <code>galPurposes</code>, <em>Flexible height</em> on. Set
+    <code>Visible: !IsBlank(varBorrower) &amp;&amp; !varLoading</code>. Only purposes
+    that actually have contacts for this borrower appear:</p>
+    <div class="formula"><div class="prop">galPurposes — Items</div>
+    <pre><code>Filter('Communication Purpose Master',
+    CountRows(Filter(colMatrix, Purpose.Value = Title)) &gt; 0)</code></pre></div>
+    <p>Inside the template add a <em>Text label</em>, rename <code>lblPurposeHeader</code>,
+    <code>Text: ThisItem.Title</code>, bold, size 15, with the brand color
+    <code>RGBA(176, 17, 22, 1)</code>.</p>
+    <div class="callout"><code>Purpose.Value</code> works whether the Matrix's Purpose
+    column is a Choice or a Lookup to Communication Purpose Master — both expose the
+    text through <code>.Value</code> <span class="verify">verify</span>.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Inner gallery — contacts for that purpose</h4>
+    <p>Inside the <code>galPurposes</code> template, below <code>lblPurposeHeader</code>:
+    <em>Insert</em> → <em>Vertical gallery</em> (blank), rename <code>galContacts</code>.
+    Set its Items to the matrix rows for this purpose, active contacts only:</p>
+    <div class="formula"><div class="prop">galContacts — Items &nbsp;(Active Status is Yes/No <span class="verify">verify</span>)</div>
+    <pre><code>Filter(colMatrix,
+    Purpose.Value = lblPurposeHeader.Text
+    &amp;&amp; ContactRec.'Active Status')</code></pre></div>
+    <div class="formula"><div class="prop">galContacts — Items &nbsp;(use instead if Active Status is a Choice column)</div>
+    <pre><code>Filter(colMatrix,
+    Purpose.Value = lblPurposeHeader.Text
+    &amp;&amp; ContactRec.'Active Status'.Value = "Active")</code></pre></div>
+    <p>Inside the <code>galContacts</code> template add four labels:</p>
+    <div class="formula"><div class="prop">lblContactName — Text (bold)</div>
+    <pre><code>ThisItem.ContactRec.Title</code></pre></div>
+    <div class="formula"><div class="prop">lblContactJob — Text (grey)</div>
+    <pre><code>ThisItem.ContactRec.'Job Title'</code></pre></div>
+    <div class="formula"><div class="prop">lblContactEmail — Text</div>
+    <pre><code>ThisItem.ContactRec.'Contact Email'</code></pre></div>
+    <div class="formula"><div class="prop">lblContactPhones — Text</div>
+    <pre><code>"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp;
+"  ·  O: " &amp; ThisItem.ContactRec.'Office Number'</code></pre></div>
+    <div class="callout warn">To show inactive contacts greyed-out instead of hiding
+    them: drop the Active Status condition from <code>galContacts.Items</code> and set the
+    labels' Color to <code>If(ContactRec.'Active Status', RGBA(26,31,46,1),
+    RGBA(150,155,165,1))</code>. Decide with the client; hidden is the default here.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Sizing the nested galleries</h4>
+    <p>Set <code>galContacts.Height</code> so each purpose row grows with its contacts, and
+    the outer row template follows:</p>
+    <div class="formula"><div class="prop">galContacts — Height</div>
+    <pre><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></pre></div>
+    <div class="formula"><div class="prop">galPurposes — TemplateSize</div>
+    <pre><code>lblPurposeHeader.Height + galContacts.Height + 16</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">5</span>No-contacts state</h4>
+    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename
+    <code>lblNoContacts</code>, <code>Text: "No contacts recorded for this borrower"</code>,
+    grey, centered.</p>
+    <div class="formula"><div class="prop">lblNoContacts — Visible</div>
+    <pre><code>!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></pre></div>
+    <div class="checkpoint">Selecting a borrower with matrix rows shows red purpose
+    headings, each with its contacts beneath (name, job title, email, both numbers).
+    A borrower with no rows shows the no-contacts message instead.</div>
+  </div>
+</section>
+```
+
+- [ ] **Step 2: Verify**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `8`
+Run: `grep -c 'galContacts' IBD_Contact_Repository_Build_Guide.html` — Expected: ≥6
+Run: `grep -c 'ContactRec' IBD_Contact_Repository_Build_Guide.html` — Expected: ≥8 (all matching the `ContactRec` name minted in Section 6's OnSelect)
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: purpose-grouped contacts section with nested galleries"
+```
+
+---
+
+### Task 8: Sections 9–11 — Polish, test checklist, publish & share
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (insert before `<!-- /sections -->`)
+
+**Interfaces:**
+- Consumes: all control names from Sections 5–8.
+- Produces: anchors `sec-9`, `sec-10`, `sec-11`; completes the document.
+
+- [ ] **Step 1: Insert Sections 9–11 before `<!-- /sections -->`**
+
+```html
+<section class="section" id="sec-9">
+  <h2>9 · Polish</h2>
+  <div class="step"><h4><span class="n">1</span>Reset search state cleanly</h4>
+    <p>Set <code>scrMain.OnVisible</code> so reopening the screen starts fresh:</p>
+    <div class="formula"><div class="prop">scrMain — OnVisible</div>
+    <pre><code>Set(varBorrower, Blank());
+Set(varLoading, false);
+Clear(colMatrix)</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Selected-row highlight</h4>
+    <div class="formula"><div class="prop">galBorrowers — TemplateFill</div>
+    <pre><code>If(ThisItem.ID = varBorrower.ID, RGBA(176, 17, 22, 0.08), RGBA(0,0,0,0))</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Consistent theme</h4>
+    <p>Use <code>RGBA(176, 17, 22, 1)</code> (bank red) only for the header bar, purpose
+    headings, and the selection highlight; body text <code>RGBA(26, 31, 46, 1)</code>;
+    secondary text <code>RGBA(90, 98, 114, 1)</code>. Font: Segoe UI throughout
+    (the default). Resist adding more color — this is a lookup tool.</p>
+  </div>
+</section>
+
+<section class="section" id="sec-10">
+  <h2>10 · Test checklist</h2>
+  <p>Run every row before publishing. All must pass.</p>
+  <table class="checklist-table">
+    <tr><th>#</th><th>Action</th><th>Expected result</th><th>Pass?</th></tr>
+    <tr><td>1</td><td>Open the app, type nothing</td><td>Left: full borrower list. Right: "Search for a borrower…" placeholder only</td><td></td></tr>
+    <tr><td>2</td><td>Type a partial borrower name</td><td>List narrows as you type</td><td></td></tr>
+    <tr><td>3</td><td>Type a partial RIM</td><td>Matching borrowers appear</td><td></td></tr>
+    <tr><td>4</td><td>Type gibberish</td><td>"No borrowers found"</td><td></td></tr>
+    <tr><td>5</td><td>Select a borrower with matrix rows</td><td>Card shows name + RIM; contacts grouped under purpose headings; only purposes with contacts appear</td><td></td></tr>
+    <tr><td>6</td><td>Select a borrower with no matrix rows</td><td>"No contacts recorded for this borrower"</td><td></td></tr>
+    <tr><td>7</td><td>Check a contact marked inactive in SharePoint</td><td>Not shown in the app</td><td></td></tr>
+    <tr><td>8</td><td>Check a contact serving two purposes</td><td>Appears under both purpose headings</td><td></td></tr>
+    <tr><td>9</td><td>Switch between two borrowers quickly</td><td>Right panel always matches the selected borrower; no stale contacts</td><td></td></tr>
+    <tr><td>10</td><td>Studio checker (stethoscope icon)</td><td>No delegation warnings on galBorrowers.Items</td><td></td></tr>
+    <tr><td>11</td><td>Add a new purpose row in Communication Purpose Master, link a contact to it, reselect the borrower</td><td>New purpose heading appears — no app change needed</td><td></td></tr>
+  </table>
+</section>
+
+<section class="section" id="sec-11">
+  <h2>11 · Publish &amp; share</h2>
+  <div class="step"><h4><span class="n">1</span>Publish</h4>
+    <p>File → <em>Save</em> → <em>Publish</em> → <em>Publish this version</em>.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Share with users</h4>
+    <p>Power Apps home → the app's <em>…</em> menu → <em>Share</em> → add the IBD users or
+    their security group as <strong>User</strong> (not Co-owner).</p>
+    <div class="callout warn">Sharing the app does not grant list access. Users also need
+    <strong>Read</strong> permission on all four SharePoint lists — grant it on the BMO
+    site (site or list level). Because the app is view-only, Read is all they need; do
+    not grant Edit.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Hand over</h4>
+    <p>Give the BMO team this guide plus the Section 2 checklist you filled in, so future
+    maintainers know the app's exact column dependencies.</p>
+    <div class="checkpoint">A colleague can open the app from office.com, search a
+    borrower, and read the contacts — without asking you anything.</div>
+  </div>
+</section>
+```
+
+- [ ] **Step 2: Verify the complete document**
+
+Run: `grep -c 'id="sec-' IBD_Contact_Repository_Build_Guide.html` — Expected: `11`
+Reload in browser; every TOC link jumps to its section.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "feat: polish, test-checklist, and publish sections"
+```
+
+---
+
+### Task 9: Final QA sweep
+
+**Files:**
+- Modify: `IBD_Contact_Repository_Build_Guide.html` (fixes only, if issues found)
+
+**Interfaces:**
+- Consumes: the complete document and the Global Constraints registries.
+
+- [ ] **Step 1: Consistency sweep against the registries**
+
+Check each of these; fix any miss:
+- Every control name in the document appears in the Global Constraints registry with identical casing (`grep -oE 'gal[A-Za-z]+|lbl[A-Za-z]+|con[A-Za-z]+|txt[A-Za-z]+|scr[A-Za-z]+|var[A-Za-z]+|col[A-Za-z]+' IBD_Contact_Repository_Build_Guide.html | sort -u` and compare by eye).
+- All four list names spelled identically everywhere: `grep -c "Master List of Exposures" …` etc. — no variant spellings.
+- No unescaped `&&`, `<`, or `>` inside `<pre>` blocks.
+- No write operations mentioned anywhere: `grep -inE "patch\(|submitform|power automate|flow" IBD_Contact_Repository_Build_Guide.html` — Expected: no matches (except the word "flow" in prose is allowed only if not about Power Automate; ideally zero).
+
+- [ ] **Step 2: Render QA in a real browser**
+
+Open the file in a browser. Verify: hero header, 11 TOC links all jump correctly, all tables render, formula blocks are dark with light text and horizontally scrollable, `verify` chips visible in Sections 2, 6 and 8, no horizontal page scroll at 1280px and at ~700px width.
+
+- [ ] **Step 3: Spec cross-check**
+
+Open `docs/superpowers/specs/2026-07-12-ibd-contact-repository-design.md` and confirm every spec bullet maps to guide content: search by RIM ✓ (S6), search by name ✓ (S6), borrower info display ✓ (S7), contacts grouped by purpose ✓ (S8), purpose-master-driven grouping ✓ (S8 F3), edge cases ✓ (S6/S7/S8), verify-columns ✓ (S2), publish/share ✓ (S11), no writes/no flows ✓ (QA step 1).
+
+- [ ] **Step 4: Commit any fixes**
+
+```bash
+git add IBD_Contact_Repository_Build_Guide.html
+git commit -m "fix: final QA sweep of build guide"
+```
+
+(Skip the commit if no fixes were needed.)
