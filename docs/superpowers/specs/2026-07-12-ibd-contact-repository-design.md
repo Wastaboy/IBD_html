@@ -73,6 +73,10 @@ Purposes with no contacts for the selected borrower are hidden.
 - **Contacts gallery items:** matching `colMatrix` rows, contact fields via the
   Contact lookup, filtered to `Active Status = Yes`.
 
+The Matrix's Purpose column may be a Choice or a Lookup to Communication
+Purpose Master — the spec doesn't say. The verify-your-columns step
+determines which, and the guide provides both formula variants.
+
 ## Edge cases
 
 - No borrower selected → "Search for a borrower" placeholder in right panel.
