@@ -1,283 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IBD Client Contact Repository — Power Apps Build Guide</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F3B6E">
+<title>IBD Client Contact Repository — Power Apps build guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #1a1f2e; --muted: #5a6272; --line: #dfe3ea;
-    --brand: #b01116; /* BBK red */ --brand-dark: #7c0c10;
-    --accent: #0f6cbd; --bg: #f6f7f9; --card: #ffffff;
-    --ok-bg: #e8f5ee; --ok-line: #2e8b57;
-    --warn-bg: #fdf3e0; --warn-line: #c77700;
+  :root{
+    --navy:#1F3B6E; --navy-deep:#142a52; --ink:#0f1f3d;
+    --amber:#E08A1E; --amber-soft:#fbe8cd;
+    --paper:#F4F5F8; --card:#fff; --line:#e3e6ee; --line-soft:#eef1f7;
+    --navy-tint:#eef0f6; --faint:#97a1b4;
+    --text:#1b2436; --muted:#5b6678;
+    --code-bg:#0f1f3d; --code-text:#e9edf7;
+    --ok:#1f8a52; --ok-soft:#e3f3ea;
+    --green:#228b57; --red:#c83737; --gray:#788291;
+    --radius:14px; --tap:46px; --sh-sm:0 1px 2px rgba(16,31,61,.04);
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif;
-         color: var(--ink); background: var(--bg); line-height: 1.55; }
-  .page { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
-  header.hero { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-         color: #fff; border-radius: 12px; padding: 32px 28px; margin-bottom: 24px; }
-  header.hero h1 { margin: 0 0 6px; font-size: 1.7rem; }
-  header.hero p { margin: 0; opacity: .85; }
-  nav.toc { background: var(--card); border: 1px solid var(--line);
-         border-radius: 12px; padding: 18px 22px; margin-bottom: 28px; }
-  nav.toc h2 { margin: 0 0 10px; font-size: 1.05rem; }
-  nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 40px; }
-  nav.toc a { color: var(--accent); text-decoration: none; }
-  nav.toc a:hover { text-decoration: underline; }
-  .section { background: var(--card); border: 1px solid var(--line);
-         border-radius: 12px; padding: 24px 28px; margin-bottom: 24px; }
-  .section > h2 { margin-top: 0; font-size: 1.3rem; color: var(--brand-dark);
-         border-bottom: 2px solid var(--line); padding-bottom: 8px; }
-  .step { border-left: 3px solid var(--accent); padding: 10px 16px;
-         margin: 16px 0; background: #f9fbfd; border-radius: 0 8px 8px 0; }
-  .step h4 { margin: 0 0 6px; font-size: 1rem; }
-  .step .n { display: inline-block; background: var(--accent); color: #fff;
-         border-radius: 50%; width: 22px; height: 22px; text-align: center;
-         line-height: 22px; font-size: .8rem; margin-right: 8px; }
-  .formula { margin: 12px 0; }
-  .formula .prop { font-size: .8rem; font-weight: 600; color: var(--muted);
-         text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
-  .formula pre { background: #101828; color: #e8eef9; padding: 14px 16px;
-         border-radius: 8px; overflow-x: auto; margin: 0; font-size: .88rem; }
-  code { font-family: Consolas, "Cascadia Mono", monospace; }
-  p code, li code, td code { background: #eef1f6; padding: 1px 5px;
-         border-radius: 4px; font-size: .88em; }
-  .checkpoint { background: var(--ok-bg); border-left: 4px solid var(--ok-line);
-         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
-  .checkpoint::before { content: "✓ You should now see: "; font-weight: 700; }
-  .callout { background: #eef4fb; border-left: 4px solid var(--accent);
-         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
-  .callout.warn { background: var(--warn-bg); border-left-color: var(--warn-line); }
-  .verify { background: var(--warn-bg); border: 1px solid var(--warn-line);
-         color: #8a5200; border-radius: 999px; padding: 0 8px; font-size: .78rem;
-         font-weight: 600; white-space: nowrap; }
-  table.checklist-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-  table.checklist-table th, table.checklist-table td { border: 1px solid var(--line);
-         padding: 8px 10px; text-align: left; font-size: .92rem; vertical-align: top; }
-  table.checklist-table th { background: #f0f2f6; }
-  .diagram { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-         justify-content: center; margin: 18px 0; }
-  .diagram .node { border: 2px solid var(--accent); border-radius: 10px;
-         padding: 10px 14px; background: #f4f9ff; font-size: .85rem;
-         font-weight: 600; text-align: center; }
-  .diagram .node small { display: block; font-weight: 400; color: var(--muted); }
-  .diagram .arrow { font-size: 1.3rem; color: var(--muted); }
-  .diagram .node.master { border-color: var(--brand); background: #fdf4f4; }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:24px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+
+  header.mast{background:radial-gradient(120% 140% at 100% 0%, rgba(224,138,30,.22), transparent 55%),linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;padding:calc(28px + env(safe-area-inset-top)) 0 26px;border-bottom:3px solid var(--amber)}
+  .mast-inner{display:flex;gap:18px;align-items:center}
+  .mast-copy{flex:1;min-width:0}
+  .brandmark{flex:none;width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,#274982,#1a345f);border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);display:grid;place-items:center}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:500;margin:0 0 10px}
+  .mast h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:42px;line-height:1.12;margin:0 0 8px;letter-spacing:-.01em}
+  .mast p.sub{margin:0;color:#c7d2e8;font-size:21px;max-width:48ch}
+  .mast .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .mast .meta span{font-family:"IBM Plex Mono",monospace;font-size:16px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);padding:5px 9px;border-radius:999px;color:#dde6f5}
+  .mast .meta span b{color:#fff;font-weight:600}
+  @media(max-width:480px){ .brandmark{width:50px;height:50px} .mast h1{font-size:34px} }
+
+  .sticky{position:sticky;top:0;z-index:40;background:rgba(244,245,248,.86);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .progress{height:5px;background:var(--line);overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--amber));transition:width .35s ease}
+  .progtext{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding:6px 0 8px;display:flex;justify-content:space-between;align-items:center}
+  .progtext button{background:none;border:none;color:var(--navy);font-family:inherit;font-size:15px;cursor:pointer;text-decoration:underline;padding:4px}
+
+  section.block{margin:26px 0}
+  section.block > h2.sec{font-family:"IBM Plex Serif",serif;font-size:29px;font-weight:600;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em;scroll-margin-top:120px}
+  section.block > p.lead{margin:0 0 14px;color:var(--muted);font-size:21px}
+
+  .tldr{background:#fffdf8;border:1px dashed #ecd6ad;border-radius:12px;padding:13px 15px;margin:0 0 15px;font-size:20px}
+  .tldr b{display:block;font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#a4651a;margin-bottom:4px}
+
+  details.step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:12px 0;overflow:hidden;scroll-margin-top:118px;box-shadow:var(--sh-sm)}
+  details.step[open]{box-shadow:0 6px 24px -12px rgba(16,31,61,.28);border-color:#d4dae8}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:var(--tap);user-select:none;-webkit-tap-highlight-color:transparent}
+  summary::-webkit-details-marker{display:none}
+  summary .num{flex:none;min-width:30px;height:30px;padding:0 5px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:18px}
+  details.isdone summary .num{background:var(--ok)}
+  summary .stitle{flex:1;font-weight:600;font-size:22px;line-height:1.3}
+  summary .chev{flex:none;color:var(--muted);transition:transform .2s ease}
+  details[open] summary .chev{transform:rotate(90deg)}
+  summary .dot{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid var(--line)}
+  details.isdone summary .dot{background:var(--ok);border-color:var(--ok)}
+  .body{padding:2px 16px 18px;border-top:1px solid var(--line-soft)}
+  .body > *:first-child{margin-top:14px}
+  .body p{margin:0 0 12px}
+  p.do{margin:0 0 12px}
+  .body ul,.body ol{margin:0 0 12px;padding-left:22px}.body li{margin:0 0 8px}
+  ol.steps2{counter-reset:s2;list-style:none;padding-left:0}
+  ol.steps2 > li{position:relative;padding:2px 0 10px 40px;margin:0}
+  ol.steps2 > li::before{counter-increment:s2;content:counter(s2);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:8px;background:var(--navy-tint);color:var(--navy);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;display:grid;place-items:center;border:1px solid #dbe3f5}
+
+  dl.props{margin:0 0 13px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  dl.props > div{display:grid;grid-template-columns:210px 1fr;border-top:1px solid var(--line-soft)}
+  dl.props > div:first-child{border-top:none}
+  dl.props dt{background:#f7f9fc;padding:9px 12px;font-family:"IBM Plex Mono",monospace;font-size:18px;color:var(--navy);font-weight:500;border-right:1px solid var(--line-soft)}
+  dl.props dd{margin:0;padding:9px 12px;font-size:20px}
+  dl.props dd code{font-family:"IBM Plex Mono",monospace;font-size:18px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  @media(max-width:430px){dl.props > div{grid-template-columns:130px 1fr}dl.props dt{font-size:15px;padding:8px 9px}dl.props dd{font-size:18px;padding:8px 10px}}
+
+  .fxlabel{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin:0 0 5px;font-weight:500}
+  .fx{position:relative;margin:0 0 13px}
+  .fx code{display:block;background:var(--code-bg);color:var(--code-text);font-family:"IBM Plex Mono",monospace;font-size:18px;line-height:1.55;padding:14px 84px 14px 16px;border-radius:11px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #1c3360}
+  .fx .copy{position:absolute;top:8px;right:8px;height:34px;min-width:34px;padding:0 11px;border:none;border-radius:8px;background:rgba(224,138,30,.95);color:#1b1206;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .fx .copy:active{transform:scale(.96)}
+  .fx .copy.copied{background:var(--ok);color:#fff}
+  .fxgroup{border:1px solid var(--line);border-radius:12px;padding:12px 13px 2px;margin:0 0 14px;background:#fcfdff}
+  .fxgroup > .gh{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;color:var(--navy);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .fxgroup > .gh::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--amber)}
+
+  .pane{background:#f4f6fb;border:1px solid #dbe2f1;border-left:4px solid var(--navy);border-radius:11px;padding:12px 14px;margin:0 0 13px}
+  .pane > .ph{font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);font-weight:600;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .pane > .ph::before{content:"\2699";font-size:16px;line-height:1}
+  .pane ol,.pane ul{margin:0;padding-left:20px}.pane li{margin:0 0 6px;font-size:19px}
+  .pane p{margin:0 0 8px;font-size:19px}
+  .pane code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#e7ecf7;color:var(--navy);padding:1px 6px;border-radius:5px}
+
+  .note{border-radius:11px;padding:12px 14px;margin:0 0 13px;font-size:20px;border:1px solid;line-height:1.55}
+  .note b{display:block;font-size:17px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;font-family:"IBM Plex Mono",monospace}
+  .note.why{background:#eef2fb;border-color:#d5def3;color:#23365e}.note.why b{color:var(--navy)}
+  .note.warn{background:#fbe8cd33;border-color:var(--amber-soft);color:#6b4410}.note.warn b{color:#a4651a}
+  .note.tip{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.tip b{color:var(--ok)}
+  .note.check{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.check b{color:var(--ok)}
+  .note.check b::before{content:"✅ ";}
+  .note code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px}
+
+  /* tap-to-copy chips: every code chip outside a dark .fx box is copyable */
+  code.cc{cursor:copy;position:relative;-webkit-tap-highlight-color:transparent}
+  code.cc::after{content:"⧉";font-size:.78em;margin-left:5px;opacity:.55}
+  code.cc.copied{background:var(--ok) !important;color:#fff !important}
+  code.cc.copied::after{content:"✓";opacity:1}
+
+  .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
+  .done:active{background:var(--line-soft)}
+  details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  table.cols{width:100%;border-collapse:collapse;margin:0 0 13px;background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:19px}
+  table.cols th,table.cols td{border-top:1px solid var(--line-soft);padding:8px 11px;text-align:left;vertical-align:top}
+  table.cols tr:first-child th{border-top:none}
+  table.cols th{background:#f7f9fc;font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  table.cols td:first-child{font-weight:600;white-space:nowrap}
+  table.cols code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:0 0 13px}
+  .tablewrap table.cols{margin:0}
+
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 13px}
+  .flow .fnode{border:1.5px solid var(--navy);border-radius:10px;padding:7px 11px;background:var(--navy-tint);font-size:17px;font-weight:600;color:var(--navy);text-align:center;line-height:1.35}
+  .flow .fnode small{display:block;font-weight:400;color:var(--muted);font-size:15px}
+  .flow .fnode.hot{border-color:var(--amber);background:#fdf6ea;color:#8a5200}
+  .flow .farrow{color:var(--faint);font-size:20px}
+
+  footer{margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:18px;text-align:center;line-height:1.6}
+  footer a{color:var(--navy);font-weight:600}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;scroll-behavior:auto !important}}
 </style>
 </head>
 <body>
-<div class="page">
 
-<header class="hero">
-  <h1>IBD Client Contact Repository — Power Apps Build Guide</h1>
-  <p>View-only canvas app over SharePoint · Sponsor: Head of Credit Assessment · Owner: BMO · Spec v3.0</p>
+<header class="mast">
+  <div class="wrap mast-inner">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="46" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="16" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/>
+        <path d="M17 20h14M17 25h14M17 30h9" stroke="rgba(224,138,30,.95)" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="mast-copy">
+      <p class="kicker">IBD · Client Contact Repository · Build guide</p>
+      <h1>One search, every contact</h1>
+      <p class="sub">A <strong>view-only</strong> canvas app over the four SharePoint lists: type a RIM or borrower name, get the borrower's card and every operational contact grouped by communication purpose. The Master List of Exposures stays the single source of truth — the app reads, never writes. <strong>Every step is self-contained</strong>, and every name and formula has a copy button.</p>
+      <div class="meta">
+        <span><b>4</b> lists (already built)</span>
+        <span><b>1</b> screen</span>
+        <span><b>15</b> steps</span>
+        <span>view-only · no flows</span>
+        <span>then publish 🎉</span>
+      </div>
+    </div>
+  </div>
 </header>
 
-<nav class="toc">
-  <h2>Contents</h2>
-  <ol>
-    <li><a href="#sec-1">Overview &amp; architecture</a></li>
-    <li><a href="#sec-2">Prerequisites &amp; verify your columns</a></li>
-    <li><a href="#sec-3">Create the app</a></li>
-    <li><a href="#sec-4">Connect the data</a></li>
-    <li><a href="#sec-5">Build the layout</a></li>
-    <li><a href="#sec-6">Search panel</a></li>
-    <li><a href="#sec-7">Borrower info card</a></li>
-    <li><a href="#sec-8">Contacts grouped by purpose</a></li>
-    <li><a href="#sec-9">Polish</a></li>
-    <li><a href="#sec-10">Test checklist</a></li>
-    <li><a href="#sec-11">Publish &amp; share</a></li>
-  </ol>
-</nav>
+<div class="sticky">
+  <div class="wrap">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="progtext"><span id="progLabel">0 of 15 steps done</span><button id="reset" type="button">Reset</button></div>
+  </div>
+</div>
 
-<section class="section" id="sec-1">
-  <h2>1 · Overview &amp; architecture</h2>
-  <p>You are building a <strong>view-only</strong> Power Apps canvas app that lets IBD staff
-  find a borrower by RIM or name and instantly see every operational contact for that
-  borrower, grouped by communication purpose (audit confirmations, legal notices, daily
-  transaction advices, and so on).</p>
-  <p>The core design principle from the specification: <strong>the Master List of Exposures
-  remains the single source of truth for borrower information.</strong> The app reads it,
-  never writes it, and never duplicates borrower data anywhere else.</p>
-  <div class="diagram">
-    <div class="node master">Master List of Exposures<small>existing borrower master (read-only)</small></div>
-    <div class="arrow">→</div>
-    <div class="node">Contact Communication Matrix<small>who · for which borrower · for what purpose</small></div>
-    <div class="arrow">←</div>
-    <div class="node">Borrower Contact Directory<small>people &amp; their details</small></div>
-  </div>
-  <div class="diagram">
-    <div class="node">Communication Purpose Master<small>drives the grouping</small></div>
-    <div class="arrow">→</div>
-    <div class="node master">Power Apps front end<small>single screen · search → detail</small></div>
-  </div>
-  <p>The app is a single screen: a search panel on the left, and on the right a borrower
-  info card above the borrower's contacts grouped by purpose. Because the purpose
-  grouping is driven by the <em>Communication Purpose Master</em> list rather than
-  hard-coded, new purposes — and new Wholesale Banking units later — appear in the app
-  with zero redesign.</p>
-  <div class="callout">This guide contains no Power Automate steps and no data-entry
-  screens: contacts and matrix rows are maintained directly in SharePoint by the BMO
-  team. The app is strictly for finding and viewing.</div>
-</section>
+<main class="wrap">
 
-<section class="section" id="sec-2">
-  <h2>2 · Prerequisites &amp; verify your columns</h2>
-  <h3>What you need before starting</h3>
-  <ul>
-    <li>A Power Apps license that allows SharePoint connections (standard Microsoft 365 is enough — no premium connectors are used).</li>
-    <li><strong>Read access</strong> to the BMO SharePoint site: <code>https://bbkonline.sharepoint.com/sites/BMO</code>.</li>
-    <li>The four lists below already created on that site, with at least a few rows of real or sample data in each (you cannot verify the app against empty lists).</li>
-  </ul>
-  <div class="callout warn"><strong>Do this step — do not skip it.</strong> Every formula
-  in this guide uses the column names from the specification document. If your real
-  SharePoint columns are named differently, the formulas will error until you substitute
-  your names. Names marked with an <span class="verify">verify</span> chip throughout the
-  guide are the ones to check. To see a column's real name: open the list in SharePoint
-  → gear icon → <em>List settings</em> → click the column → the <code>Field=</code> part
-  of the URL is the internal name. In Power Apps formulas you use the
-  <em>display name</em>, wrapped in single quotes if it contains spaces.</div>
-  <h3>Column verification checklist</h3>
-  <table class="checklist-table">
-    <tr><th>List</th><th>Column the guide assumes</th><th>Assumed type</th><th>Your actual name</th></tr>
-    <tr><td rowspan="2">Master List of Exposures</td><td>Title <em>(borrower name)</em></td><td>Single line of text</td><td></td></tr>
-    <tr><td>Borrower RIM</td><td>Single line of text <em>or</em> Number — Section 6 gives a formula for each</td><td></td></tr>
-    <tr><td rowspan="8">Borrower Contact Directory</td><td>Title <em>(contact full name)</em></td><td>Single line of text</td><td></td></tr>
-    <tr><td>Contact Email</td><td>Single line of text</td><td></td></tr>
-    <tr><td>Mobile Number</td><td>Single line of text</td><td></td></tr>
-    <tr><td>Office Number</td><td>Single line of text</td><td></td></tr>
-    <tr><td>Job Title</td><td>Single line of text</td><td></td></tr>
-    <tr><td>Active Status</td><td>Yes/No <em>or</em> Choice — Section 8 gives a formula for each</td><td></td></tr>
-    <tr><td>Preferred Language</td><td>Choice</td><td></td></tr>
-    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
-    <tr><td>Communication Purpose Master</td><td>Title <em>(purpose name — six seeded values: Audit Confirmations, Daily Transaction Advices, Legal Notices, Facility Documentation, Covenant Reporting, Business Matters)</em></td><td>Single line of text</td><td></td></tr>
-    <tr><td rowspan="4">Contact Communication Matrix</td><td>Borrower RIM</td><td>Lookup → Master List of Exposures — Section 6 notes the plain-text alternative</td><td></td></tr>
-    <tr><td>Contact</td><td>Lookup → Borrower Contact Directory</td><td></td></tr>
-    <tr><td>Purpose</td><td>Choice <em>or</em> Lookup → Communication Purpose Master (both work with the guide's formulas)</td><td></td></tr>
-    <tr><td>Notes</td><td>Multiple lines of text</td><td></td></tr>
-  </table>
-  <p>Print or copy this table and fill in the <em>Your actual name</em> column now.
-  Wherever a name differs, substitute yours when pasting formulas later.</p>
-</section>
+  <section class="block" id="intro">
+    <h2 class="sec">Read this first</h2>
+    <div class="note why"><b>What you're building</b>Single screen, master-detail: a search panel on the left, borrower card and purpose-grouped contacts on the right. The grouping is driven by the <em>Communication Purpose Master</em> list — not hard-coded — so new purposes (and new Wholesale Banking units later) appear in the app with <strong>zero redesign</strong>. No Power Automate, no data entry: contacts and matrix rows are maintained directly in SharePoint by the BMO team.</div>
+    <div class="flow" aria-hidden="true">
+      <div class="fnode hot">Master List of Exposures<small>borrower truth · read-only</small></div>
+      <div class="farrow">→</div>
+      <div class="fnode">Contact Communication Matrix<small>who · which borrower · what purpose</small></div>
+      <div class="farrow">←</div>
+      <div class="fnode">Borrower Contact Directory<small>people &amp; details</small></div>
+      <div class="farrow">＋</div>
+      <div class="fnode">Communication Purpose Master<small>drives the grouping</small></div>
+      <div class="farrow">→</div>
+      <div class="fnode hot">Power Apps front end<small>this guide</small></div>
+    </div>
+    <div class="note warn"><b>Column names are from the spec — verify before pasting</b>Every formula on this page uses the specification's list and column names. Your real SharePoint columns may differ. Step V1 is the verification pass — do it first, and wherever a name differs, substitute yours when pasting. Formulas that depend on a column's <em>type</em> come in two variants with the right one to pick.</div>
+    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> is tap-to-copy — the ⧉ mark is the reminder. Paste, never retype.</div>
+  </section>
 
-<section class="section" id="sec-3">
-  <h2>3 · Create the app</h2>
-  <div class="step"><h4><span class="n">1</span>Start a blank tablet app</h4>
-    <p>Go to <code>make.powerapps.com</code> → make sure you are in the environment your
-    client uses → <em>Create</em> → <em>Blank app</em> → <em>Blank canvas app</em>.
-    Name it <code>IBD Client Contact Repository</code> and choose <strong>Tablet</strong>
-    format → <em>Create</em>.</p>
-    <div class="checkpoint">Power Apps Studio open on an empty screen called <code>Screen1</code>.</div>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Rename the screen</h4>
-    <p>In the left <em>Tree view</em>, double-click <code>Screen1</code> and rename it to
-    <code>scrMain</code>.</p>
-    <div class="checkpoint"><code>scrMain</code> at the top of the tree view.</div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Set app settings</h4>
-    <p><em>Settings</em> (gear) → <em>Display</em> → turn <strong>Scale to fit</strong> off and
-    <strong>Lock aspect ratio</strong> off, so the container layout resizes with the window.
-    Close settings and save the app (Ctrl+S).</p>
-    <div class="checkpoint">App saved; title bar shows <em>IBD Client Contact Repository</em>.</div>
-  </div>
-</section>
+  <section class="block" id="phase0">
+    <h2 class="sec">Phase 0 — Before you build</h2>
 
-<section class="section" id="sec-4">
-  <h2>4 · Connect the data</h2>
-  <div class="step"><h4><span class="n">1</span>Add the SharePoint connection</h4>
-    <p>Left rail → <em>Data</em> → <em>Add data</em> → search <code>SharePoint</code> →
-    choose the SharePoint connector (sign in if prompted).</p>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Pick the site and the four lists</h4>
-    <p>Paste the site URL <code>https://bbkonline.sharepoint.com/sites/BMO</code> →
-    <em>Connect</em> → tick exactly these four lists → <em>Connect</em>:</p>
-    <ul>
-      <li>Master List of Exposures</li>
-      <li>Borrower Contact Directory</li>
-      <li>Communication Purpose Master</li>
-      <li>Contact Communication Matrix</li>
-    </ul>
-    <div class="checkpoint">All four lists under <em>Data</em> in the left rail.</div>
-    <div class="callout">If a list is missing from the picker, it doesn't exist on this
-    site under that name — go back to the Section 2 checklist before continuing.</div>
-  </div>
-</section>
+    <details class="step" id="v1" open>
+      <summary><span class="dot"></span><span class="num">V1</span><span class="stitle">Verify the four lists and their columns</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">You need <strong>read access</strong> to the BMO site — <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> — and the four lists below already on it, each with a few rows of real or sample data (you can't verify the app against empty lists). A standard Microsoft 365 license is enough; nothing here is premium.</p>
+        <p class="do">For each list: open it in SharePoint → gear icon → <strong>List settings</strong> → compare the columns against this table. In Power Apps formulas you use the <em>display name</em>, wrapped in single quotes when it contains spaces.</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>List</th><th>Column</th><th>Type the guide assumes</th></tr>
+          <tr><td rowspan="2">Master List of Exposures</td><td>Title <em>(borrower name)</em></td><td>Single line of text</td></tr>
+          <tr><td>Borrower RIM</td><td>Text <em>or</em> Number — S4 has a formula for each</td></tr>
+          <tr><td rowspan="8">Borrower Contact Directory</td><td>Title <em>(contact full name)</em></td><td>Single line of text</td></tr>
+          <tr><td>Contact Email</td><td>Single line of text</td></tr>
+          <tr><td>Mobile Number</td><td>Single line of text</td></tr>
+          <tr><td>Office Number</td><td>Single line of text</td></tr>
+          <tr><td>Job Title</td><td>Single line of text</td></tr>
+          <tr><td>Active Status</td><td>Yes/No <em>or</em> Choice — S9 has a formula for each</td></tr>
+          <tr><td>Preferred Language</td><td>Choice</td></tr>
+          <tr><td>Notes</td><td>Multiple lines of text</td></tr>
+          <tr><td>Communication Purpose Master</td><td>Title <em>(purpose name)</em></td><td>Text — seeded with the six purposes: Audit Confirmations, Daily Transaction Advices, Legal Notices, Facility Documentation, Covenant Reporting, Business Matters</td></tr>
+          <tr><td rowspan="3">Contact Communication Matrix</td><td>Borrower RIM</td><td>Lookup → Master List of Exposures (S5 has the plain-text alternative)</td></tr>
+          <tr><td>Contact</td><td>Lookup → Borrower Contact Directory</td></tr>
+          <tr><td>Purpose</td><td>Choice <em>or</em> Lookup → Purpose Master — both work as-is</td></tr>
+        </table></div>
+        <div class="note check"><b>Check before moving on</b>All four lists exist under those names, every column above is accounted for (yours or the spec's), and you've noted every name that differs so you can substitute it when pasting.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
 
-<section class="section" id="sec-5">
-  <h2>5 · Build the layout</h2>
-  <p>The whole screen is built from auto-layout containers, so it resizes cleanly.
-  Structure: a vertical root → header bar on top → horizontal body → left (search)
-  and right (detail) panels.</p>
-  <div class="step"><h4><span class="n">1</span>Root container</h4>
-    <p>With <code>scrMain</code> selected: <em>Insert</em> → <em>Layout</em> →
-    <em>Vertical container</em>. Rename it <code>conRoot</code> and set:</p>
-    <div class="formula"><div class="prop">conRoot — X / Y / Width / Height</div>
-    <pre><code>X: 0        Y: 0
-Width:  Parent.Width
-Height: Parent.Height</code></pre></div>
-    <p>In the right-hand panel set <em>Gap</em> to <code>0</code> and padding on all sides to <code>0</code>.</p>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Header bar</h4>
-    <p>Inside <code>conRoot</code>: <em>Insert</em> → <em>Horizontal container</em>, rename
-    <code>conHeader</code>. Set <em>Flexible height</em> off and <code>Height: 64</code>.
-    Set its Fill to the bank's red:</p>
-    <div class="formula"><div class="prop">conHeader — Fill</div>
-    <pre><code>RGBA(176, 17, 22, 1)</code></pre></div>
-    <p>Inside it insert a <em>Text label</em>, rename <code>lblAppTitle</code>, set
-    <code>Text: "IBD Client Contact Repository"</code>, font size <code>18</code>, bold,
-    color white, vertical align center.</p>
-    <div class="checkpoint">A red bar across the top with the app title in white.</div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Body and the two panels</h4>
-    <p>Inside <code>conRoot</code> (below the header): <em>Insert</em> →
-    <em>Horizontal container</em>, rename <code>conBody</code>, leave <em>Flexible height</em>
-    on so it fills the rest of the screen. Set <em>Gap</em> to <code>12</code> and padding
-    <code>12</code> on all sides. Inside <code>conBody</code> insert two
-    <em>Vertical containers</em>:</p>
-    <ul>
-      <li><code>conLeft</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>1</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>8</code>, padding <code>12</code>.</li>
-      <li><code>conRight</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>2</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>12</code>, padding <code>16</code>.</li>
-    </ul>
-    <div class="checkpoint">A white ⅓-width panel on the left and ⅔-width panel on the
-    right, on a light-grey background, red bar on top. Nothing in the panels yet.</div>
-  </div>
-  <div class="step"><h4><span class="n">4</span>Save</h4><p>Ctrl+S.</p></div>
-</section>
+  <section class="block" id="phase1">
+    <h2 class="sec">Phase 1 — Foundation</h2>
+    <p class="lead">A blank tablet app, the four connections, and the container skeleton everything else sits in.</p>
 
-<section class="section" id="sec-6">
-  <h2>6 · Search panel</h2>
-  <div class="step"><h4><span class="n">1</span>Search box</h4>
-    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Text input</em> (modern).
-    Rename <code>txtSearch</code>. Set <code>Placeholder</code> (or HintText on classic):
-    <code>"Search by RIM or borrower name"</code>. Set <em>Flexible height</em> off.</p>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Borrower results gallery</h4>
-    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank
-    layout). Rename <code>galBorrowers</code>, turn <em>Flexible height</em> on so it
-    fills the panel. Set its Items — this is the delegable search that stays fast at any
-    list size:</p>
-    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(RIM stored as text <span class="verify">verify</span>)</div>
-    <pre><code>Filter('Master List of Exposures',
+    <details class="step" id="s1">
+      <summary><span class="dot"></span><span class="num">S1</span><span class="stitle">Create the app</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Go to <code class="cc">make.powerapps.com</code> → check you're in the client's environment (top-right) → <strong>Create</strong> → <strong>Blank app</strong> → <strong>Blank canvas app</strong>.</li>
+          <li>Name: <code class="cc">IBD Client Contact Repository</code> · Format: <strong>Tablet</strong> → <strong>Create</strong>.</li>
+          <li>Tree view → double-click <code class="cc">Screen1</code> → rename to <code class="cc">scrMain</code>.</li>
+          <li>Settings (gear) → <strong>Display</strong> → turn <strong>Scale to fit</strong> off and <strong>Lock aspect ratio</strong> off, so the layout resizes with the window. Save (Ctrl+S).</li>
+        </ol>
+        <div class="note check"><b>Check before moving on</b>Studio open on an empty screen named <code>scrMain</code>, app saved under the right name.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s2">
+      <summary><span class="dot"></span><span class="num">S2</span><span class="stitle">Connect the four lists</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Left rail → <strong>Data</strong> → <strong>Add data</strong> → search <code class="cc">SharePoint</code> → pick the SharePoint connector (sign in if asked).</li>
+          <li>Paste the site URL: <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → <strong>Connect</strong>.</li>
+          <li>Tick exactly four lists: <code class="cc">Master List of Exposures</code> · <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code> → <strong>Connect</strong>.</li>
+        </ol>
+        <div class="note warn"><b>A list missing from the picker?</b>Then it doesn't exist on this site under that name — go back to V1 before continuing.</div>
+        <div class="note check"><b>Check before moving on</b>All four lists listed under Data in the left rail.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s3">
+      <summary><span class="dot"></span><span class="num">S3</span><span class="stitle">Build the container skeleton</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Auto-layout containers so the screen resizes cleanly: a vertical root, header bar on top, then a horizontal body split into the search panel (left) and the detail panel (right).</p>
+        <p class="do"><strong>a) Root.</strong> With <code class="cc">scrMain</code> selected: <strong>Insert</strong> → <strong>Layout</strong> → <strong>Vertical container</strong> → rename <code class="cc">conRoot</code>.</p>
+        <dl class="props">
+          <div><dt>X · Y</dt><dd><code>0</code> · <code>0</code></dd></div>
+          <div><dt>Width</dt><dd><code>Parent.Width</code></dd></div>
+          <div><dt>Height</dt><dd><code>Parent.Height</code></dd></div>
+          <div><dt>Gap · Padding</dt><dd><code>0</code> · <code>0</code> all sides</dd></div>
+        </dl>
+        <p class="do"><strong>b) Header bar.</strong> Inside <code class="cc">conRoot</code>: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conHeader</code>. Flexible height <strong>off</strong>, Height <code class="cc">64</code>. Set its Fill:</p>
+        <p class="fxlabel">conHeader · Fill</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(31, 59, 110, 1)</code></div>
+        <p class="do">Inside it insert a <strong>Text label</strong> → rename <code class="cc">lblAppTitle</code> → Text <code class="cc">"IBD Client Contact Repository"</code>, font size 18, bold, white, vertically centered.</p>
+        <p class="do"><strong>c) Body and the two panels.</strong> Inside <code class="cc">conRoot</code>, below the header: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conBody</code>. Leave Flexible height <strong>on</strong>; Gap <code class="cc">12</code>; padding <code class="cc">12</code> all sides. Then insert two <strong>Vertical containers</strong> inside <code class="cc">conBody</code>:</p>
+        <dl class="props">
+          <div><dt>conLeft</dt><dd>Flexible width on · Fill portions <code>1</code> · Fill <code>RGBA(255,255,255,1)</code> · Gap <code>8</code> · padding <code>12</code></dd></div>
+          <div><dt>conRight</dt><dd>Flexible width on · Fill portions <code>2</code> · Fill <code>RGBA(255,255,255,1)</code> · Gap <code>12</code> · padding <code>16</code></dd></div>
+        </dl>
+        <div class="note check"><b>Check before moving on</b>A navy bar across the top with the white app title, a white ⅓-width panel left and ⅔-width panel right on a light-grey background. Both panels empty. Save.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="phase2">
+    <h2 class="sec">Phase 2 — The search panel</h2>
+    <p class="lead">Delegable search over the Master List, and the selection that powers everything on the right.</p>
+
+    <details class="step" id="s4">
+      <summary><span class="dot"></span><span class="num">S4</span><span class="stitle">Search box &amp; borrower list</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) The search box.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Text input</strong> → rename <code class="cc">txtSearch</code>. Flexible height off. Set the hint:</p>
+        <p class="fxlabel">txtSearch · Placeholder (HintText on classic)</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"Search by RIM or borrower name"</code></div>
+        <p class="do"><strong>b) The results list.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename <code class="cc">galBorrowers</code> → Flexible height <strong>on</strong>. Set Items — delegable <code>StartsWith</code>, so it stays fast past 500/2000 rows:</p>
+        <p class="fxlabel">galBorrowers · Items — if Borrower RIM is TEXT</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Master List of Exposures',
     StartsWith(Title, txtSearch.Text)
-    || StartsWith('Borrower RIM', txtSearch.Text))</code></pre></div>
-    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(use this instead if RIM is a Number column)</div>
-    <pre><code>Filter('Master List of Exposures',
+    || StartsWith('Borrower RIM', txtSearch.Text))</code></div>
+        <p class="fxlabel">galBorrowers · Items — if Borrower RIM is a NUMBER</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Master List of Exposures',
     StartsWith(Title, txtSearch.Text)
-    || (IsNumeric(txtSearch.Text) &amp;&amp; 'Borrower RIM' = Value(txtSearch.Text)))</code></pre></div>
-    <p>Inside the gallery template add two labels: borrower name
-    (<code>Text: ThisItem.Title</code>, bold) and RIM
-    (<code>Text: "RIM: " &amp; ThisItem.'Borrower RIM'</code>, smaller, grey).</p>
-    <div class="checkpoint">Typing in the search box live-filters the borrower list.</div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Selection loads the contact matrix</h4>
-    <p>Set <code>galBorrowers.OnSelect</code>. This stores the selected borrower and pulls
-    <em>only that borrower's</em> matrix rows into a local collection, enriched with the
-    full contact record — one server call per selection, so the nested galleries in
-    Section 8 never query SharePoint:</p>
-    <div class="formula"><div class="prop">galBorrowers — OnSelect</div>
-    <pre><code>Set(varBorrower, ThisItem);
+    || (IsNumeric(txtSearch.Text) &amp;&amp; 'Borrower RIM' = Value(txtSearch.Text)))</code></div>
+        <p class="do"><strong>c) The row template.</strong> Inside the gallery template add two labels — name on top, RIM under it:</p>
+        <p class="fxlabel">Label 1 (bold) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.Title</code></div>
+        <p class="fxlabel">Label 2 (smaller, grey) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; ThisItem.'Borrower RIM'</code></div>
+        <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name and by RIM.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s5">
+      <summary><span class="dot"></span><span class="num">S5</span><span class="stitle">Selection loads that borrower's contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">One paste. It remembers the selected borrower, then pulls <em>only that borrower's</em> matrix rows into a local collection — each row enriched with the full contact record. One server call per selection; the nested galleries later never touch SharePoint.</p>
+        <p class="fxlabel">galBorrowers · OnSelect</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem);
 Set(varLoading, true);
 ClearCollect(colMatrix,
     AddColumns(
@@ -285,186 +318,254 @@ ClearCollect(colMatrix,
         ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
     )
 );
-Set(varLoading, false)</code></pre></div>
-    <div class="callout"><strong>If your Matrix stores RIM as plain text</strong> instead of
-    a Lookup <span class="verify">verify</span>, replace the Filter condition with
-    <code>'Borrower RIM' = varBorrower.'Borrower RIM'</code>.</div>
-  </div>
-  <div class="step"><h4><span class="n">4</span>Empty-search state</h4>
-    <p>Insert a <em>Text label</em> into <code>conLeft</code> below the gallery, rename
-    <code>lblNoResults</code>, <code>Text: "No borrowers found"</code>, grey, centered.</p>
-    <div class="formula"><div class="prop">lblNoResults — Visible</div>
-    <pre><code>!IsBlank(txtSearch.Text) &amp;&amp; CountRows(galBorrowers.AllItems) = 0</code></pre></div>
-    <div class="checkpoint">Typing gibberish shows "No borrowers found"; clearing the box hides it.</div>
-  </div>
-</section>
+Set(varLoading, false)</code></div>
+        <div class="note warn"><b>Matrix stores RIM as plain text instead of a lookup?</b>Replace the Filter condition with <code>'Borrower RIM' = varBorrower.'Borrower RIM'</code> — the rest of the paste stays the same.</div>
+        <div class="note why"><b>Why a collection</b>Grouping contacts by purpose needs nested galleries. If those queried SharePoint per row you'd get delegation warnings and a slow app. <code>colMatrix</code> is local, tiny (one borrower's rows), and instant.</div>
+        <div class="note check"><b>Check before moving on</b>Select a borrower in Preview, then File → open the Variables pane: <code>varBorrower</code> holds the record and <code>colMatrix</code> has that borrower's matrix rows.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
 
-<section class="section" id="sec-7">
-  <h2>7 · Borrower info card</h2>
-  <div class="step"><h4><span class="n">1</span>Placeholder before any selection</h4>
-    <p>Select <code>conRight</code> → insert a <em>Text label</em>, rename
-    <code>lblPlaceholder</code>, <code>Text: "Search for a borrower to see their
-    contacts"</code>, grey, size 16, centered.</p>
-    <div class="formula"><div class="prop">lblPlaceholder — Visible</div>
-    <pre><code>IsBlank(varBorrower)</code></pre></div>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Borrower card</h4>
-    <p>Select <code>conRight</code> → insert a <em>Vertical container</em>, rename
-    <code>conBorrowerCard</code>, <em>Flexible height</em> off, <code>Height: 92</code>,
-    Fill <code>RGBA(246, 247, 249, 1)</code>, padding <code>12</code>. Set
-    <code>Visible: !IsBlank(varBorrower)</code>. Inside it add three labels:</p>
-    <div class="formula"><div class="prop">lblBorrowerName — Text (size 20, bold)</div>
-    <pre><code>varBorrower.Title</code></pre></div>
-    <div class="formula"><div class="prop">lblBorrowerRIM — Text (size 13, grey)</div>
-    <pre><code>"RIM: " &amp; varBorrower.'Borrower RIM'</code></pre></div>
-    <div class="formula"><div class="prop">lblBorrowerMeta — Text (size 13, grey)</div>
-    <pre><code>/* Optional: append any other Master List display fields your client wants,
-   e.g. sector or status — read them from varBorrower the same way. */
-""</code></pre></div>
-    <div class="callout">Everything on this card reads from <code>varBorrower</code> — i.e.
-    straight from the Master List of Exposures. Nothing is copied to another list, which
-    is exactly the spec's single-source-of-truth rule.</div>
-    <div class="checkpoint">Selecting a borrower on the left shows their name and RIM on
-    the right; before any selection you see only the placeholder text.</div>
-  </div>
-</section>
+    <details class="step" id="s6">
+      <summary><span class="dot"></span><span class="num">S6</span><span class="stitle">"No borrowers found"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Select <code class="cc">conLeft</code> → Insert → <strong>Text label</strong> below the gallery → rename <code class="cc">lblNoResults</code>.</li>
+          <li>Text <code class="cc">"No borrowers found"</code>, grey, centered.</li>
+          <li>Property dropdown → <strong>Visible</strong> → paste:</li>
+        </ol>
+        <p class="fxlabel">lblNoResults · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(txtSearch.Text) &amp;&amp; CountRows(galBorrowers.AllItems) = 0</code></div>
+        <div class="note check"><b>Check before moving on</b>Gibberish in the search box shows the message; clearing the box hides it.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
 
-<section class="section" id="sec-8">
-  <h2>8 · Contacts grouped by purpose</h2>
-  <p>This is the heart of the app: an outer gallery of purposes, each row containing an
-  inner gallery of that borrower's contacts for that purpose. Both galleries read the
-  local <code>colMatrix</code> collection, so nothing here hits SharePoint.</p>
-  <div class="step"><h4><span class="n">1</span>Loading indicator</h4>
-    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename <code>lblLoading</code>,
-    <code>Text: "Loading contacts…"</code>, grey italic.</p>
-    <div class="formula"><div class="prop">lblLoading — Visible</div>
-    <pre><code>varLoading</code></pre></div>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Outer gallery — purposes</h4>
-    <p>Select <code>conRight</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank),
-    rename <code>galPurposes</code>, <em>Flexible height</em> on. Set
-    <code>Visible: !IsBlank(varBorrower) &amp;&amp; !varLoading</code>. Only purposes
-    that actually have contacts for this borrower appear:</p>
-    <div class="formula"><div class="prop">galPurposes — Items</div>
-    <pre><code>Filter('Communication Purpose Master',
-    CountRows(Filter(colMatrix, Purpose.Value = Title)) &gt; 0)</code></pre></div>
-    <p>Inside the template add a <em>Text label</em>, rename <code>lblPurposeHeader</code>,
-    <code>Text: ThisItem.Title</code>, bold, size 15, with the brand color
-    <code>RGBA(176, 17, 22, 1)</code>.</p>
-    <div class="callout"><code>Purpose.Value</code> works whether the Matrix's Purpose
-    column is a Choice or a Lookup to Communication Purpose Master — both expose the
-    text through <code>.Value</code> <span class="verify">verify</span>.</div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Inner gallery — contacts for that purpose</h4>
-    <p>Inside the <code>galPurposes</code> template, below <code>lblPurposeHeader</code>:
-    <em>Insert</em> → <em>Vertical gallery</em> (blank), rename <code>galContacts</code>.
-    Set its Items to the matrix rows for this purpose, active contacts only:</p>
-    <div class="formula"><div class="prop">galContacts — Items &nbsp;(Active Status is Yes/No <span class="verify">verify</span>)</div>
-    <pre><code>Filter(colMatrix,
+  <section class="block" id="phase3">
+    <h2 class="sec">Phase 3 — The detail panel</h2>
+    <p class="lead">Borrower card on top, then the heart of the app: contacts grouped by purpose.</p>
+
+    <details class="step" id="s7">
+      <summary><span class="dot"></span><span class="num">S7</span><span class="stitle">Placeholder &amp; borrower card</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) Before any selection.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename <code class="cc">lblPlaceholder</code> → Text <code class="cc">"Search for a borrower to see their contacts"</code>, grey, size 16, centered.</p>
+        <p class="fxlabel">lblPlaceholder · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>IsBlank(varBorrower)</code></div>
+        <p class="do"><strong>b) The card.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> → rename <code class="cc">conBorrowerCard</code>. Flexible height off, Height <code class="cc">92</code>, Fill <code class="cc">RGBA(244, 245, 248, 1)</code>, padding <code class="cc">12</code>.</p>
+        <p class="fxlabel">conBorrowerCard · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower)</code></div>
+        <p class="do"><strong>c) Its two labels.</strong> Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere. Add more Master List fields the same way if the client wants them (sector, status…).</p>
+        <p class="fxlabel">lblBorrowerName (size 20, bold) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.Title</code></div>
+        <p class="fxlabel">lblBorrowerRIM (size 13, grey) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; varBorrower.'Borrower RIM'</code></div>
+        <div class="note check"><b>Check before moving on</b>Selecting a borrower shows name + RIM on the right; with nothing selected you see only the placeholder line.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s8">
+      <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">Loading line &amp; the purposes gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) Loading.</strong> In <code class="cc">conRight</code>: Insert → <strong>Text label</strong> → rename <code class="cc">lblLoading</code> → Text <code class="cc">"Loading contacts…"</code>, grey italic.</p>
+        <p class="fxlabel">lblLoading · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>varLoading</code></div>
+        <p class="do"><strong>b) The outer gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank) → rename <code class="cc">galPurposes</code> → Flexible height <strong>on</strong>. Two pastes:</p>
+        <p class="fxlabel">galPurposes · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower) &amp;&amp; !varLoading</code></div>
+        <p class="fxlabel">galPurposes · Items — only purposes that have contacts for this borrower</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Communication Purpose Master',
+    CountRows(Filter(colMatrix, Purpose.Value = Title)) > 0)</code></div>
+        <p class="do"><strong>c) The heading.</strong> Inside the template: Insert → <strong>Text label</strong> → rename <code class="cc">lblPurposeHeader</code> → Text <code class="cc">ThisItem.Title</code>, bold, size 15, color:</p>
+        <p class="fxlabel">lblPurposeHeader · Color</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(31, 59, 110, 1)</code></div>
+        <div class="note why"><b>Choice or lookup — both fine</b><code>Purpose.Value</code> works whether the Matrix's Purpose column is a Choice or a Lookup to the Purpose Master: both expose their text through <code>.Value</code>.</div>
+        <div class="note check"><b>Check before moving on</b>Selecting a borrower with matrix rows shows navy purpose headings — and only the purposes that actually have contacts for that borrower.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s9">
+      <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The contacts inside each purpose</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Inside the <code class="cc">galPurposes</code> template, below <code class="cc">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank) → rename <code class="cc">galContacts</code>. Its Items are the matrix rows for this purpose, active contacts only — pick the variant matching your Active Status column type from V1:</p>
+        <p class="fxlabel">galContacts · Items — if Active Status is YES/NO</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter(colMatrix,
     Purpose.Value = lblPurposeHeader.Text
-    &amp;&amp; ContactRec.'Active Status')</code></pre></div>
-    <div class="formula"><div class="prop">galContacts — Items &nbsp;(use instead if Active Status is a Choice column)</div>
-    <pre><code>Filter(colMatrix,
+    &amp;&amp; ContactRec.'Active Status')</code></div>
+        <p class="fxlabel">galContacts · Items — if Active Status is a CHOICE</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter(colMatrix,
     Purpose.Value = lblPurposeHeader.Text
-    &amp;&amp; ContactRec.'Active Status'.Value = "Active")</code></pre></div>
-    <p>Inside the <code>galContacts</code> template add four labels:</p>
-    <div class="formula"><div class="prop">lblContactName — Text (bold)</div>
-    <pre><code>ThisItem.ContactRec.Title</code></pre></div>
-    <div class="formula"><div class="prop">lblContactJob — Text (grey)</div>
-    <pre><code>ThisItem.ContactRec.'Job Title'</code></pre></div>
-    <div class="formula"><div class="prop">lblContactEmail — Text</div>
-    <pre><code>ThisItem.ContactRec.'Contact Email'</code></pre></div>
-    <div class="formula"><div class="prop">lblContactPhones — Text</div>
-    <pre><code>"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp;
-"  ·  O: " &amp; ThisItem.ContactRec.'Office Number'</code></pre></div>
-    <div class="callout warn">To show inactive contacts greyed-out instead of hiding
-    them: drop the Active Status condition from <code>galContacts.Items</code> and set the
-    labels' Color to <code>If(ContactRec.'Active Status', RGBA(26,31,46,1),
-    RGBA(150,155,165,1))</code>. Decide with the client; hidden is the default here.</div>
-  </div>
-  <div class="step"><h4><span class="n">4</span>Sizing the nested galleries</h4>
-    <p>Set <code>galContacts.Height</code> so each purpose row grows with its contacts, and
-    the outer row template follows:</p>
-    <div class="formula"><div class="prop">galContacts — Height</div>
-    <pre><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></pre></div>
-    <div class="formula"><div class="prop">galPurposes — TemplateSize</div>
-    <pre><code>lblPurposeHeader.Height + galContacts.Height + 16</code></pre></div>
-  </div>
-  <div class="step"><h4><span class="n">5</span>No-contacts state</h4>
-    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename
-    <code>lblNoContacts</code>, <code>Text: "No contacts recorded for this borrower"</code>,
-    grey, centered.</p>
-    <div class="formula"><div class="prop">lblNoContacts — Visible</div>
-    <pre><code>!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></pre></div>
-    <div class="checkpoint">Selecting a borrower with matrix rows shows red purpose
-    headings, each with its contacts beneath (name, job title, email, both numbers).
-    A borrower with no rows shows the no-contacts message instead.</div>
-  </div>
-</section>
+    &amp;&amp; ContactRec.'Active Status'.Value = "Active")</code></div>
+        <p class="do">Then four labels inside the <code class="cc">galContacts</code> template:</p>
+        <p class="fxlabel">lblContactName (bold) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.ContactRec.Title</code></div>
+        <p class="fxlabel">lblContactJob (grey) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.ContactRec.'Job Title'</code></div>
+        <p class="fxlabel">lblContactEmail · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.ContactRec.'Contact Email'</code></div>
+        <p class="fxlabel">lblContactPhones · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp;
+"  ·  O: " &amp; ThisItem.ContactRec.'Office Number'</code></div>
+        <div class="note tip"><b>Want inactive contacts greyed-out instead of hidden?</b>Drop the Active Status condition from Items and set the labels' Color to <code>If(ThisItem.ContactRec.'Active Status', RGBA(27,36,54,1), RGBA(151,161,180,1))</code>. Decide with the client — hidden is the default here.</div>
+        <div class="note check"><b>Check before moving on</b>Each purpose heading now lists its contacts: name, job title, email, both numbers. A contact serving two purposes appears under both.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
 
-<section class="section" id="sec-9">
-  <h2>9 · Polish</h2>
-  <div class="step"><h4><span class="n">1</span>Reset search state cleanly</h4>
-    <p>Set <code>scrMain.OnVisible</code> so reopening the screen starts fresh:</p>
-    <div class="formula"><div class="prop">scrMain — OnVisible</div>
-    <pre><code>Set(varBorrower, Blank());
+    <details class="step" id="s10">
+      <summary><span class="dot"></span><span class="num">S10</span><span class="stitle">Make the nested rows size themselves</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Two pastes so each purpose row grows with its contact count instead of clipping or leaving dead space:</p>
+        <p class="fxlabel">galContacts · Height</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></div>
+        <p class="fxlabel">galPurposes · TemplateSize</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>lblPurposeHeader.Height + galContacts.Height + 16</code></div>
+        <div class="note check"><b>Check before moving on</b>A purpose with one contact takes one row of space; a purpose with four takes four — no clipped rows, no gaps.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s11">
+      <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">"No contacts recorded"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>In <code class="cc">conRight</code>: Insert → <strong>Text label</strong> → rename <code class="cc">lblNoContacts</code>.</li>
+          <li>Text <code class="cc">"No contacts recorded for this borrower"</code>, grey, centered.</li>
+          <li>Property dropdown → <strong>Visible</strong> → paste:</li>
+        </ol>
+        <p class="fxlabel">lblNoContacts · Visible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></div>
+        <div class="note check"><b>Check before moving on</b>A borrower with no matrix rows shows the message; one with rows shows the grouped contacts instead.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="phase4">
+    <h2 class="sec">Phase 4 — Finish &amp; ship</h2>
+
+    <details class="step" id="s12">
+      <summary><span class="dot"></span><span class="num">S12</span><span class="stitle">Polish — clean state &amp; selection highlight</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) Fresh start on every visit.</strong></p>
+        <p class="fxlabel">scrMain · OnVisible</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, Blank());
 Set(varLoading, false);
-Clear(colMatrix)</code></pre></div>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Selected-row highlight</h4>
-    <div class="formula"><div class="prop">galBorrowers — TemplateFill</div>
-    <pre><code>If(ThisItem.ID = varBorrower.ID, RGBA(176, 17, 22, 0.08), RGBA(0,0,0,0))</code></pre></div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Consistent theme</h4>
-    <p>Use <code>RGBA(176, 17, 22, 1)</code> (bank red) only for the header bar, purpose
-    headings, and the selection highlight; body text <code>RGBA(26, 31, 46, 1)</code>;
-    secondary text <code>RGBA(90, 98, 114, 1)</code>. Font: Segoe UI throughout
-    (the default). Resist adding more color — this is a lookup tool.</p>
-  </div>
-</section>
+Clear(colMatrix)</code></div>
+        <p class="do"><strong>b) Show which borrower is selected.</strong></p>
+        <p class="fxlabel">galBorrowers · TemplateFill</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>If(ThisItem.ID = varBorrower.ID, RGBA(31, 59, 110, 0.08), RGBA(0, 0, 0, 0))</code></div>
+        <div class="note tip"><b>Theme discipline</b>Navy <code>RGBA(31,59,110,1)</code> only on the header bar, purpose headings and the highlight; body text <code>RGBA(27,36,54,1)</code>; secondary grey <code>RGBA(91,102,120,1)</code>. Segoe UI throughout (the default). Resist more color — it's a lookup tool.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
 
-<section class="section" id="sec-10">
-  <h2>10 · Test checklist</h2>
-  <p>Run every row before publishing. All must pass.</p>
-  <table class="checklist-table">
-    <tr><th>#</th><th>Action</th><th>Expected result</th><th>Pass?</th></tr>
-    <tr><td>1</td><td>Open the app, type nothing</td><td>Left: full borrower list. Right: "Search for a borrower…" placeholder only</td><td></td></tr>
-    <tr><td>2</td><td>Type a partial borrower name</td><td>List narrows as you type</td><td></td></tr>
-    <tr><td>3</td><td>Type a partial RIM</td><td>Matching borrowers appear</td><td></td></tr>
-    <tr><td>4</td><td>Type gibberish</td><td>"No borrowers found"</td><td></td></tr>
-    <tr><td>5</td><td>Select a borrower with matrix rows</td><td>Card shows name + RIM; contacts grouped under purpose headings; only purposes with contacts appear</td><td></td></tr>
-    <tr><td>6</td><td>Select a borrower with no matrix rows</td><td>"No contacts recorded for this borrower"</td><td></td></tr>
-    <tr><td>7</td><td>Check a contact marked inactive in SharePoint</td><td>Not shown in the app</td><td></td></tr>
-    <tr><td>8</td><td>Check a contact serving two purposes</td><td>Appears under both purpose headings</td><td></td></tr>
-    <tr><td>9</td><td>Switch between two borrowers quickly</td><td>Right panel always matches the selected borrower; no stale contacts</td><td></td></tr>
-    <tr><td>10</td><td>Studio checker (stethoscope icon)</td><td>No delegation warnings on galBorrowers.Items</td><td></td></tr>
-    <tr><td>11</td><td>Add a new purpose row in Communication Purpose Master, link a contact to it, reselect the borrower</td><td>New purpose heading appears — no app change needed</td><td></td></tr>
-  </table>
-</section>
+    <details class="step" id="s13">
+      <summary><span class="dot"></span><span class="num">S13</span><span class="stitle">Test everything</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">F5 from <code class="cc">scrMain</code> and run all eleven. All must pass before publishing:</p>
+        <ul>
+          <li>Open with nothing typed → full borrower list left, placeholder line right.</li>
+          <li>Partial borrower <strong>name</strong> → list narrows as you type.</li>
+          <li>Partial <strong>RIM</strong> → matching borrowers appear.</li>
+          <li>Gibberish → <strong>"No borrowers found"</strong>.</li>
+          <li>Borrower <em>with</em> matrix rows → card + contacts under navy purpose headings; only purposes with contacts show.</li>
+          <li>Borrower <em>without</em> rows → <strong>"No contacts recorded for this borrower"</strong>.</li>
+          <li>A contact marked <strong>inactive</strong> in SharePoint → not shown.</li>
+          <li>A contact serving <strong>two purposes</strong> → appears under both headings.</li>
+          <li>Switch borrowers quickly → the right panel always matches the selection, no stale contacts.</li>
+          <li>App checker (stethoscope) → <strong>no delegation warnings</strong> on <code class="cc">galBorrowers</code>.</li>
+          <li>Add a new purpose in the Purpose Master, link a contact, reselect → the new heading appears with <strong>no app change</strong>.</li>
+        </ul>
+        <div class="note check"><b>Check before moving on</b>Eleven for eleven. Any miss → the step that built that piece has the formula to re-check.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
 
-<section class="section" id="sec-11">
-  <h2>11 · Publish &amp; share</h2>
-  <div class="step"><h4><span class="n">1</span>Publish</h4>
-    <p>File → <em>Save</em> → <em>Publish</em> → <em>Publish this version</em>.</p>
-  </div>
-  <div class="step"><h4><span class="n">2</span>Share with users</h4>
-    <p>Power Apps home → the app's <em>…</em> menu → <em>Share</em> → add the IBD users or
-    their security group as <strong>User</strong> (not Co-owner).</p>
-    <div class="callout warn">Sharing the app does not grant list access. Users also need
-    <strong>Read</strong> permission on all four SharePoint lists — grant it on the BMO
-    site (site or list level). Because the app is view-only, Read is all they need; do
-    not grant Edit.</div>
-  </div>
-  <div class="step"><h4><span class="n">3</span>Hand over</h4>
-    <p>Give the BMO team this guide plus the Section 2 checklist you filled in, so future
-    maintainers know the app's exact column dependencies.</p>
-    <div class="checkpoint">A colleague can open the app from office.com, search a
-    borrower, and read the contacts — without asking you anything.</div>
-  </div>
-</section>
+    <details class="step" id="s14">
+      <summary><span class="dot"></span><span class="num">S14</span><span class="stitle">Publish &amp; share — the victory lap</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>File → <strong>Save</strong> → <strong>Publish</strong> → <strong>Publish this version</strong>.</li>
+          <li>Power Apps home → the app's <strong>⋯</strong> menu → <strong>Share</strong> → add the IBD users or their security group as <strong>User</strong> (not Co-owner).</li>
+          <li>Hand the BMO team this guide plus your filled-in V1 checklist, so future maintainers know the app's exact column dependencies.</li>
+        </ol>
+        <div class="note warn"><b>Sharing the app does not grant list access</b>Users also need <strong>Read</strong> on all four SharePoint lists — grant it on the BMO site. The app is view-only, so Read is all they need; don't grant Edit.</div>
+        <div class="note check"><b>Done</b>A colleague opens the app from office.com, types a RIM, and reads the contacts — without asking you anything. That's the whole job. 🏁</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
 
-<!-- /sections -->
+  <footer>
+    IBD Client Contact Repository — view-only Power Apps over SharePoint · spec v3.0 · Owner: BMO<br>
+    One verification pass, three foundation steps, eight build steps, polish, then test and publish.
+  </footer>
+</main>
 
-</div>
+<script>
+(function(){
+  "use strict";
+  var mem={};
+  var store={
+    get:function(k){try{return localStorage.getItem(k);}catch(e){return (k in mem)?mem[k]:null;}},
+    set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
+    del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
+  };
+  var KEY="ibdContactRepoGuide_v1";
+
+  function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+  function copyText(text,onDone){
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(onDone,function(){fallbackCopy(text);onDone();});}
+    else{fallbackCopy(text);onDone();}
+  }
+  document.querySelectorAll(".fx .copy").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var code=btn.parentElement.querySelector("code");
+      copyText(code?code.textContent:"",function(){
+        btn.classList.add("copied");btn.textContent="✓";
+        setTimeout(function(){btn.classList.remove("copied");btn.textContent="Copy";},1300);
+      });
+    });
+  });
+  document.querySelectorAll("code.cc").forEach(function(chip){
+    chip.setAttribute("title","Tap to copy");
+    chip.addEventListener("click",function(){
+      copyText(chip.textContent,function(){
+        chip.classList.add("copied");
+        setTimeout(function(){chip.classList.remove("copied");},1100);
+      });
+    });
+  });
+
+  var steps=Array.prototype.slice.call(document.querySelectorAll("details.step"));
+  var total=steps.length;
+  var bar=document.getElementById("bar");
+  var label=document.getElementById("progLabel");
+  function loadDone(){var raw=store.get(KEY);if(!raw)return {};try{return JSON.parse(raw)||{};}catch(e){return {};}}
+  function saveDone(obj){store.set(KEY,JSON.stringify(obj));}
+  var doneMap=loadDone();
+  function refreshProgress(){
+    var n=0;
+    steps.forEach(function(d){if(d.classList.contains("isdone"))n++;});
+    bar.style.width=(total?Math.round(n/total*100):0)+"%";
+    label.textContent=n+" of "+total+" steps done";
+  }
+  steps.forEach(function(d){
+    if(doneMap[d.id])d.classList.add("isdone");
+    var btn=d.querySelector(".done");
+    function syncBtn(){btn.textContent=d.classList.contains("isdone")?"✓ Done — tap to undo":"Mark step done";}
+    syncBtn();
+    btn.addEventListener("click",function(){d.classList.toggle("isdone");doneMap[d.id]=d.classList.contains("isdone");saveDone(doneMap);syncBtn();refreshProgress();});
+  });
+  refreshProgress();
+  document.getElementById("reset").addEventListener("click",function(){
+    steps.forEach(function(d){d.classList.remove("isdone");d.querySelector(".done").textContent="Mark step done";});
+    doneMap={};store.del(KEY);refreshProgress();
+  });
+})();
+</script>
 </body>
 </html>
