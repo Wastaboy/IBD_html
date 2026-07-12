@@ -402,6 +402,67 @@ Set(varLoading, false)</code></pre></div>
   </div>
 </section>
 
+<section class="section" id="sec-9">
+  <h2>9 · Polish</h2>
+  <div class="step"><h4><span class="n">1</span>Reset search state cleanly</h4>
+    <p>Set <code>scrMain.OnVisible</code> so reopening the screen starts fresh:</p>
+    <div class="formula"><div class="prop">scrMain — OnVisible</div>
+    <pre><code>Set(varBorrower, Blank());
+Set(varLoading, false);
+Clear(colMatrix)</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Selected-row highlight</h4>
+    <div class="formula"><div class="prop">galBorrowers — TemplateFill</div>
+    <pre><code>If(ThisItem.ID = varBorrower.ID, RGBA(176, 17, 22, 0.08), RGBA(0,0,0,0))</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Consistent theme</h4>
+    <p>Use <code>RGBA(176, 17, 22, 1)</code> (bank red) only for the header bar, purpose
+    headings, and the selection highlight; body text <code>RGBA(26, 31, 46, 1)</code>;
+    secondary text <code>RGBA(90, 98, 114, 1)</code>. Font: Segoe UI throughout
+    (the default). Resist adding more color — this is a lookup tool.</p>
+  </div>
+</section>
+
+<section class="section" id="sec-10">
+  <h2>10 · Test checklist</h2>
+  <p>Run every row before publishing. All must pass.</p>
+  <table class="checklist-table">
+    <tr><th>#</th><th>Action</th><th>Expected result</th><th>Pass?</th></tr>
+    <tr><td>1</td><td>Open the app, type nothing</td><td>Left: full borrower list. Right: "Search for a borrower…" placeholder only</td><td></td></tr>
+    <tr><td>2</td><td>Type a partial borrower name</td><td>List narrows as you type</td><td></td></tr>
+    <tr><td>3</td><td>Type a partial RIM</td><td>Matching borrowers appear</td><td></td></tr>
+    <tr><td>4</td><td>Type gibberish</td><td>"No borrowers found"</td><td></td></tr>
+    <tr><td>5</td><td>Select a borrower with matrix rows</td><td>Card shows name + RIM; contacts grouped under purpose headings; only purposes with contacts appear</td><td></td></tr>
+    <tr><td>6</td><td>Select a borrower with no matrix rows</td><td>"No contacts recorded for this borrower"</td><td></td></tr>
+    <tr><td>7</td><td>Check a contact marked inactive in SharePoint</td><td>Not shown in the app</td><td></td></tr>
+    <tr><td>8</td><td>Check a contact serving two purposes</td><td>Appears under both purpose headings</td><td></td></tr>
+    <tr><td>9</td><td>Switch between two borrowers quickly</td><td>Right panel always matches the selected borrower; no stale contacts</td><td></td></tr>
+    <tr><td>10</td><td>Studio checker (stethoscope icon)</td><td>No delegation warnings on galBorrowers.Items</td><td></td></tr>
+    <tr><td>11</td><td>Add a new purpose row in Communication Purpose Master, link a contact to it, reselect the borrower</td><td>New purpose heading appears — no app change needed</td><td></td></tr>
+  </table>
+</section>
+
+<section class="section" id="sec-11">
+  <h2>11 · Publish &amp; share</h2>
+  <div class="step"><h4><span class="n">1</span>Publish</h4>
+    <p>File → <em>Save</em> → <em>Publish</em> → <em>Publish this version</em>.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Share with users</h4>
+    <p>Power Apps home → the app's <em>…</em> menu → <em>Share</em> → add the IBD users or
+    their security group as <strong>User</strong> (not Co-owner).</p>
+    <div class="callout warn">Sharing the app does not grant list access. Users also need
+    <strong>Read</strong> permission on all four SharePoint lists — grant it on the BMO
+    site (site or list level). Because the app is view-only, Read is all they need; do
+    not grant Edit.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Hand over</h4>
+    <p>Give the BMO team this guide plus the Section 2 checklist you filled in, so future
+    maintainers know the app's exact column dependencies.</p>
+    <div class="checkpoint">A colleague can open the app from office.com, search a
+    borrower, and read the contacts — without asking you anything.</div>
+  </div>
+</section>
+
 <!-- /sections -->
 
 </div>
