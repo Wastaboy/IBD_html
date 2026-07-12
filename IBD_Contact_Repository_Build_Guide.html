@@ -299,6 +299,36 @@ Set(varLoading, false)</code></pre></div>
   </div>
 </section>
 
+<section class="section" id="sec-7">
+  <h2>7 · Borrower info card</h2>
+  <div class="step"><h4><span class="n">1</span>Placeholder before any selection</h4>
+    <p>Select <code>conRight</code> → insert a <em>Text label</em>, rename
+    <code>lblPlaceholder</code>, <code>Text: "Search for a borrower to see their
+    contacts"</code>, grey, size 16, centered.</p>
+    <div class="formula"><div class="prop">lblPlaceholder — Visible</div>
+    <pre><code>IsBlank(varBorrower)</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Borrower card</h4>
+    <p>Select <code>conRight</code> → insert a <em>Vertical container</em>, rename
+    <code>conBorrowerCard</code>, <em>Flexible height</em> off, <code>Height: 92</code>,
+    Fill <code>RGBA(246, 247, 249, 1)</code>, padding <code>12</code>. Set
+    <code>Visible: !IsBlank(varBorrower)</code>. Inside it add three labels:</p>
+    <div class="formula"><div class="prop">lblBorrowerName — Text (size 20, bold)</div>
+    <pre><code>varBorrower.Title</code></pre></div>
+    <div class="formula"><div class="prop">lblBorrowerRIM — Text (size 13, grey)</div>
+    <pre><code>"RIM: " &amp; varBorrower.'Borrower RIM'</code></pre></div>
+    <div class="formula"><div class="prop">lblBorrowerMeta — Text (size 13, grey)</div>
+    <pre><code>/* Optional: append any other Master List display fields your client wants,
+   e.g. sector or status — read them from varBorrower the same way. */
+""</code></pre></div>
+    <div class="callout">Everything on this card reads from <code>varBorrower</code> — i.e.
+    straight from the Master List of Exposures. Nothing is copied to another list, which
+    is exactly the spec's single-source-of-truth rule.</div>
+    <div class="checkpoint">Selecting a borrower on the left shows their name and RIM on
+    the right; before any selection you see only the placeholder text.</div>
+  </div>
+</section>
+
 <!-- /sections -->
 
 </div>
