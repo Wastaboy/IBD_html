@@ -162,6 +162,49 @@
   Wherever a name differs, substitute yours when pasting formulas later.</p>
 </section>
 
+<section class="section" id="sec-3">
+  <h2>3 · Create the app</h2>
+  <div class="step"><h4><span class="n">1</span>Start a blank tablet app</h4>
+    <p>Go to <code>make.powerapps.com</code> → make sure you are in the environment your
+    client uses → <em>Create</em> → <em>Blank app</em> → <em>Blank canvas app</em>.
+    Name it <code>IBD Client Contact Repository</code> and choose <strong>Tablet</strong>
+    format → <em>Create</em>.</p>
+    <div class="checkpoint">Power Apps Studio open on an empty screen called <code>Screen1</code>.</div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Rename the screen</h4>
+    <p>In the left <em>Tree view</em>, double-click <code>Screen1</code> and rename it to
+    <code>scrMain</code>.</p>
+    <div class="checkpoint"><code>scrMain</code> at the top of the tree view.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Set app settings</h4>
+    <p><em>Settings</em> (gear) → <em>Display</em> → turn <strong>Scale to fit</strong> off and
+    <strong>Lock aspect ratio</strong> off, so the container layout resizes with the window.
+    Close settings and save the app (Ctrl+S).</p>
+    <div class="checkpoint">App saved; title bar shows <em>IBD Client Contact Repository</em>.</div>
+  </div>
+</section>
+
+<section class="section" id="sec-4">
+  <h2>4 · Connect the data</h2>
+  <div class="step"><h4><span class="n">1</span>Add the SharePoint connection</h4>
+    <p>Left rail → <em>Data</em> → <em>Add data</em> → search <code>SharePoint</code> →
+    choose the SharePoint connector (sign in if prompted).</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Pick the site and the four lists</h4>
+    <p>Paste the site URL <code>https://bbkonline.sharepoint.com/sites/BMO</code> →
+    <em>Connect</em> → tick exactly these four lists → <em>Connect</em>:</p>
+    <ul>
+      <li>Master List of Exposures</li>
+      <li>Borrower Contact Directory</li>
+      <li>Communication Purpose Master</li>
+      <li>Contact Communication Matrix</li>
+    </ul>
+    <div class="checkpoint">All four lists under <em>Data</em> in the left rail.</div>
+    <div class="callout">If a list is missing from the picker, it doesn't exist on this
+    site under that name — go back to the Section 2 checklist before continuing.</div>
+  </div>
+</section>
+
 <!-- /sections -->
 
 </div>
