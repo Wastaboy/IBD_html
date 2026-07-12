@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IBD Client Contact Repository — Power Apps Build Guide</title>
+<style>
+  :root {
+    --ink: #1a1f2e; --muted: #5a6272; --line: #dfe3ea;
+    --brand: #b01116; /* BBK red */ --brand-dark: #7c0c10;
+    --accent: #0f6cbd; --bg: #f6f7f9; --card: #ffffff;
+    --ok-bg: #e8f5ee; --ok-line: #2e8b57;
+    --warn-bg: #fdf3e0; --warn-line: #c77700;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif;
+         color: var(--ink); background: var(--bg); line-height: 1.55; }
+  .page { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+  header.hero { background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+         color: #fff; border-radius: 12px; padding: 32px 28px; margin-bottom: 24px; }
+  header.hero h1 { margin: 0 0 6px; font-size: 1.7rem; }
+  header.hero p { margin: 0; opacity: .85; }
+  nav.toc { background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 18px 22px; margin-bottom: 28px; }
+  nav.toc h2 { margin: 0 0 10px; font-size: 1.05rem; }
+  nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 40px; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  .section { background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 24px 28px; margin-bottom: 24px; }
+  .section > h2 { margin-top: 0; font-size: 1.3rem; color: var(--brand-dark);
+         border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+  .step { border-left: 3px solid var(--accent); padding: 10px 16px;
+         margin: 16px 0; background: #f9fbfd; border-radius: 0 8px 8px 0; }
+  .step h4 { margin: 0 0 6px; font-size: 1rem; }
+  .step .n { display: inline-block; background: var(--accent); color: #fff;
+         border-radius: 50%; width: 22px; height: 22px; text-align: center;
+         line-height: 22px; font-size: .8rem; margin-right: 8px; }
+  .formula { margin: 12px 0; }
+  .formula .prop { font-size: .8rem; font-weight: 600; color: var(--muted);
+         text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+  .formula pre { background: #101828; color: #e8eef9; padding: 14px 16px;
+         border-radius: 8px; overflow-x: auto; margin: 0; font-size: .88rem; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; }
+  p code, li code, td code { background: #eef1f6; padding: 1px 5px;
+         border-radius: 4px; font-size: .88em; }
+  .checkpoint { background: var(--ok-bg); border-left: 4px solid var(--ok-line);
+         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .checkpoint::before { content: "✓ You should now see: "; font-weight: 700; }
+  .callout { background: #eef4fb; border-left: 4px solid var(--accent);
+         padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .callout.warn { background: var(--warn-bg); border-left-color: var(--warn-line); }
+  .verify { background: var(--warn-bg); border: 1px solid var(--warn-line);
+         color: #8a5200; border-radius: 999px; padding: 0 8px; font-size: .78rem;
+         font-weight: 600; white-space: nowrap; }
+  table.checklist-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  table.checklist-table th, table.checklist-table td { border: 1px solid var(--line);
+         padding: 8px 10px; text-align: left; font-size: .92rem; vertical-align: top; }
+  table.checklist-table th { background: #f0f2f6; }
+  .diagram { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+         justify-content: center; margin: 18px 0; }
+  .diagram .node { border: 2px solid var(--accent); border-radius: 10px;
+         padding: 10px 14px; background: #f4f9ff; font-size: .85rem;
+         font-weight: 600; text-align: center; }
+  .diagram .node small { display: block; font-weight: 400; color: var(--muted); }
+  .diagram .arrow { font-size: 1.3rem; color: var(--muted); }
+  .diagram .node.master { border-color: var(--brand); background: #fdf4f4; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <h1>IBD Client Contact Repository — Power Apps Build Guide</h1>
+  <p>View-only canvas app over SharePoint · Sponsor: Head of Credit Assessment · Owner: BMO · Spec v3.0</p>
+</header>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#sec-1">Overview &amp; architecture</a></li>
+    <li><a href="#sec-2">Prerequisites &amp; verify your columns</a></li>
+    <li><a href="#sec-3">Create the app</a></li>
+    <li><a href="#sec-4">Connect the data</a></li>
+    <li><a href="#sec-5">Build the layout</a></li>
+    <li><a href="#sec-6">Search panel</a></li>
+    <li><a href="#sec-7">Borrower info card</a></li>
+    <li><a href="#sec-8">Contacts grouped by purpose</a></li>
+    <li><a href="#sec-9">Polish</a></li>
+    <li><a href="#sec-10">Test checklist</a></li>
+    <li><a href="#sec-11">Publish &amp; share</a></li>
+  </ol>
+</nav>
+
+<section class="section" id="sec-1">
+  <h2>1 · Overview &amp; architecture</h2>
+  <p>You are building a <strong>view-only</strong> Power Apps canvas app that lets IBD staff
+  find a borrower by RIM or name and instantly see every operational contact for that
+  borrower, grouped by communication purpose (audit confirmations, legal notices, daily
+  transaction advices, and so on).</p>
+  <p>The core design principle from the specification: <strong>the Master List of Exposures
+  remains the single source of truth for borrower information.</strong> The app reads it,
+  never writes it, and never duplicates borrower data anywhere else.</p>
+  <div class="diagram">
+    <div class="node master">Master List of Exposures<small>existing borrower master (read-only)</small></div>
+    <div class="arrow">→</div>
+    <div class="node">Contact Communication Matrix<small>who · for which borrower · for what purpose</small></div>
+    <div class="arrow">←</div>
+    <div class="node">Borrower Contact Directory<small>people &amp; their details</small></div>
+  </div>
+  <div class="diagram">
+    <div class="node">Communication Purpose Master<small>drives the grouping</small></div>
+    <div class="arrow">→</div>
+    <div class="node master">Power Apps front end<small>single screen · search → detail</small></div>
+  </div>
+  <p>The app is a single screen: a search panel on the left, and on the right a borrower
+  info card above the borrower's contacts grouped by purpose. Because the purpose
+  grouping is driven by the <em>Communication Purpose Master</em> list rather than
+  hard-coded, new purposes — and new Wholesale Banking units later — appear in the app
+  with zero redesign.</p>
+  <div class="callout">This guide contains no Power Automate steps and no data-entry
+  screens: contacts and matrix rows are maintained directly in SharePoint by the BMO
+  team. The app is strictly for finding and viewing.</div>
+</section>
+
+<!-- /sections -->
+
+</div>
+</body>
+</html>
