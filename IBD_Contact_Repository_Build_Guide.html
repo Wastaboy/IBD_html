@@ -246,6 +246,59 @@ Height: Parent.Height</code></pre></div>
   <div class="step"><h4><span class="n">4</span>Save</h4><p>Ctrl+S.</p></div>
 </section>
 
+<section class="section" id="sec-6">
+  <h2>6 · Search panel</h2>
+  <div class="step"><h4><span class="n">1</span>Search box</h4>
+    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Text input</em> (modern).
+    Rename <code>txtSearch</code>. Set <code>Placeholder</code> (or HintText on classic):
+    <code>"Search by RIM or borrower name"</code>. Set <em>Flexible height</em> off.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Borrower results gallery</h4>
+    <p>Select <code>conLeft</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank
+    layout). Rename <code>galBorrowers</code>, turn <em>Flexible height</em> on so it
+    fills the panel. Set its Items — this is the delegable search that stays fast at any
+    list size:</p>
+    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(RIM stored as text <span class="verify">verify</span>)</div>
+    <pre><code>Filter('Master List of Exposures',
+    StartsWith(Title, txtSearch.Text)
+    || StartsWith('Borrower RIM', txtSearch.Text))</code></pre></div>
+    <div class="formula"><div class="prop">galBorrowers — Items &nbsp;(use this instead if RIM is a Number column)</div>
+    <pre><code>Filter('Master List of Exposures',
+    StartsWith(Title, txtSearch.Text)
+    || (IsNumeric(txtSearch.Text) &amp;&amp; 'Borrower RIM' = Value(txtSearch.Text)))</code></pre></div>
+    <p>Inside the gallery template add two labels: borrower name
+    (<code>Text: ThisItem.Title</code>, bold) and RIM
+    (<code>Text: "RIM: " &amp; ThisItem.'Borrower RIM'</code>, smaller, grey).</p>
+    <div class="checkpoint">Typing in the search box live-filters the borrower list.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Selection loads the contact matrix</h4>
+    <p>Set <code>galBorrowers.OnSelect</code>. This stores the selected borrower and pulls
+    <em>only that borrower's</em> matrix rows into a local collection, enriched with the
+    full contact record — one server call per selection, so the nested galleries in
+    Section 8 never query SharePoint:</p>
+    <div class="formula"><div class="prop">galBorrowers — OnSelect</div>
+    <pre><code>Set(varBorrower, ThisItem);
+Set(varLoading, true);
+ClearCollect(colMatrix,
+    AddColumns(
+        Filter('Contact Communication Matrix', 'Borrower RIM'.Id = varBorrower.ID),
+        ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
+    )
+);
+Set(varLoading, false)</code></pre></div>
+    <div class="callout"><strong>If your Matrix stores RIM as plain text</strong> instead of
+    a Lookup <span class="verify">verify</span>, replace the Filter condition with
+    <code>'Borrower RIM' = varBorrower.'Borrower RIM'</code>.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Empty-search state</h4>
+    <p>Insert a <em>Text label</em> into <code>conLeft</code> below the gallery, rename
+    <code>lblNoResults</code>, <code>Text: "No borrowers found"</code>, grey, centered.</p>
+    <div class="formula"><div class="prop">lblNoResults — Visible</div>
+    <pre><code>!IsBlank(txtSearch.Text) &amp;&amp; CountRows(galBorrowers.AllItems) = 0</code></pre></div>
+    <div class="checkpoint">Typing gibberish shows "No borrowers found"; clearing the box hides it.</div>
+  </div>
+</section>
+
 <!-- /sections -->
 
 </div>
