@@ -205,6 +205,47 @@
   </div>
 </section>
 
+<section class="section" id="sec-5">
+  <h2>5 · Build the layout</h2>
+  <p>The whole screen is built from auto-layout containers, so it resizes cleanly.
+  Structure: a vertical root → header bar on top → horizontal body → left (search)
+  and right (detail) panels.</p>
+  <div class="step"><h4><span class="n">1</span>Root container</h4>
+    <p>With <code>scrMain</code> selected: <em>Insert</em> → <em>Layout</em> →
+    <em>Vertical container</em>. Rename it <code>conRoot</code> and set:</p>
+    <div class="formula"><div class="prop">conRoot — X / Y / Width / Height</div>
+    <pre><code>X: 0        Y: 0
+Width:  Parent.Width
+Height: Parent.Height</code></pre></div>
+    <p>In the right-hand panel set <em>Gap</em> to <code>0</code> and padding on all sides to <code>0</code>.</p>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Header bar</h4>
+    <p>Inside <code>conRoot</code>: <em>Insert</em> → <em>Horizontal container</em>, rename
+    <code>conHeader</code>. Set <em>Flexible height</em> off and <code>Height: 64</code>.
+    Set its Fill to the bank's red:</p>
+    <div class="formula"><div class="prop">conHeader — Fill</div>
+    <pre><code>RGBA(176, 17, 22, 1)</code></pre></div>
+    <p>Inside it insert a <em>Text label</em>, rename <code>lblAppTitle</code>, set
+    <code>Text: "IBD Client Contact Repository"</code>, font size <code>18</code>, bold,
+    color white, vertical align center.</p>
+    <div class="checkpoint">A red bar across the top with the app title in white.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Body and the two panels</h4>
+    <p>Inside <code>conRoot</code> (below the header): <em>Insert</em> →
+    <em>Horizontal container</em>, rename <code>conBody</code>, leave <em>Flexible height</em>
+    on so it fills the rest of the screen. Set <em>Gap</em> to <code>12</code> and padding
+    <code>12</code> on all sides. Inside <code>conBody</code> insert two
+    <em>Vertical containers</em>:</p>
+    <ul>
+      <li><code>conLeft</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>1</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>8</code>, padding <code>12</code>.</li>
+      <li><code>conRight</code> — <em>Flexible width</em> on, <em>Fill portions</em> <code>2</code>, Fill <code>RGBA(255,255,255,1)</code>, Gap <code>12</code>, padding <code>16</code>.</li>
+    </ul>
+    <div class="checkpoint">A white ⅓-width panel on the left and ⅔-width panel on the
+    right, on a light-grey background, red bar on top. Nothing in the panels yet.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Save</h4><p>Ctrl+S.</p></div>
+</section>
+
 <!-- /sections -->
 
 </div>
