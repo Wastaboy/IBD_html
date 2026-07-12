@@ -329,6 +329,79 @@ Set(varLoading, false)</code></pre></div>
   </div>
 </section>
 
+<section class="section" id="sec-8">
+  <h2>8 · Contacts grouped by purpose</h2>
+  <p>This is the heart of the app: an outer gallery of purposes, each row containing an
+  inner gallery of that borrower's contacts for that purpose. Both galleries read the
+  local <code>colMatrix</code> collection, so nothing here hits SharePoint.</p>
+  <div class="step"><h4><span class="n">1</span>Loading indicator</h4>
+    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename <code>lblLoading</code>,
+    <code>Text: "Loading contacts…"</code>, grey italic.</p>
+    <div class="formula"><div class="prop">lblLoading — Visible</div>
+    <pre><code>varLoading</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">2</span>Outer gallery — purposes</h4>
+    <p>Select <code>conRight</code> → <em>Insert</em> → <em>Vertical gallery</em> (blank),
+    rename <code>galPurposes</code>, <em>Flexible height</em> on. Set
+    <code>Visible: !IsBlank(varBorrower) &amp;&amp; !varLoading</code>. Only purposes
+    that actually have contacts for this borrower appear:</p>
+    <div class="formula"><div class="prop">galPurposes — Items</div>
+    <pre><code>Filter('Communication Purpose Master',
+    CountRows(Filter(colMatrix, Purpose.Value = Title)) &gt; 0)</code></pre></div>
+    <p>Inside the template add a <em>Text label</em>, rename <code>lblPurposeHeader</code>,
+    <code>Text: ThisItem.Title</code>, bold, size 15, with the brand color
+    <code>RGBA(176, 17, 22, 1)</code>.</p>
+    <div class="callout"><code>Purpose.Value</code> works whether the Matrix's Purpose
+    column is a Choice or a Lookup to Communication Purpose Master — both expose the
+    text through <code>.Value</code> <span class="verify">verify</span>.</div>
+  </div>
+  <div class="step"><h4><span class="n">3</span>Inner gallery — contacts for that purpose</h4>
+    <p>Inside the <code>galPurposes</code> template, below <code>lblPurposeHeader</code>:
+    <em>Insert</em> → <em>Vertical gallery</em> (blank), rename <code>galContacts</code>.
+    Set its Items to the matrix rows for this purpose, active contacts only:</p>
+    <div class="formula"><div class="prop">galContacts — Items &nbsp;(Active Status is Yes/No <span class="verify">verify</span>)</div>
+    <pre><code>Filter(colMatrix,
+    Purpose.Value = lblPurposeHeader.Text
+    &amp;&amp; ContactRec.'Active Status')</code></pre></div>
+    <div class="formula"><div class="prop">galContacts — Items &nbsp;(use instead if Active Status is a Choice column)</div>
+    <pre><code>Filter(colMatrix,
+    Purpose.Value = lblPurposeHeader.Text
+    &amp;&amp; ContactRec.'Active Status'.Value = "Active")</code></pre></div>
+    <p>Inside the <code>galContacts</code> template add four labels:</p>
+    <div class="formula"><div class="prop">lblContactName — Text (bold)</div>
+    <pre><code>ThisItem.ContactRec.Title</code></pre></div>
+    <div class="formula"><div class="prop">lblContactJob — Text (grey)</div>
+    <pre><code>ThisItem.ContactRec.'Job Title'</code></pre></div>
+    <div class="formula"><div class="prop">lblContactEmail — Text</div>
+    <pre><code>ThisItem.ContactRec.'Contact Email'</code></pre></div>
+    <div class="formula"><div class="prop">lblContactPhones — Text</div>
+    <pre><code>"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp;
+"  ·  O: " &amp; ThisItem.ContactRec.'Office Number'</code></pre></div>
+    <div class="callout warn">To show inactive contacts greyed-out instead of hiding
+    them: drop the Active Status condition from <code>galContacts.Items</code> and set the
+    labels' Color to <code>If(ContactRec.'Active Status', RGBA(26,31,46,1),
+    RGBA(150,155,165,1))</code>. Decide with the client; hidden is the default here.</div>
+  </div>
+  <div class="step"><h4><span class="n">4</span>Sizing the nested galleries</h4>
+    <p>Set <code>galContacts.Height</code> so each purpose row grows with its contacts, and
+    the outer row template follows:</p>
+    <div class="formula"><div class="prop">galContacts — Height</div>
+    <pre><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></pre></div>
+    <div class="formula"><div class="prop">galPurposes — TemplateSize</div>
+    <pre><code>lblPurposeHeader.Height + galContacts.Height + 16</code></pre></div>
+  </div>
+  <div class="step"><h4><span class="n">5</span>No-contacts state</h4>
+    <p>In <code>conRight</code>, insert a <em>Text label</em>, rename
+    <code>lblNoContacts</code>, <code>Text: "No contacts recorded for this borrower"</code>,
+    grey, centered.</p>
+    <div class="formula"><div class="prop">lblNoContacts — Visible</div>
+    <pre><code>!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></pre></div>
+    <div class="checkpoint">Selecting a borrower with matrix rows shows red purpose
+    headings, each with its contacts beneath (name, job title, email, both numbers).
+    A borrower with no rows shows the no-contacts message instead.</div>
+  </div>
+</section>
+
 <!-- /sections -->
 
 </div>
