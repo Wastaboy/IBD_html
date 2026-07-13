@@ -148,7 +148,7 @@
     <div class="mast-copy">
       <p class="kicker">IBD · Client Contact Repository · Build guide</p>
       <h1>One search, every contact</h1>
-      <p class="sub">A <strong>view-only</strong> canvas app over <strong>one</strong> SharePoint list: type a RIM or borrower name, get the borrower's facility snapshot and everyone on the relationship — the BMO coverage team and the borrower's office contacts — straight from the Master List of Exposures. The app reads, never writes. <strong>Every step is self-contained</strong>, and every name and formula has a copy button.</p>
+      <p class="sub">A <strong>view-only</strong> canvas app over <strong>one</strong> SharePoint list: type a RIM or borrower name, get the borrower's facility snapshot and everyone on the relationship — the BMO coverage team and the borrower's office contacts — straight from the Master List of Exposures. The app reads, never writes. <strong>Every step is self-contained</strong>, and everything — names, formulas, colors, sizes, spacing — has a copy button.</p>
       <div class="meta">
         <span><b>1</b> list (already built)</span>
         <span><b>1</b> screen</span>
@@ -181,7 +181,19 @@
     </div>
     <div class="note tip"><b>Every name and type in this guide is confirmed</b>Column names come from the client's list export, and column <em>types</em> were verified against the live connector schema (from a working app connected to the real list). No either/or formulas left — every paste is the right one. V1 is now just a sanity pass.</div>
     <div class="note why"><b>Where did the four-list design go?</b>The v3 spec designed three more lists (Borrower Contact Directory, Communication Purpose Master, Contact Communication Matrix) for per-purpose external contacts. The client's real site keeps all contact data as <em>columns on the Master List</em>, so this guide builds on what exists. If those three lists ever get created and populated, the four-list version of this guide is preserved in the project's git history as the phase-2 design.</div>
-    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> is tap-to-copy — the ⧉ mark is the reminder. Paste, never retype.</div>
+    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> — including every size, color and spacing value in the property tables — is tap-to-copy; the ⧉ mark is the reminder. Paste, never retype.</div>
+    <div class="pane">
+      <div class="ph">The visual system — five values you'll reuse everywhere</div>
+      <p>The app stays uncluttered because it uses <em>one</em> accent color, <em>one</em> grey, a fixed type scale and a fixed spacing scale. Copy these once, recognize them everywhere:</p>
+      <ul>
+        <li><strong>Navy accent</strong> (header, block headings, email links, highlight): <code class="cc">RGBA(31, 59, 110, 1)</code></li>
+        <li><strong>Body text</strong> (names, values): <code class="cc">RGBA(27, 36, 54, 1)</code></li>
+        <li><strong>Secondary grey</strong> (meta lines, hints, placeholders): <code class="cc">RGBA(91, 102, 120, 1)</code></li>
+        <li><strong>Card / panel background</strong>: <code class="cc">RGBA(244, 245, 248, 1)</code> — page behind panels: <code class="cc">RGBA(237, 239, 244, 1)</code></li>
+        <li><strong>Type scale</strong>: 20 (borrower name) · 15 (block headings) · 14 (facility line, emails) · 13 (contact rows) · 12 (meta, hints). <strong>Spacing scale</strong>: 4 (inside a pair) · 8 (between rows) · 12 (between blocks) · 16 (panel padding). Nothing else.</li>
+      </ul>
+      <p>Font is <strong>Segoe UI</strong> (Power Apps' default — set it only if a control shows something else). If two things compete visually, the fix is always: smaller size, greyer color, or more gap — never a new color.</p>
+    </div>
   </section>
 
   <section class="block" id="phase0">
@@ -249,24 +261,64 @@
     <details class="step" id="s3">
       <summary><span class="dot"></span><span class="num">S3</span><span class="stitle">Build the container skeleton</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Auto-layout containers so the screen resizes cleanly: a vertical root, header bar on top, then a horizontal body split into the search panel (left) and the detail panel (right).</p>
-        <p class="do"><strong>a) Root.</strong> With <code class="cc">scrMain</code> selected: <strong>Insert</strong> → <strong>Layout</strong> → <strong>Vertical container</strong> → rename <code class="cc">conRoot</code>.</p>
+        <p class="do">Auto-layout containers so the screen resizes cleanly: a vertical root, header bar on top, then a horizontal body split into the search panel (left) and the detail panel (right). Each control below gets a full property table — set <em>every row</em>, in order, before moving to the next control.</p>
+        <p class="do"><strong>a) The screen itself.</strong> Select <code class="cc">scrMain</code> → in the formula bar set its Fill (this is the light grey that shows between the panels):</p>
+        <p class="fxlabel">scrMain · Fill</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(237, 239, 244, 1)</code></div>
+        <p class="do"><strong>b) Root.</strong> With <code class="cc">scrMain</code> selected: <strong>Insert</strong> → <strong>Layout</strong> → <strong>Vertical container</strong> → rename <code class="cc">conRoot</code>.</p>
         <dl class="props">
-          <div><dt>X · Y</dt><dd><code>0</code> · <code>0</code></dd></div>
-          <div><dt>Width</dt><dd><code>Parent.Width</code></dd></div>
-          <div><dt>Height</dt><dd><code>Parent.Height</code></dd></div>
-          <div><dt>Gap · Padding</dt><dd><code>0</code> · <code>0</code> all sides</dd></div>
+          <div><dt>X · Y</dt><dd><code class="cc">0</code> · <code class="cc">0</code></dd></div>
+          <div><dt>Width</dt><dd><code class="cc">Parent.Width</code></dd></div>
+          <div><dt>Height</dt><dd><code class="cc">Parent.Height</code></dd></div>
+          <div><dt>Direction</dt><dd>Vertical</dd></div>
+          <div><dt>Align (horizontal)</dt><dd><strong>Stretch</strong> — not Center; Center squeezes every child to its minimum width</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">0</code></dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">0</code> all four sides</dd></div>
+          <div><dt>Fill</dt><dd>leave transparent</dd></div>
         </dl>
-        <p class="do"><strong>b) Header bar.</strong> Inside <code class="cc">conRoot</code>: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conHeader</code>. Flexible height <strong>off</strong>, Height <code class="cc">64</code>. Set its Fill:</p>
-        <p class="fxlabel">conHeader · Fill</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(31, 59, 110, 1)</code></div>
-        <p class="do">Inside it insert a <strong>Text label</strong> → rename <code class="cc">lblAppTitle</code> → Text <code class="cc">"IBD Client Contact Repository"</code>, font size 18, bold, white, vertically centered.</p>
-        <p class="do"><strong>c) Body and the two panels.</strong> Inside <code class="cc">conRoot</code>, below the header: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conBody</code>. Leave Flexible height <strong>on</strong>; Gap <code class="cc">12</code>; padding <code class="cc">12</code> all sides. Then insert two <strong>Vertical containers</strong> inside <code class="cc">conBody</code>:</p>
+        <p class="do"><strong>c) Header bar.</strong> Inside <code class="cc">conRoot</code>: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conHeader</code>.</p>
         <dl class="props">
-          <div><dt>conLeft</dt><dd>Flexible width on · Fill portions <code>1</code> · Fill <code>RGBA(255,255,255,1)</code> · Gap <code>8</code> · padding <code>12</code></dd></div>
-          <div><dt>conRight</dt><dd>Flexible width on · Fill portions <code>2</code> · Fill <code>RGBA(255,255,255,1)</code> · Gap <code>12</code> · padding <code>16</code></dd></div>
+          <div><dt>Flexible height</dt><dd><strong>Off</strong></dd></div>
+          <div><dt>Height</dt><dd><code class="cc">64</code></dd></div>
+          <div><dt>Align (vertical)</dt><dd>Center — centers the title in the bar</dd></div>
+          <div><dt>Padding left</dt><dd><code class="cc">16</code> (other three sides <code class="cc">0</code>)</dd></div>
+          <div><dt>Fill</dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
         </dl>
-        <div class="note check"><b>Check before moving on</b>A navy bar across the top with the white app title, a white ⅓-width panel left and ⅔-width panel right on a light-grey background. Both panels empty. Save.</div>
+        <p class="do">Inside it insert a <strong>Text label</strong> → rename <code class="cc">lblAppTitle</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">"IBD Client Contact Repository"</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">18</code></dd></div>
+          <div><dt>Font weight</dt><dd>Semibold</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
+          <div><dt>Width</dt><dd><code class="cc">450</code></dd></div>
+        </dl>
+        <p class="do"><strong>d) Body.</strong> Inside <code class="cc">conRoot</code>, below the header: Insert → <strong>Horizontal container</strong> → rename <code class="cc">conBody</code>.</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>On</strong> — this is what makes the body fill the screen below the bar; off gives you a squashed strip</dd></div>
+          <div><dt>Align (vertical)</dt><dd><strong>Stretch</strong> — both panels always reach the bottom</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">12</code></dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">12</code> all four sides</dd></div>
+          <div><dt>Fill</dt><dd>leave transparent — the screen grey shows through as the gutter</dd></div>
+        </dl>
+        <p class="do"><strong>e) The two panels.</strong> Insert two <strong>Vertical containers</strong> inside <code class="cc">conBody</code>. First one → rename <code class="cc">conLeft</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible width</dt><dd>On · Fill portions <code class="cc">1</code> (⅓ of the width)</dd></div>
+          <div><dt>Align (horizontal)</dt><dd><strong>Stretch</strong> — the search box and gallery fill the panel edge-to-edge</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">8</code></dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">12</code> all four sides</dd></div>
+          <div><dt>Fill</dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
+        </dl>
+        <p class="do">Second one → rename <code class="cc">conRight</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible width</dt><dd>On · Fill portions <code class="cc">2</code> (⅔ of the width)</dd></div>
+          <div><dt>Align (horizontal)</dt><dd><strong>Stretch</strong></dd></div>
+          <div><dt>Vertical overflow</dt><dd>Scroll — long contact blocks scroll instead of clipping</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">12</code> — this single value is the breathing room between card, coverage block and office block</dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">16</code> all four sides</dd></div>
+          <div><dt>Fill</dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
+        </dl>
+        <div class="note warn"><b>The Align setting is where layouts go wobbly</b>Every container above says <strong>Stretch</strong> for a reason: with Align set to Center, children shrink to minimum width and float in the middle — the "everything's squeezed in a column" look. If your layout ever looks pinched, check Align first.</div>
+        <div class="note check"><b>Check before moving on</b>A navy bar across the top with the white app title starting 16px from the left, a white ⅓-width panel left and ⅔-width panel right, separated by a 12px grey gutter, both reaching the bottom of the screen. Both panels empty. Save (Ctrl+S).</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -279,21 +331,53 @@
     <details class="step" id="s4">
       <summary><span class="dot"></span><span class="num">S4</span><span class="stitle">Search box &amp; borrower list</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The search box.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Text input</strong> → rename <code class="cc">txtSearch</code>. Flexible height off. Set the hint:</p>
-        <p class="fxlabel">txtSearch · Placeholder (HintText on classic)</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>"Search by RIM or borrower name"</code></div>
-        <p class="do"><strong>b) The results list.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename <code class="cc">galBorrowers</code> → Flexible height <strong>on</strong>. Set Items — delegable <code>StartsWith</code>, so it stays fast past 500/2000 rows:</p>
+        <p class="do"><strong>a) The search box.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Text input</strong> → rename <code class="cc">txtSearch</code>.</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>Off</strong></dd></div>
+          <div><dt>Height</dt><dd><code class="cc">44</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">14</code></dd></div>
+          <div><dt>Placeholder (HintText)</dt><dd><code class="cc">"Search by RIM or borrower name"</code></dd></div>
+          <div><dt>Hint text color</dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt>Border color</dt><dd><code class="cc">RGBA(227, 230, 238, 1)</code></dd></div>
+          <div><dt>Border radius</dt><dd><code class="cc">8</code> (all four corners)</dd></div>
+          <div><dt>Fill</dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
+        </dl>
+        <p class="do"><strong>b) The results list.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename <code class="cc">galBorrowers</code>.</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>On</strong> — the gallery takes all the panel below the search box</dd></div>
+          <div><dt>Template size</dt><dd><code class="cc">64</code> — room for two lines plus air</dd></div>
+          <div><dt>Template padding</dt><dd><code class="cc">0</code></dd></div>
+          <div><dt>Show scrollbar</dt><dd>On</dd></div>
+        </dl>
+        <p class="do">Set Items — delegable <code>StartsWith</code>, so it stays fast past 500/2000 rows:</p>
         <p class="fxlabel">galBorrowers · Items — RIM is a Number column, so it matches on the exact RIM</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Master List of Exposures',
     StartsWith(Borrower, txtSearch.Text)
     || (IsNumeric(txtSearch.Text) &amp;&amp; RIM = Value(txtSearch.Text)))</code></div>
-        <p class="do"><strong>c) The row template.</strong> Two labels <em>inside the gallery template</em> — name on top, RIM under it.</p>
+        <p class="do"><strong>c) The row template.</strong> Two labels <em>inside the gallery template</em> — name on top, RIM under it. Inside a gallery template controls are positioned by X/Y, so both tables below include exact coordinates.</p>
         <div class="note warn"><b>The #1 trap in this whole build — put the labels IN the template</b>Click <em>into the gallery's first row</em> (the pencil icon that appears on it) so the template is selected, <em>then</em> Insert → Text label. If you insert while the panel container is selected, the label lands <em>next to</em> the gallery, <code>ThisItem</code> errors with "name isn't recognized", and the gallery rows stay blank. Placed right, the label repeats once per row automatically.</div>
-        <p class="fxlabel">Label 1 (bold) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.Borrower</code></div>
-        <p class="fxlabel">Label 2 (smaller, grey) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; ThisItem.RIM</code></div>
-        <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name, or by typing a full RIM. Every visible row shows a name and a RIM (blank rows = the trap above).</div>
+        <p class="do">First label → rename <code class="cc">lblRowName</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">ThisItem.Borrower</code></dd></div>
+          <div><dt>X · Y</dt><dd><code class="cc">12</code> · <code class="cc">8</code></dd></div>
+          <div><dt>Width</dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt>Height</dt><dd><code class="cc">26</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">15</code></dd></div>
+          <div><dt>Font weight</dt><dd>Semibold</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="do">Second label → rename <code class="cc">lblRowRIM</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">"RIM: " &amp; ThisItem.RIM</code></dd></div>
+          <div><dt>X · Y</dt><dd><code class="cc">12</code> · <code class="cc">34</code> — 8px top + 26px name = the RIM line starts exactly under the name</dd></div>
+          <div><dt>Width</dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt>Height</dt><dd><code class="cc">20</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">12</code></dd></div>
+          <div><dt>Font weight</dt><dd>Normal</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <div class="note tip"><b>Why these numbers don't look cluttered</b>12px left inset matches nothing touching the panel edge; 26 + 20 + the paddings = 62 of the 64px template, so rows sit tight without overlapping; name at 15 semibold + RIM at 12 grey gives instant hierarchy without a second color.</div>
+        <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name, or by typing a full RIM. Every visible row shows a bold name with a grey RIM line directly beneath it (blank rows = the trap above).</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -313,11 +397,15 @@
     <details class="step" id="s6">
       <summary><span class="dot"></span><span class="num">S6</span><span class="stitle">"No borrowers found"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <ol class="steps2">
-          <li>Select <code class="cc">conLeft</code> → Insert → <strong>Text label</strong> below the gallery → rename <code class="cc">lblNoResults</code>.</li>
-          <li>Text <code class="cc">"No borrowers found"</code>, grey, centered.</li>
-          <li>Property dropdown → <strong>Visible</strong> → paste:</li>
-        </ol>
+        <p class="do">Select <code class="cc">conLeft</code> → Insert → <strong>Text label</strong> below the gallery → rename <code class="cc">lblNoResults</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">"No borrowers found"</code></dd></div>
+          <div><dt>Text alignment</dt><dd>Center</dd></div>
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">40</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">13</code></dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <p class="do">Then the property dropdown (top-left of the formula bar) → <strong>Visible</strong> → paste:</p>
         <p class="fxlabel">lblNoResults · Visible</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(txtSearch.Text) &amp;&amp; CountRows(galBorrowers.AllItems) = 0</code></div>
         <div class="note check"><b>Check before moving on</b>Gibberish in the search box shows the message; clearing the box hides it.</div>
@@ -333,18 +421,52 @@
     <details class="step" id="s7">
       <summary><span class="dot"></span><span class="num">S7</span><span class="stitle">Placeholder &amp; borrower card</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) Before any selection.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename <code class="cc">lblPlaceholder</code> → Text <code class="cc">"Search for a borrower to see their contacts"</code>, grey, size 16, centered.</p>
+        <p class="do"><strong>a) Before any selection.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename <code class="cc">lblPlaceholder</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">"Search for a borrower to see their contacts"</code></dd></div>
+          <div><dt>Text alignment</dt><dd>Center</dd></div>
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">60</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">15</code></dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
         <p class="fxlabel">lblPlaceholder · Visible</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>IsBlank(varBorrower)</code></div>
-        <p class="do"><strong>b) The card.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> → rename <code class="cc">conBorrowerCard</code>. Flexible height off, Height <code class="cc">130</code>, Fill <code class="cc">RGBA(244, 245, 248, 1)</code>, padding <code class="cc">12</code>.</p>
+        <p class="do"><strong>b) The card.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> → rename <code class="cc">conBorrowerCard</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>Off</strong> · Height <code class="cc">130</code></dd></div>
+          <div><dt>Align (horizontal)</dt><dd>Stretch</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">4</code> — the three lines read as one card, not three strays</dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">12</code> all four sides</dd></div>
+          <div><dt>Fill</dt><dd><code class="cc">RGBA(244, 245, 248, 1)</code></dd></div>
+          <div><dt>Border radius</dt><dd><code class="cc">8</code></dd></div>
+        </dl>
         <p class="fxlabel">conBorrowerCard · Visible</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower)</code></div>
-        <p class="do"><strong>c) Its three labels.</strong> Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere.</p>
-        <p class="fxlabel">lblBorrowerName (size 20, bold) · Text</p>
+        <p class="do"><strong>c) Its three labels.</strong> All three go <em>inside</em> <code class="cc">conBorrowerCard</code>, top to bottom. Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere.</p>
+        <p class="do">First → rename <code class="cc">lblBorrowerName</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">34</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">20</code></dd></div>
+          <div><dt>Font weight</dt><dd>Semibold</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="fxlabel">lblBorrowerName · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.Borrower</code></div>
-        <p class="fxlabel">lblBorrowerMeta (size 13, grey) · Text</p>
+        <p class="do">Second → rename <code class="cc">lblBorrowerMeta</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">22</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">13</code></dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <p class="fxlabel">lblBorrowerMeta · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; varBorrower.RIM &amp; "   ·   " &amp; varBorrower.Office &amp; "   ·   " &amp; varBorrower.'Facility Type' &amp; "   ·   Grade " &amp; varBorrower.Grade</code></div>
-        <p class="fxlabel">lblBorrowerFacility (size 14) · Text</p>
+        <p class="do">Third → rename <code class="cc">lblBorrowerFacility</code>:</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">24</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">14</code></dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="fxlabel">lblBorrowerFacility · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"Limit " &amp; Text(varBorrower.'Total Limit', "#,##0") &amp;
 "   ·   Exposure " &amp; Text(varBorrower.'Current Exposure', "#,##0") &amp;
 "   ·   Utilization " &amp; varBorrower.'Overall Utilization %' &amp; "%"</code></div>
@@ -358,30 +480,59 @@
     <details class="step" id="s8">
       <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">The BMO coverage team</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The heading.</strong> In <code class="cc">conRight</code>, below the card: Insert → <strong>Text label</strong> → rename <code class="cc">lblCoverageHeader</code> → Text <code class="cc">"BMO coverage team"</code>, bold, size 15, Visible <code class="cc">!IsBlank(varBorrower)</code>, color:</p>
-        <p class="fxlabel">lblCoverageHeader · Color</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(31, 59, 110, 1)</code></div>
-        <p class="do"><strong>b) The two RSMs.</strong> Four labels under the heading — name and email per RSM. Both RSM columns are <strong>Lookups</strong>: the name comes through <code>.Value</code>, and the email rides along as its own expansion column (also read via <code>.Value</code>):</p>
-        <p class="fxlabel">lblRSM1 · Text</p>
+        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> below the card → rename <code class="cc">conCoverage</code>. Grouping the block in its own container is what keeps the name/email pairs tight (gap 4 inside) while the blocks stay clearly separated (conRight's gap 12 outside):</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>Off</strong> · Height <code class="cc">216</code></dd></div>
+          <div><dt>Align (horizontal)</dt><dd>Stretch</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">4</code></dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">8</code> top and bottom · <code class="cc">0</code> left and right</dd></div>
+          <div><dt>Fill</dt><dd>leave transparent</dd></div>
+          <div><dt>Visible</dt><dd><code class="cc">!IsBlank(varBorrower)</code> — set once here; every label inside inherits it</dd></div>
+        </dl>
+        <p class="do"><strong>b) The heading.</strong> Inside <code class="cc">conCoverage</code>: Insert → <strong>Text label</strong> → rename <code class="cc">lblCoverageHeader</code>:</p>
+        <dl class="props">
+          <div><dt>Text</dt><dd><code class="cc">"BMO coverage team"</code></dd></div>
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">24</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">15</code></dd></div>
+          <div><dt>Font weight</dt><dd>Semibold</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+        </dl>
+        <p class="do"><strong>c) The rows — two recipes, used for every row in S8 and S9.</strong> Every <em>name row</em> and every <em>email row</em> below uses one of these two property sets. Build the first of each, then copy-paste the control (Ctrl+C, Ctrl+V inside the container) and change only its name and Text.</p>
+        <div class="fxgroup"><div class="gh">Name-row recipe</div>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">22</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">13</code></dd></div>
+          <div><dt>Font weight</dt><dd>Normal</dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl></div>
+        <div class="fxgroup"><div class="gh">Email-row recipe (tappable)</div>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd>Off · Height <code class="cc">20</code></dd></div>
+          <div><dt>Font size (Size)</dt><dd><code class="cc">13</code></dd></div>
+          <div><dt>Color</dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+          <div><dt>Underline</dt><dd>On</dd></div>
+          <div><dt>Padding left</dt><dd><code class="cc">18</code> — indents the email under its name so the pair reads as one unit</dd></div>
+          <div><dt>OnSelect</dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
+          <div><dt>Visible</dt><dd><code class="cc">!IsBlank(Self.Text)</code> — blank emails just disappear, no empty gap</dd></div>
+        </dl></div>
+        <p class="do"><strong>d) Now the six rows</strong>, inside <code class="cc">conCoverage</code>, top to bottom. Both RSM columns are <strong>Lookups</strong> (name via <code>.Value</code>, email via its expansion column's <code>.Value</code>); <code class="cc">Rim Officer Name</code> is a <strong>Person</strong> column:</p>
+        <p class="fxlabel">lblRSM1 (name-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"RSM 1  ·  " &amp; varBorrower.'BMO RSM 1'.Value</code></div>
-        <p class="fxlabel">lblRSM1Email · Text</p>
+        <p class="fxlabel">lblRSM1Email (email-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'BMO RSM 1: Email Address'.Value</code></div>
-        <p class="do">Repeat both labels for <code class="cc">lblRSM2</code> / <code class="cc">lblRSM2Email</code> with <code class="cc">'BMO RSM 2'</code>.</p>
-        <p class="do"><strong>c) RM and RIM officer.</strong> RM is plain text; <code class="cc">Rim Officer Name</code> is a <strong>Person</strong> column, so it gets a name <em>and</em> a tappable email:</p>
-        <p class="fxlabel">lblRM · Text</p>
+        <p class="fxlabel">lblRSM2 (name-row recipe) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"RSM 2  ·  " &amp; varBorrower.'BMO RSM 2'.Value</code></div>
+        <p class="fxlabel">lblRSM2Email (email-row recipe) · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'BMO RSM 2: Email Address'.Value</code></div>
+        <p class="fxlabel">lblRM (name-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"RM  ·  " &amp; varBorrower.RM</code></div>
-        <p class="fxlabel">lblRimOfficer · Text</p>
+        <p class="fxlabel">lblRimOfficer (name-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM officer  ·  " &amp; varBorrower.'Rim Officer Name'.DisplayName</code></div>
-        <p class="fxlabel">lblRimOfficerEmail · Text</p>
+        <p class="fxlabel">lblRimOfficerEmail (email-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'Rim Officer Name'.Email</code></div>
-        <p class="do"><strong>d) Make every email label tappable.</strong> The same two pastes on <em>each</em> email label (here and in S9) — navy, underlined, and it opens a mail draft when tapped:</p>
-        <p class="fxlabel">every email label · OnSelect</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>Launch("mailto:" &amp; Self.Text)</code></div>
-        <p class="fxlabel">every email label · Visible — blank emails just disappear</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower) &amp;&amp; !IsBlank(Self.Text)</code></div>
-        <p class="do">Set the name rows' (<code class="cc">lblRSM1</code>, <code class="cc">lblRM</code>…) Visible to <code class="cc">!IsBlank(varBorrower)</code>.</p>
         <div class="note why"><b>Why <code>.Value</code> here but <code>.DisplayName</code> there</b>The RSM columns are <em>Lookups</em> — they carry their text through <code>.Value</code>, and their extra fields arrive as separate read-only columns (<code>'BMO RSM 1: Email Address'</code>, also a <code>.Value</code>). <code>Rim Officer Name</code> is a <em>Person</em> column — it carries the whole person record: <code>.DisplayName</code>, <code>.Email</code>. Confirmed from the live connector schema; IntelliSense will agree as you type.</div>
-        <div class="note tip"><b>A blank name making an awkward row?</b>Hide that row the same way — e.g. <code>lblRM</code> · Visible → <code>!IsBlank(varBorrower) &amp;&amp; !IsBlank(varBorrower.RM)</code>.</div>
+        <div class="note tip"><b>A blank name making an awkward row?</b>Hide that row the same way the email recipe does — e.g. <code>lblRM</code> · Visible → <code>!IsBlank(varBorrower.RM)</code>. (The container already handles the no-selection case.)</div>
+        <div class="note tip"><b>Sizing sanity check</b>conCoverage's 216 = heading 24 + rows (22+20+22+20+22+22+20) + seven 4px gaps + 16px padding. If you add or remove a row, adjust the height by that row + 4.</div>
         <div class="note check"><b>Check before moving on</b>Selecting a borrower shows RSM 1, RSM 2, RM and RIM officer with their names from the list; tapping an RSM or RIM-officer email opens a mail draft to that address.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -390,18 +541,28 @@
     <details class="step" id="s9">
       <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The borrower's office contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The heading.</strong> Below the coverage block: Insert → <strong>Text label</strong> → rename <code class="cc">lblOfficeHeader</code> → Text <code class="cc">"Borrower office contacts"</code>, bold, size 15, Visible <code class="cc">!IsBlank(varBorrower)</code>, Color <code class="cc">RGBA(31, 59, 110, 1)</code>.</p>
-        <p class="do"><strong>b) The office name.</strong> A small grey label — the lookup shows its text through <code>.Value</code>:</p>
+        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> below <code class="cc">conCoverage</code> → rename <code class="cc">conOffice</code>. Same idea as S8-a: tight inside, separated outside.</p>
+        <dl class="props">
+          <div><dt>Flexible height</dt><dd><strong>Off</strong> · Height <code class="cc">136</code></dd></div>
+          <div><dt>Align (horizontal)</dt><dd>Stretch</dd></div>
+          <div><dt>Gap</dt><dd><code class="cc">4</code></dd></div>
+          <div><dt>Padding</dt><dd><code class="cc">8</code> top and bottom · <code class="cc">0</code> left and right</dd></div>
+          <div><dt>Fill</dt><dd>leave transparent</dd></div>
+          <div><dt>Visible</dt><dd><code class="cc">!IsBlank(varBorrower)</code></dd></div>
+        </dl>
+        <p class="do"><strong>b) The heading.</strong> Inside <code class="cc">conOffice</code>: Insert → <strong>Text label</strong> → rename <code class="cc">lblOfficeHeader</code> — identical properties to <code class="cc">lblCoverageHeader</code> (S8-b: Height <code class="cc">24</code>, Size <code class="cc">15</code>, Semibold, Color <code class="cc">RGBA(31, 59, 110, 1)</code>):</p>
+        <p class="fxlabel">lblOfficeHeader · Text</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"Borrower office contacts"</code></div>
+        <p class="do"><strong>c) The office name.</strong> Inside <code class="cc">conOffice</code> — a name-row-recipe label (S8-c) but grey, since it's context rather than a person: rename <code class="cc">lblOfficeName</code>, Height <code class="cc">20</code>, Size <code class="cc">13</code>, Color <code class="cc">RGBA(91, 102, 120, 1)</code>. The lookup shows its text through <code>.Value</code>:</p>
         <p class="fxlabel">lblOfficeName · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'Office (list)'.Value</code></div>
-        <p class="do"><strong>c) The three email labels.</strong> One label each. The first two are extra fields riding on the <code class="cc">Office (list)</code> lookup — like the RSM emails in S8, they arrive lookup-shaped, so read them via <code>.Value</code>. The third is the plain <code class="cc">office email</code> column (the lower-case name is real):</p>
-        <p class="fxlabel">lblOfficeEmail1 · Text</p>
+        <p class="do"><strong>d) The three email labels.</strong> All three use the S8-c <strong>email-row recipe</strong> exactly (Height 20, Size 13, navy, underline, 18px left padding, the OnSelect and Visible pastes). The first two are extra fields riding on the <code class="cc">Office (list)</code> lookup — they arrive lookup-shaped, so read them via <code>.Value</code>. The third is the plain <code class="cc">office email</code> column (the lower-case name is real):</p>
+        <p class="fxlabel">lblOfficeEmail1 (email-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'Office (list):1st Email Address'.Value</code></div>
-        <p class="fxlabel">lblOfficeEmail2 · Text</p>
+        <p class="fxlabel">lblOfficeEmail2 (email-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'Office (list):2nd Email Address'.Value</code></div>
-        <p class="fxlabel">lblOfficeEmail3 · Text</p>
+        <p class="fxlabel">lblOfficeEmail3 (email-row recipe) · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.'office email'</code></div>
-        <p class="do"><strong>d)</strong> Give all three the S8-d email pastes: OnSelect <code class="cc">Launch("mailto:" &amp; Self.Text)</code> and Visible <code class="cc">!IsBlank(varBorrower) &amp;&amp; !IsBlank(Self.Text)</code>. Navy, underlined.</p>
         <div class="note tip"><b>If a lookup-expansion name doesn't autocomplete</b>Power Apps names lookup extra fields exactly as SharePoint shows them in views — start typing <code>varBorrower.'Office</code> and take what IntelliSense offers; that's the authoritative spelling.</div>
         <div class="note why"><b>Still view-only</b><code>Launch("mailto:…")</code> only opens the user's mail client with a pre-addressed draft — the app never writes to SharePoint and never sends anything itself.</div>
         <div class="note check"><b>Check before moving on</b>The office name and its emails show under the coverage block; a borrower with a blank 2nd email shows no empty row; tapping an email opens a draft.</div>
