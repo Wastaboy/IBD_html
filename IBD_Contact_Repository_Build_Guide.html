@@ -183,7 +183,7 @@
       <div class="farrow">→</div>
       <div class="fnode hot">Power Apps front end<small>this guide</small></div>
     </div>
-    <div class="note warn"><b>Column names are from the spec — verify before pasting</b>Every formula on this page uses the specification's list and column names. Your real SharePoint columns may differ. Step V1 is the verification pass — do it first, and wherever a name differs, substitute yours when pasting. Formulas that depend on a column's <em>type</em> come in two variants with the right one to pick.</div>
+    <div class="note warn"><b>Column names — Master List confirmed, other three lists still from the spec</b>The <strong>Master List of Exposures</strong> column names in every formula (<code class="cc">Borrower</code>, <code class="cc">RIM</code>) are confirmed against the client's actual list export. The other three lists still use the specification's names — step V1 is the verification pass; do it first, and wherever a name differs, substitute yours when pasting. Formulas that depend on a column's <em>type</em> come in two variants with the right one to pick.</div>
     <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> is tap-to-copy — the ⧉ mark is the reminder. Paste, never retype.</div>
   </section>
 
@@ -197,8 +197,8 @@
         <p class="do">For each list: open it in SharePoint → gear icon → <strong>List settings</strong> → compare the columns against this table. In Power Apps formulas you use the <em>display name</em>, wrapped in single quotes when it contains spaces.</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>List</th><th>Column</th><th>Type the guide assumes</th></tr>
-          <tr><td rowspan="2">Master List of Exposures</td><td>Title <em>(borrower name)</em></td><td>Single line of text</td></tr>
-          <tr><td>Borrower RIM</td><td>Text <em>or</em> Number — S4 has a formula for each</td></tr>
+          <tr><td rowspan="2">Master List of Exposures <em>(names confirmed from the client's export)</em></td><td>Borrower <em>(borrower name)</em></td><td>Single line of text</td></tr>
+          <tr><td>RIM</td><td>Text <em>or</em> Number — S4 has a formula for each; the export doesn't show the type, so check it here</td></tr>
           <tr><td rowspan="8">Borrower Contact Directory</td><td>Title <em>(contact full name)</em></td><td>Single line of text</td></tr>
           <tr><td>Contact Email</td><td>Single line of text</td></tr>
           <tr><td>Mobile Number</td><td>Single line of text</td></tr>
@@ -287,19 +287,20 @@
         <p class="fxlabel">txtSearch · Placeholder (HintText on classic)</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"Search by RIM or borrower name"</code></div>
         <p class="do"><strong>b) The results list.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename <code class="cc">galBorrowers</code> → Flexible height <strong>on</strong>. Set Items — delegable <code>StartsWith</code>, so it stays fast past 500/2000 rows:</p>
-        <p class="fxlabel">galBorrowers · Items — if Borrower RIM is TEXT</p>
+        <p class="fxlabel">galBorrowers · Items — if RIM is TEXT</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Master List of Exposures',
-    StartsWith(Title, txtSearch.Text)
-    || StartsWith('Borrower RIM', txtSearch.Text))</code></div>
-        <p class="fxlabel">galBorrowers · Items — if Borrower RIM is a NUMBER</p>
+    StartsWith(Borrower, txtSearch.Text)
+    || StartsWith(RIM, txtSearch.Text))</code></div>
+        <p class="fxlabel">galBorrowers · Items — if RIM is a NUMBER</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Master List of Exposures',
-    StartsWith(Title, txtSearch.Text)
-    || (IsNumeric(txtSearch.Text) &amp;&amp; 'Borrower RIM' = Value(txtSearch.Text)))</code></div>
+    StartsWith(Borrower, txtSearch.Text)
+    || (IsNumeric(txtSearch.Text) &amp;&amp; RIM = Value(txtSearch.Text)))</code></div>
+        <div class="note tip"><b>If Power Apps flags <code>Borrower</code></b>The name column may still be the built-in <code>Title</code> column with its display name unchanged in Power Apps — the formula bar's IntelliSense will offer the right one as you type. Same fix everywhere <code>Borrower</code> appears.</div>
         <p class="do"><strong>c) The row template.</strong> Inside the gallery template add two labels — name on top, RIM under it:</p>
         <p class="fxlabel">Label 1 (bold) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.Title</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>ThisItem.Borrower</code></div>
         <p class="fxlabel">Label 2 (smaller, grey) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; ThisItem.'Borrower RIM'</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; ThisItem.RIM</code></div>
         <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name and by RIM.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -319,7 +320,7 @@ ClearCollect(colMatrix,
     )
 );
 Set(varLoading, false)</code></div>
-        <div class="note warn"><b>Matrix stores RIM as plain text instead of a lookup?</b>Replace the Filter condition with <code>'Borrower RIM' = varBorrower.'Borrower RIM'</code> — the rest of the paste stays the same.</div>
+        <div class="note warn"><b>Matrix stores RIM as plain text instead of a lookup?</b>Replace the Filter condition with <code>'Borrower RIM' = varBorrower.RIM</code> — the rest of the paste stays the same. (<code>'Borrower RIM'</code> here is the <em>Matrix's</em> column, spec-named and unconfirmed — substitute whatever V1 found on that list.)</div>
         <div class="note why"><b>Why a collection</b>Grouping contacts by purpose needs nested galleries. If those queried SharePoint per row you'd get delegation warnings and a slow app. <code>colMatrix</code> is local, tiny (one borrower's rows), and instant.</div>
         <div class="note check"><b>Check before moving on</b>Select a borrower in Preview, then File → open the Variables pane: <code>varBorrower</code> holds the record and <code>colMatrix</code> has that borrower's matrix rows.</div>
         <button class="done" type="button">Mark step done</button>
@@ -355,11 +356,11 @@ Set(varLoading, false)</code></div>
         <p class="do"><strong>b) The card.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> → rename <code class="cc">conBorrowerCard</code>. Flexible height off, Height <code class="cc">92</code>, Fill <code class="cc">RGBA(244, 245, 248, 1)</code>, padding <code class="cc">12</code>.</p>
         <p class="fxlabel">conBorrowerCard · Visible</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>!IsBlank(varBorrower)</code></div>
-        <p class="do"><strong>c) Its two labels.</strong> Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere. Add more Master List fields the same way if the client wants them (sector, status…).</p>
+        <p class="do"><strong>c) Its two labels.</strong> Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere. Add more Master List fields the same way if the client wants them; the real list has plenty worth showing: <code class="cc">'Rim Officer Name'</code>, <code class="cc">RM</code>, <code class="cc">Office</code>, <code class="cc">Grade</code>, <code class="cc">'Facility Type'</code>, <code class="cc">Status</code>.</p>
         <p class="fxlabel">lblBorrowerName (size 20, bold) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.Title</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.Borrower</code></div>
         <p class="fxlabel">lblBorrowerRIM (size 13, grey) · Text</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; varBorrower.'Borrower RIM'</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; varBorrower.RIM</code></div>
         <div class="note check"><b>Check before moving on</b>Selecting a borrower shows name + RIM on the right; with nothing selected you see only the placeholder line.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
