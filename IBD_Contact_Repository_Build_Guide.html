@@ -366,30 +366,31 @@
     || (IsNumeric(txtSearch.Text) &amp;&amp; RIM = Value(txtSearch.Text)))</code></div>
         <p class="do"><strong>c) The row template.</strong> Two labels <em>inside the gallery template</em> — name on top, RIM under it. Inside a gallery template controls are positioned by X/Y, so both tables below include exact coordinates.</p>
         <div class="note warn"><b>The #1 trap in this whole build — put the labels IN the template</b>Click <em>into the gallery's first row</em> (the pencil icon that appears on it) so the template is selected, <em>then</em> Insert → Text label. If you insert while the panel container is selected, the label lands <em>next to</em> the gallery, <code>ThisItem</code> errors with "name isn't recognized", and the gallery rows stay blank. Placed right, the label repeats once per row automatically.</div>
-        <p class="do">First label → rename to <code class="cc">lblRowName</code>. No fixed <code>Height</code> on this one — <code>AutoHeight</code> lets a long borrower name wrap to a second line instead of clipping:</p>
+        <p class="do">First label → rename to <code class="cc">lblRowName</code>. A fixed <strong>two-line box, anchored to the top</strong>: short names take the first line, long names wrap into the second — the box itself never moves or resizes:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Borrower</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">8</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">46</code> — exactly two lines at size 15; not AutoHeight, so every row stays identical</dd></div>
           <div><dt><code class="cc">Wrap</code></dt><dd><code class="cc">true</code></dd></div>
-          <div><dt><code class="cc">AutoHeight</code></dt><dd><code class="cc">true</code> — the label grows to fit the name; short names take one line, long ones two</dd></div>
+          <div><dt><code class="cc">VerticalAlign</code></dt><dd><code class="cc">VerticalAlign.Top</code> — one-line names hug the top of the box instead of floating in its middle</dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">15</code></dd></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second label → rename to <code class="cc">lblRowRIM</code>. Its <code>Y</code> is a formula, not a number — it re-computes per row, so the RIM line always sits right under the name whether that name took one line or two:</p>
+        <p class="do">Second label → rename to <code class="cc">lblRowRIM</code>. <strong>Anchored near the bottom</strong> — the same spot in every single row, whether the name above it took one line or two:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RIM: " &amp; ThisItem.RIM</code></dd></div>
-          <div><dt><code class="cc">X</code></dt><dd><code class="cc">12</code></dd></div>
-          <div><dt><code class="cc">Y</code></dt><dd><code class="cc">lblRowName.Y + lblRowName.Height + 2</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">58</code> — 84 − 20 − 6: pinned 6px off the row's bottom edge</dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">20</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Normal</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <div class="note tip"><b>Why these numbers don't look cluttered</b>12px left inset means nothing touches the panel edge; a one-line name uses 8 + ~21 + 2 + 20 ≈ 51px of the 84px template and a two-line name ≈ 72px, so neither overlaps the next row; name at 15 semibold + RIM at 12 grey gives instant hierarchy without a second color. If your borrower names ever run to <em>three</em> lines, raise <code class="cc">TemplateSize</code> to <code class="cc">104</code> — nothing else changes.</div>
-        <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name, or by typing a full RIM. Every visible row shows a bold name with a grey RIM line directly beneath it (blank rows = the trap above). Find your longest borrower name: it wraps to a second line and the RIM line moves down with it — nothing clips, nothing overlaps.</div>
+        <div class="note why"><b>Why fixed anchors beat "smart" positioning</b>An earlier revision moved the RIM line up and down with each name's height — technically correct, visually noisy: the grey line sat at a different height in every row and the list looked cluttered. Fixed anchors (name top, RIM bottom) mean every row has identical geometry, so the RIM column reads as a clean vertical rhythm. Short names simply get a little breathing room between the two lines — whitespace is calm, misalignment is clutter.</div>
+        <div class="note tip"><b>The escape hatches</b>A name longer than two lines clips at the end of line two — if that ever actually happens, raise <code class="cc">TemplateSize</code> to <code class="cc">104</code>, <code class="cc">lblRowName</code> <code class="cc">Height</code> to <code class="cc">66</code>, and <code class="cc">lblRowRIM</code> <code class="cc">Y</code> to <code class="cc">78</code> — three lines, same anchoring.</div>
+        <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name, or by typing a full RIM. Every visible row shows a bold name with a grey RIM line directly beneath it (blank rows = the trap above). Find your longest borrower name: it wraps to a second line while the RIM line stays put at the bottom — and every row's RIM line sits at exactly the same height.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -698,7 +699,7 @@
         <p class="do">F5 from <code class="cc">scrMain</code> and run all eleven. All must pass before publishing:</p>
         <ul>
           <li>Open with nothing typed → full borrower list left, placeholder line right.</li>
-          <li>Your <strong>longest borrower name</strong> → wraps to two lines in the list (RIM line moves down, no clipping) and the card grows to fit it.</li>
+          <li>Your <strong>longest borrower name</strong> → wraps to two lines in the list, every row's RIM line sits at the same height, and the card grows to fit the name.</li>
           <li>Partial borrower <strong>name</strong> → list narrows as you type.</li>
           <li>Partial <strong>RIM</strong> → matching borrowers appear.</li>
           <li>Gibberish → <strong>"No borrowers found"</strong>.</li>
