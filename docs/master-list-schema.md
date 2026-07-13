@@ -3,48 +3,38 @@
 **Architecture decision (2026-07-13):** the build guide was rewritten around this
 single list. The spec's four-list design (Borrower Contact Directory, Communication
 Purpose Master, Contact Communication Matrix) has no supporting evidence on the real
-site — the contact data lives in this list's columns (RSM 1/2 + emails, RM, Rim
-Officer, office emails). The four-list guide is preserved at git commit `ec7c30f`.
+site — the contact data lives in this list's columns. The four-list guide is
+preserved at git commit `ec7c30f`.
 
-Source: client export `schema.csv` (header row only, no data rows), received 2026-07-13.
-These are SharePoint **display names**. Column *types* are inferred where the export
-gives evidence; blank means unknown.
+**Types confirmed 2026-07-13** from the connector schema embedded in the user's own
+`IBD Client Contact Repository.msapp` (`References/DataSources.json`,
+`DataEntityMetadataJson`) — a working app connected to the live list. Names were
+first confirmed from the client's `schema.csv` export. Nothing is assumed anymore.
 
-| Column | Type evidence |
-|---|---|
-| Borrower | Text (borrower name — may be the built-in Title column renamed) |
-| RIM | unknown — text vs number still unverified (guide keeps both formula variants) |
-| Office | |
-| BMO RSM 1 | Person/lookup (export has `BMO RSM 1: Email Address` expansion) |
-| Office (list) | Lookup (export has `:1st Email Address` and `:2nd Email Address` expansions) |
-| RM | |
-| Total Limit | likely Number/Currency |
-| Facility Type | |
-| Rim Officer Name | |
-| Active/Inactive Status | |
-| Current Exposure | likely Number/Currency |
-| Overall Utilization % | likely Number |
-| Status | |
-| Syndicated or Bilateral | |
-| Term or WC | |
-| Group Name (if applicable) | |
-| Trade Facilities | |
-| Repayment Method | |
-| DCO | |
-| Original Review Date | likely Date |
-| Mid-Year Rev / QCM Date | likely Date |
-| Final Maturity | likely Date |
-| Grade | |
-| office email | |
-| BMO RSM 2 | Person/lookup (export has `BMO RSM 2: Email Address` expansion) |
-| ID | SharePoint item ID |
+| Display name | Internal name | Type | In Power Apps |
+|---|---|---|---|
+| Borrower | `Title` (renamed) | Text | `Borrower` |
+| RIM | `field_2` | **Number** | `RIM = Value(txtSearch.Text)` |
+| Office | `field_1` | Text | `Office` |
+| BMO RSM 1 / BMO RSM 2 | `BMORSM1` / `BMORSM2` | **Lookup** | `.'BMO RSM 1'.Value` |
+| BMO RSM 1/2: Email Address | expansion | Lookup-shaped | `.'BMO RSM 1: Email Address'.Value` |
+| RM | `field_3` | Text | `RM` |
+| Rim Officer Name | `RimOfficerName` | **Person** | `.DisplayName`, `.Email` |
+| Office (list) | `Office_x0020_…` | Lookup | `.'Office (list)'.Value` |
+| Office (list):1st/2nd Email Address | expansions | Lookup-shaped | `….Value` |
+| office email | `office_x0020_email` | Text | `.'office email'` |
+| Total Limit / Current Exposure / Overall Utilization % / Grade | `field_4/5/6/16` | Number | `Text(..., "#,##0")` |
+| Facility Type / Status / Trade Facilities / Repayment Method / DCO / Pricing | `field_8/7/9/10/11/15` | Text | as-is |
+| Group Name (if applicable) | `GroupName…` | Text | as-is |
+| Active/Inactive Status · Syndicated or Bilateral · Term or WC | choice cols | **Choice** | `.Value` |
+| Original Review Date · Mid-Year Rev / QCM Date · Final Maturity | `field_12/13/14` | Date | as-is |
 
-Expansion columns in the export (not real list columns): `BMO RSM 1: Email Address`,
-`Office (list):1st Email Address`, `Office (list):2nd Email Address`,
-`BMO RSM 2: Email Address`.
+Note: `Pricing` (`field_15`) is non-filterable/non-sortable per the connector
+capabilities — don't use it in a `Filter()`.
 
-## Still unconfirmed (spec-placeholder names in the guide)
+## App build status (user's .msapp, 2026-07-13)
 
-- **Borrower Contact Directory** — all columns, incl. `Active Status` type (yes/no vs choice)
-- **Communication Purpose Master** — all columns
-- **Contact Communication Matrix** — all columns, incl. whether `Borrower RIM` is a lookup or plain text
+Built through S4b correctly (containers, one connection, search formula — the
+correct number variant). Found and diagnosed: row-template labels inserted outside
+the gallery (the S4c trap, now a warn note in the guide), conBody flexible height
+off, containers set to Align Center instead of Stretch. Resumes at S5.
