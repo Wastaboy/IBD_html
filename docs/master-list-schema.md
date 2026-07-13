@@ -1,5 +1,11 @@
 # Master List of Exposures — confirmed columns
 
+**Architecture decision (2026-07-13):** the build guide was rewritten around this
+single list. The spec's four-list design (Borrower Contact Directory, Communication
+Purpose Master, Contact Communication Matrix) has no supporting evidence on the real
+site — the contact data lives in this list's columns (RSM 1/2 + emails, RM, Rim
+Officer, office emails). The four-list guide is preserved at git commit `ec7c30f`.
+
 Source: client export `schema.csv` (header row only, no data rows), received 2026-07-13.
 These are SharePoint **display names**. Column *types* are inferred where the export
 gives evidence; blank means unknown.
