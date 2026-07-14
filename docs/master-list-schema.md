@@ -1,10 +1,26 @@
 # Master List of Exposures — confirmed columns
 
-**Architecture decision (2026-07-13):** the build guide was rewritten around this
-single list. The spec's four-list design (Borrower Contact Directory, Communication
-Purpose Master, Contact Communication Matrix) has no supporting evidence on the real
-site — the contact data lives in this list's columns. The four-list guide is
-preserved at git commit `ec7c30f`.
+**Architecture decision (2026-07-14, supersedes the 07-13 single-list call):** the
+client clarified that the three missing lists (spec §5–§7) are meant to be **created
+by the user**. The guide now has a Phase 0.5 (L1–L4) that builds them with locked
+types, and the app is the four-list design again (purpose-grouped contacts as the
+centerpiece, coverage/office blocks kept as extras).
+
+## Three new lists — types locked by the guide (L1–L3)
+
+| List | Column | Type (by construction) |
+|---|---|---|
+| Borrower Contact Directory | Title | Text (contact full name) |
+| | Contact Email / Mobile Number / Office Number / Job Title | Text |
+| | Active Status | **Yes/No, default Yes** (app filters on the boolean) |
+| | Preferred Language | Choice: English, Arabic |
+| | Notes | Multi-line text |
+| Communication Purpose Master | Title | Text — six seeded purpose rows |
+| Contact Communication Matrix | Title | optional (not required) |
+| | Borrower RIM | **Lookup → Master List (RIM)** + additional field `Borrower` (covers the spec's "Borrower Name (Lookup)" from the same lookup) |
+| | Contact | Lookup → Borrower Contact Directory (Title) |
+| | Purpose | **Lookup → Purpose Master (Title)** (not Choice — spec §9 expansion) |
+| | Notes | Multi-line text |
 
 **Types confirmed 2026-07-13** from the connector schema embedded in the user's own
 `IBD Client Contact Repository.msapp` (`References/DataSources.json`,

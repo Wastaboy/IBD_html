@@ -148,11 +148,11 @@
     <div class="mast-copy">
       <p class="kicker">IBD · Client Contact Repository · Build guide</p>
       <h1>One search, every contact</h1>
-      <p class="sub">A <strong>view-only</strong> canvas app over <strong>one</strong> SharePoint list: type a RIM or borrower name, get the borrower's facility snapshot and everyone on the relationship — the BMO coverage team and the borrower's office contacts — straight from the Master List of Exposures. The app reads, never writes. <strong>Every step is self-contained</strong>, and everything — names, formulas, colors, sizes, spacing — has a copy button.</p>
+      <p class="sub">Build the <strong>three contact lists in SharePoint</strong>, then a <strong>view-only</strong> canvas app over all four: type a RIM or borrower name, get the borrower's facility snapshot, every operational contact <strong>grouped by communication purpose</strong>, plus the BMO coverage team. The Master List of Exposures stays the single source of truth — the app reads, never writes. <strong>Every step is self-contained</strong>, and everything — names, formulas, column types, colors, sizes, spacing — has a copy button.</p>
       <div class="meta">
-        <span><b>1</b> list (already built)</span>
-        <span><b>1</b> screen</span>
-        <span><b>13</b> steps</span>
+        <span><b>3</b> lists to build</span>
+        <span><b>1</b> app · <b>1</b> screen</span>
+        <span><b>21</b> steps</span>
         <span>view-only · no flows</span>
         <span>then publish 🎉</span>
       </div>
@@ -163,7 +163,7 @@
 <div class="sticky">
   <div class="wrap">
     <div class="progress"><i id="bar"></i></div>
-    <div class="progtext"><span id="progLabel">0 of 13 steps done</span><button id="reset" type="button">Reset</button></div>
+    <div class="progtext"><span id="progLabel">0 of 21 steps done</span><button id="reset" type="button">Reset</button></div>
   </div>
 </div>
 
@@ -171,16 +171,19 @@
 
   <section class="block" id="intro">
     <h2 class="sec">Read this first</h2>
-    <div class="note why"><b>What you're building</b>Single screen, master-detail: a search panel on the left, and on the right a borrower card (facility snapshot) plus two contact blocks — the <strong>BMO coverage team</strong> (RSMs, RM, RIM officer) and the <strong>borrower's office contacts</strong> (email addresses). Everything comes straight off the selected row of the Master List of Exposures. No Power Automate, no data entry, no other lists: the BMO team keeps maintaining the Master List exactly as they do today, and the app just makes it searchable.</div>
+    <div class="note why"><b>What you're building — two deliverables</b>First, <strong>three new SharePoint lists</strong> (Phase 0.5) that hold the contact data: a contact directory, a purpose master, and the matrix that ties contacts to borrowers per purpose. Then a single-screen master-detail app: search panel on the left; on the right a borrower card (facility snapshot from the Master List), the contacts <strong>grouped by communication purpose</strong> — driven by the Purpose Master list, so new purposes appear with <strong>zero redesign</strong> — and below that the <strong>BMO coverage team</strong> and office contacts from the Master List's own columns. No Power Automate, no data entry in the app: contacts and matrix rows are maintained directly in SharePoint by the BMO team.</div>
     <div class="flow" aria-hidden="true">
-      <div class="fnode hot">Master List of Exposures<small>single source of truth · read-only</small></div>
+      <div class="fnode hot">Master List of Exposures<small>borrower truth · read-only · exists</small></div>
       <div class="farrow">→</div>
-      <div class="fnode">Search &amp; select<small>left panel · by name or RIM</small></div>
+      <div class="fnode">Contact Communication Matrix<small>who · which borrower · what purpose · L3</small></div>
+      <div class="farrow">←</div>
+      <div class="fnode">Borrower Contact Directory<small>people &amp; details · L1</small></div>
+      <div class="farrow">＋</div>
+      <div class="fnode">Communication Purpose Master<small>drives the grouping · L2</small></div>
       <div class="farrow">→</div>
-      <div class="fnode hot">Card + contacts<small>right panel · this guide</small></div>
+      <div class="fnode hot">Power Apps front end<small>S1–S16</small></div>
     </div>
-    <div class="note tip"><b>Every name and type in this guide is confirmed</b>Column names come from the client's list export, and column <em>types</em> were verified against the live connector schema (from a working app connected to the real list). No either/or formulas left — every paste is the right one. V1 is now just a sanity pass.</div>
-    <div class="note why"><b>Where did the four-list design go?</b>The v3 spec designed three more lists (Borrower Contact Directory, Communication Purpose Master, Contact Communication Matrix) for per-purpose external contacts. The client's real site keeps all contact data as <em>columns on the Master List</em>, so this guide builds on what exists. If those three lists ever get created and populated, the four-list version of this guide is preserved in the project's git history as the phase-2 design.</div>
+    <div class="note tip"><b>Every name and type in this guide is deterministic</b>Master List column names and types are confirmed against the live connector schema (from a working app on the real list). The three new lists' types are whatever <em>you</em> create in Phase 0.5 — the guide fixes each one, so every formula later is single-variant. No either/or anywhere.</div>
     <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> — including every size, color and spacing value in the property tables — is tap-to-copy; the ⧉ mark is the reminder. Paste, never retype.</div>
     <div class="pane">
       <div class="ph">The visual system — five values you'll reuse everywhere</div>
@@ -229,8 +232,122 @@
           <tr><td>office email</td><td>Text — lower-case name is real, not a typo</td></tr>
           <tr><td>Available extras</td><td>Syndicated or Bilateral · Term or WC (Choice — read via <code>.Value</code>) · Group Name (if applicable) · Trade Facilities · Repayment Method · DCO · Pricing (Text) · Original Review Date · Mid-Year Rev / QCM Date · Final Maturity (Date)</td><td>Not used by the app — add any of them to the S7 card the same way if the client asks</td></tr>
         </table></div>
-        <div class="note warn"><b>If you find the spec's three extra lists</b>The v3 spec also designed <em>Borrower Contact Directory</em>, <em>Communication Purpose Master</em> and <em>Contact Communication Matrix</em>. If those exist on the site <strong>with real data</strong>, stop here — the four-list version of this guide (in the project's git history) is the one to follow. If they're absent or empty, carry on: this guide matches the site as it is.</div>
+        <div class="note tip"><b>Only the Master List exists today</b>The three contact lists don't exist yet — that's not a problem, it's Phase 0.5: you build them next, to the spec, with every column type locked by this guide. (If someone already created any of them, compare against L1–L3 and fix differences before continuing.)</div>
         <div class="note check"><b>Check before moving on</b>Every column above exists under that exact name and type. Anything renamed since this guide was written → substitute your name when pasting.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="phase05">
+    <h2 class="sec">Phase 0.5 — Build the three lists</h2>
+    <p class="lead">The contact repository itself. Straight from the spec (§5–§7), every column type locked so the app formulas later are single-variant. Build them in this order — L3's lookups need L1 and L2 to exist first.</p>
+
+    <details class="step" id="l1">
+      <summary><span class="dot"></span><span class="num">L1</span><span class="stitle">Create the Borrower Contact Directory</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) Create the list.</strong> Open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → gear icon (top-right) → <strong>Site contents</strong> → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Borrower Contact Directory</code></div>
+        <p class="do">Leave "Show in site navigation" ticked → <strong>Create</strong>.</p>
+        <p class="do"><strong>b) The Title column holds the contact's full name.</strong> Nothing to change — you'll simply type the person's full name in Title when adding contacts. (Optional clarity: gear → <strong>List settings</strong> → <strong>Title</strong> → Description → <code class="cc">Contact Full Name</code>.)</p>
+        <p class="do"><strong>c) Add the seven columns</strong>, in the list view via <strong>+ Add column</strong>, one row of this table at a time. For each: pick the type from the menu, paste the Name, apply the settings in the third cell, <strong>Save</strong>:</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>Name (paste)</th><th>+ Add column → type</th><th>Settings</th></tr>
+          <tr><td><code class="cc">Contact Email</code></td><td>Text</td><td>defaults as-is</td></tr>
+          <tr><td><code class="cc">Mobile Number</code></td><td>Text</td><td>defaults as-is (text, not number — phone numbers keep leading zeros and "+" prefixes)</td></tr>
+          <tr><td><code class="cc">Office Number</code></td><td>Text</td><td>defaults as-is</td></tr>
+          <tr><td><code class="cc">Job Title</code></td><td>Text</td><td>defaults as-is</td></tr>
+          <tr><td><code class="cc">Active Status</code></td><td>Yes/No</td><td>Default value → <strong>Yes</strong> — new contacts are active unless someone flips them off</td></tr>
+          <tr><td><code class="cc">Preferred Language</code></td><td>Choice</td><td>Delete the sample choices; add two: <code class="cc">English</code> and <code class="cc">Arabic</code>. "Can add values manually" → off</td></tr>
+          <tr><td><code class="cc">Notes</code></td><td>Multiple lines of text</td><td>defaults as-is</td></tr>
+        </table></div>
+        <div class="note why"><b>Why Active Status is Yes/No, not Choice</b>The app filters on it (<code>ContactRec.'Active Status'</code> — S9). A Yes/No column makes that a clean boolean; a Choice column would force a string comparison and a place for typos ("active" vs "Active"). The spec doesn't dictate the type — this guide does, so the formula later is exact.</div>
+        <div class="note warn"><b>No borrower information in this list</b>Spec §5's rule and §2's core principle: a contact row is a person, nothing else. Which borrower they belong to lives <em>only</em> in the Matrix (L3) — never add a borrower column here.</div>
+        <div class="note check"><b>Check before moving on</b>The list shows columns: Title, Contact Email, Mobile Number, Office Number, Job Title, Active Status, Preferred Language, Notes — exactly these, exactly these spellings.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="l2">
+      <summary><span class="dot"></span><span class="num">L2</span><span class="stitle">Create the Communication Purpose Master &amp; seed the six purposes</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) Create the list.</strong> Site contents → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Communication Purpose Master</code></div>
+        <p class="do"><strong>Create</strong>. No extra columns — Title <em>is</em> the purpose name. That's the whole schema.</p>
+        <p class="do"><strong>b) Seed the six purposes.</strong> Six times: <strong>+ New</strong> → paste one name into <strong>Title</strong> → <strong>Save</strong>:</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Audit Confirmations</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Daily Transaction Advices</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Legal Notices</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Facility Documentation</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Covenant Reporting</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Business Matters</code></div>
+        <div class="note why"><b>This tiny list is the future-proofing</b>Spec §9 wants new Wholesale Banking units onboarded <em>without redesign</em>. Because the app's purpose grouping reads this list (S8) and the Matrix's Purpose column looks it up (L3), a new purpose is just a new row here — no app change, no column edit, no republish.</div>
+        <div class="note check"><b>Check before moving on</b>Six rows, spelled exactly as above — these strings are what the app groups by.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="l3">
+      <summary><span class="dot"></span><span class="num">L3</span><span class="stitle">Create the Contact Communication Matrix</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <div class="note warn"><b>Build this list last</b>Its three lookup columns point at the Master List, L1 and L2 — they must all exist before you start here.</div>
+        <p class="do"><strong>a) Create the list.</strong> Site contents → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Contact Communication Matrix</code></div>
+        <p class="do"><strong>b) Make Title optional.</strong> Matrix rows are pure links (who × which borrower × what purpose) — they don't need a name. Gear → <strong>List settings</strong> → under Columns click <strong>Title</strong> → "Require that this column contains information" → <strong>No</strong> → OK.</p>
+        <p class="do"><strong>c) The Borrower RIM lookup.</strong> Back in the list view: <strong>+ Add column</strong> → <strong>Lookup</strong>, then fill the panel exactly:</p>
+        <dl class="props">
+          <div><dt>Name</dt><dd><code class="cc">Borrower RIM</code></dd></div>
+          <div><dt>Select a list as a source</dt><dd><code class="cc">Master List of Exposures</code></dd></div>
+          <div><dt>Select a column from the list above</dt><dd><code class="cc">RIM</code></dd></div>
+          <div><dt>More options → Add a column to show each of these additional fields</dt><dd>tick <code class="cc">Borrower</code> — this creates the read-only <em>Borrower RIM: Borrower</em> column automatically</dd></div>
+        </dl>
+        <div class="note why"><b>Where's the spec's separate "Borrower Name (Lookup)"?</b>It's the additional field you just ticked. One lookup carrying both RIM and name means they can <em>never</em> point at two different borrowers — two independent lookups could. Same data, one less way to corrupt it. (Spec §2: no borrower information duplicated — the name is projected from the Master List, not stored here.)</div>
+        <p class="do"><strong>d) The Contact lookup.</strong> <strong>+ Add column</strong> → <strong>Lookup</strong>:</p>
+        <dl class="props">
+          <div><dt>Name</dt><dd><code class="cc">Contact</code></dd></div>
+          <div><dt>Select a list as a source</dt><dd><code class="cc">Borrower Contact Directory</code></dd></div>
+          <div><dt>Select a column from the list above</dt><dd><code class="cc">Title</code></dd></div>
+        </dl>
+        <p class="do"><strong>e) The Purpose lookup.</strong> <strong>+ Add column</strong> → <strong>Lookup</strong>:</p>
+        <dl class="props">
+          <div><dt>Name</dt><dd><code class="cc">Purpose</code></dd></div>
+          <div><dt>Select a list as a source</dt><dd><code class="cc">Communication Purpose Master</code></dd></div>
+          <div><dt>Select a column from the list above</dt><dd><code class="cc">Title</code></dd></div>
+        </dl>
+        <div class="note why"><b>Why Purpose is a Lookup, not a Choice</b>A Choice column's values live inside the column — adding a purpose means editing the column and republishing nothing but still touching schema. A Lookup reads L2, so purpose #7 is a row somebody types. That's spec §9 for free.</div>
+        <p class="do"><strong>f) Notes.</strong> <strong>+ Add column</strong> → <strong>Multiple lines of text</strong> → Name:</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Notes</code></div>
+        <div class="note check"><b>Check before moving on</b>Columns read: Title (optional), Borrower RIM, Borrower RIM: Borrower <em>(auto-created, read-only)</em>, Contact, Purpose, Notes. Open <strong>+ New</strong> once: Borrower RIM offers RIM numbers, Contact offers people from L1, Purpose offers the six purposes. Cancel without saving.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="l4">
+      <summary><span class="dot"></span><span class="num">L4</span><span class="stitle">Seed test data (deletable later)</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Empty lists can't verify an app (and S15's checklist needs specific shapes of data). Two minutes of seeding now saves an hour of "is it broken or just empty?" later.</p>
+        <p class="do"><strong>a) Two contacts</strong> in <code class="cc">Borrower Contact Directory</code> (+ New each):</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>Column</th><th>Contact 1</th><th>Contact 2</th></tr>
+          <tr><td>Title</td><td><code class="cc">Test Contact One</code></td><td><code class="cc">Test Contact Two</code></td></tr>
+          <tr><td>Contact Email</td><td><code class="cc">test.one@example.com</code></td><td><code class="cc">test.two@example.com</code></td></tr>
+          <tr><td>Mobile Number</td><td><code class="cc">+973 3900 0001</code></td><td><code class="cc">+973 3900 0002</code></td></tr>
+          <tr><td>Office Number</td><td><code class="cc">+973 1750 0001</code></td><td><code class="cc">+973 1750 0002</code></td></tr>
+          <tr><td>Job Title</td><td><code class="cc">Finance Manager</code></td><td><code class="cc">Accountant</code></td></tr>
+          <tr><td>Active Status</td><td>Yes</td><td><strong>No</strong> — deliberately inactive, S15 checks it's hidden</td></tr>
+          <tr><td>Preferred Language</td><td>English</td><td>Arabic</td></tr>
+        </table></div>
+        <p class="do"><strong>b) Four matrix rows</strong> in <code class="cc">Contact Communication Matrix</code>, all for <strong>one real borrower</strong> you'll remember (pick any from the Master List):</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>Row</th><th>Borrower RIM</th><th>Contact</th><th>Purpose</th></tr>
+          <tr><td>1</td><td>your test borrower</td><td>Test Contact One</td><td>Audit Confirmations</td></tr>
+          <tr><td>2</td><td>your test borrower</td><td>Test Contact One</td><td>Legal Notices</td></tr>
+          <tr><td>3</td><td>your test borrower</td><td>Test Contact Two</td><td>Audit Confirmations</td></tr>
+          <tr><td>4</td><td>your test borrower</td><td>Test Contact Two</td><td>Covenant Reporting</td></tr>
+        </table></div>
+        <div class="note why"><b>Why exactly this shape</b>One contact serving two purposes (row 1+2) proves the grouping duplicates correctly; an inactive contact in the matrix (rows 3–4) proves the active filter hides them; purposes with no rows prove empty groups don't render. That's three S15 checklist items covered by four rows.</div>
+        <div class="note tip"><b>Cleanup</b>After S15 passes, delete the two test contacts and four matrix rows (real data replaces them). Keep the six purposes — those are production.</div>
+        <div class="note check"><b>Check before moving on</b>Matrix shows 4 rows; each shows the RIM number, the borrower name beside it (the additional field working), a contact and a purpose.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -238,7 +355,7 @@
 
   <section class="block" id="phase1">
     <h2 class="sec">Phase 1 — Foundation</h2>
-    <p class="lead">A blank tablet app, one connection, and the container skeleton everything else sits in.</p>
+    <p class="lead">A blank tablet app, the four connections, and the container skeleton everything else sits in.</p>
 
     <details class="step" id="s1">
       <summary><span class="dot"></span><span class="num">S1</span><span class="stitle">Create the app</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
@@ -255,15 +372,15 @@
     </details>
 
     <details class="step" id="s2">
-      <summary><span class="dot"></span><span class="num">S2</span><span class="stitle">Connect the Master List</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">S2</span><span class="stitle">Connect the four lists</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
           <li>Left rail → <strong>Data</strong> → <strong>Add data</strong> → search <code class="cc">SharePoint</code> → pick the SharePoint connector (sign in if asked).</li>
           <li>Paste the site URL: <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → <strong>Connect</strong>.</li>
-          <li>Tick exactly one list: <code class="cc">Master List of Exposures</code> → <strong>Connect</strong>.</li>
+          <li>Tick exactly four lists: <code class="cc">Master List of Exposures</code> · <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code> → <strong>Connect</strong>.</li>
         </ol>
-        <div class="note warn"><b>List missing from the picker?</b>Then it doesn't exist on this site under that name — go back to V1 before continuing. (And if you spot the spec's three contact lists in the picker <em>with data</em>, see the V1 note — that changes which guide version to follow.)</div>
-        <div class="note check"><b>Check before moving on</b><code>Master List of Exposures</code> listed under Data in the left rail.</div>
+        <div class="note warn"><b>One of the three new lists missing from the picker?</b>Then L1–L3 didn't complete under that exact name — go back and check the list's name spelling before continuing.</div>
+        <div class="note check"><b>Check before moving on</b>All four lists listed under Data in the left rail.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -396,13 +513,21 @@
     </details>
 
     <details class="step" id="s5">
-      <summary><span class="dot"></span><span class="num">S5</span><span class="stitle">Selection powers the right panel</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">S5</span><span class="stitle">Selection loads that borrower's contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">One line. Everything the right panel shows — facility figures, coverage team, office emails — is a column on the row the user just tapped, so remembering that row is the whole job.</p>
+        <p class="do">One paste. It remembers the selected borrower, then pulls <em>only that borrower's</em> matrix rows into a local collection — each row enriched with the full contact record from the Directory. One server call per selection; the nested galleries later never touch SharePoint. Every column name and type in this formula is fixed by L1–L3, so it pastes and works:</p>
         <p class="fxlabel">galBorrowers · OnSelect</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem)</code></div>
-        <div class="note why"><b>Why it's this simple</b>The contact data lives <em>on</em> the Master List row — no second list to query, no collection to build, zero extra server calls per selection. The right panel just reads <code>varBorrower.&lt;column&gt;</code>.</div>
-        <div class="note check"><b>Check before moving on</b>Select a borrower in Preview, then open the Variables pane: <code>varBorrower</code> holds that borrower's full record.</div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem);
+Set(varLoading, true);
+ClearCollect(colMatrix,
+    AddColumns(
+        Filter('Contact Communication Matrix', 'Borrower RIM'.Id = varBorrower.ID),
+        ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
+    )
+);
+Set(varLoading, false)</code></div>
+        <div class="note why"><b>Why a collection</b>Grouping contacts by purpose needs nested galleries (S9 inside S8). If those queried SharePoint per row you'd get delegation warnings and a slow app. <code>colMatrix</code> is local, tiny (one borrower's rows), and instant. <code>'Borrower RIM'.Id = varBorrower.ID</code> matches on the lookup's row ID — exact and delegable, and it can't confuse two borrowers the way matching on a name could.</div>
+        <div class="note check"><b>Check before moving on</b>Select your L4 test borrower in Preview, then open the Variables pane: <code>varBorrower</code> holds the record and <code>colMatrix</code> holds 4 rows, each with a <code>ContactRec</code> record inside.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -430,7 +555,7 @@
 
   <section class="block" id="phase3">
     <h2 class="sec">Phase 3 — The detail panel</h2>
-    <p class="lead">Borrower card on top, then the heart of the app: the coverage team and the office contacts, straight off the selected row.</p>
+    <p class="lead">Borrower card on top, then the heart of the app: contacts grouped by communication purpose — and below them, the BMO coverage extras from the Master List's own columns.</p>
 
     <details class="step" id="s7">
       <summary><span class="dot"></span><span class="num">S7</span><span class="stitle">Placeholder &amp; borrower card</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
@@ -493,15 +618,146 @@
         <div class="fx"><button class="copy" type="button">Copy</button><code>lblBorrowerName.Height + 78</code></div>
         <div class="note tip"><b>Formatting the numbers</b>All four figures are Number columns (confirmed), so <code>Text(..., "#,##0")</code> works as-is. One judgment call: if Utilization is stored as a fraction (0.85 rather than 85), use <code>Text(varBorrower.'Overall Utilization %', "0%")</code> instead — one glance at the list data tells you which.</div>
         <div class="note tip"><b>Client wants more on the card?</b>Any V1 "available extras" column drops in the same way — e.g. <code>varBorrower.'Final Maturity'</code> or <code>varBorrower.'Syndicated or Bilateral'</code>. Add a label, reference the column, done.</div>
-        <div class="note check"><b>Check before moving on</b>Selecting a borrower shows name, the RIM/office/grade line and the facility figures on the right; with nothing selected you see only the placeholder line. Select your longest-named borrower: the name wraps and the card grows — the meta and facility lines never get pushed out of the grey box.</div>
+        <div class="note check"><b>Check before moving on</b>Selecting a borrower shows name, the RIM/office/grade line and the facility figures; the card grows if a long name wraps; with nothing selected only the placeholder shows.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="s8">
-      <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">The BMO coverage team</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">Loading line &amp; the purposes gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below the card) → rename to <code class="cc">conCoverage</code>. Grouping the block in its own container is what keeps the name/email pairs tight (gap 4 inside) while the blocks stay clearly separated (conRight's gap 12 outside):</p>
+        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc">lblLoading</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Loading contacts…"</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Italic</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">varLoading</code></dd></div>
+        </dl>
+        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master', CountRows(Filter(colMatrix, Purpose.Value = Title)) > 0)</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the purposes section takes the panel between the card and the coverage blocks, and scrolls inside itself</dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">140</code> for now — S10 replaces this with a formula that sizes each group to its contact count</dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading</code></dd></div>
+        </dl>
+        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">24</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">15</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+        </dl>
+        <div class="note why"><b>Why <code>Purpose.Value</code> just works</b>Purpose is the Lookup you created in L3-e — a lookup exposes its text through <code>.Value</code>. And because the Items formula reads the Purpose Master list, a purpose with no contacts for this borrower simply doesn't render, and a brand-new purpose row shows up with zero app changes (spec §9).</div>
+        <div class="note check"><b>Check before moving on</b>Selecting your L4 test borrower shows navy headings for exactly the purposes that have rows — Audit Confirmations, Legal Notices, Covenant Reporting — and none of the other three.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s9">
+      <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The contacts inside each purpose</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc">galPurposes</code> template still selected (pencil icon), below <code class="cc">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galContacts</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code> — 4 + the 24px heading + 4</dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">100</code> for now — S10 replaces it</dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">92</code></dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code> — it will size itself to its rows, so there's nothing to scroll</dd></div>
+        </dl>
+        <div class="note why"><b>The Active Status filter is exact by construction</b><code>ContactRec.'Active Status'</code> is the Yes/No column you created in L1 — a clean boolean, no string comparison, no variants. Flip a contact to No in SharePoint and they vanish from every purpose group.</div>
+        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
+        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">20</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+          <div><dt><code class="cc">Underline</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
+        </dl>
+        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <div class="note tip"><b>The row math</b>6 + 22 + 18 + 20 + 18 = 84 of the 92px template — same fixed-anchor discipline as the borrower list: every contact row identical, the email always in the same spot.</div>
+        <div class="note check"><b>Check before moving on</b>Each purpose heading lists its contacts: bold name, grey job title, tappable navy email, phone line. Test Contact One appears under <em>both</em> Audit Confirmations and Legal Notices; Test Contact Two (inactive) appears nowhere.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s10">
+      <summary><span class="dot"></span><span class="num">S10</span><span class="stitle">Make the nested rows size themselves</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Two pastes replace the two placeholder numbers from S8/S9, so each purpose group grows with its contact count instead of clipping or leaving dead space:</p>
+        <p class="fxlabel">galContacts · Height — replaces the 100</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></div>
+        <p class="fxlabel">galPurposes · TemplateSize — replaces the 140</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>lblPurposeHeader.Height + galContacts.Height + 16</code></div>
+        <div class="note check"><b>Check before moving on</b>Audit Confirmations (one active contact) takes one contact-row of space; a purpose with three would take three — no clipped rows, no gaps between groups.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s11">
+      <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">"No contacts recorded"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc">lblNoContacts</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
+          <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">40</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></dd></div>
+        </dl>
+        <div class="note check"><b>Check before moving on</b>A borrower with no matrix rows shows the message; your test borrower shows the grouped contacts instead. The coverage blocks (next two steps) still show for both — they come from the Master List, not the matrix.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s12">
+      <summary><span class="dot"></span><span class="num">S12</span><span class="stitle">The BMO coverage team</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <div class="note tip"><b>These two blocks (S12–S13) are extras beyond the spec</b>They surface the coverage data that already lives on the Master List row — genuinely useful, but not in spec §8. If the client prefers the purposes section to get the whole panel (or small screens feel tight), skip S12–S13 entirely; nothing else depends on them.</div>
+        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below the "No contacts" label) → rename to <code class="cc">conCoverage</code>. Grouping the block in its own container is what keeps the name/email pairs tight (gap 4 inside) while the blocks stay clearly separated (conRight's gap 12 outside):</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">216</code></dd></div>
@@ -601,8 +857,8 @@
       </div>
     </details>
 
-    <details class="step" id="s9">
-      <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The borrower's office contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="s13">
+      <summary><span class="dot"></span><span class="num">S13</span><span class="stitle">The borrower's office contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below <code class="cc">conCoverage</code>) → rename to <code class="cc">conOffice</code>. Same idea as S8-a: tight inside, separated outside.</p>
         <dl class="props">
@@ -679,12 +935,14 @@
   <section class="block" id="phase4">
     <h2 class="sec">Phase 4 — Finish &amp; ship</h2>
 
-    <details class="step" id="s10">
-      <summary><span class="dot"></span><span class="num">S10</span><span class="stitle">Polish — clean state &amp; selection highlight</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="s14">
+      <summary><span class="dot"></span><span class="num">S14</span><span class="stitle">Polish — clean state &amp; selection highlight</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <p class="do"><strong>a) Fresh start on every visit.</strong></p>
         <p class="fxlabel">scrMain · OnVisible</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, Blank())</code></div>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, Blank());
+Set(varLoading, false);
+Clear(colMatrix)</code></div>
         <p class="do"><strong>b) Show which borrower is selected.</strong></p>
         <p class="fxlabel">galBorrowers · TemplateFill</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>If(ThisItem.ID = varBorrower.ID, RGBA(31, 59, 110, 0.08), RGBA(0, 0, 0, 0))</code></div>
@@ -693,37 +951,42 @@
       </div>
     </details>
 
-    <details class="step" id="s11">
-      <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">Test everything</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="s15">
+      <summary><span class="dot"></span><span class="num">S15</span><span class="stitle">Test everything</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">F5 from <code class="cc">scrMain</code> and run all eleven. All must pass before publishing:</p>
+        <p class="do">F5 from <code class="cc">scrMain</code> and run all fifteen. The L4 seed data covers the purpose-grouping cases. All must pass before publishing:</p>
         <ul>
           <li>Open with nothing typed → full borrower list left, placeholder line right.</li>
           <li>Your <strong>longest borrower name</strong> → wraps to two lines in the list, every row's RIM line sits at the same height, and the card grows to fit the name.</li>
           <li>Partial borrower <strong>name</strong> → list narrows as you type.</li>
-          <li>Partial <strong>RIM</strong> → matching borrowers appear.</li>
+          <li>Full <strong>RIM</strong> → that borrower appears.</li>
           <li>Gibberish → <strong>"No borrowers found"</strong>.</li>
-          <li>Select a borrower → card shows name, RIM/office/grade line and the facility figures.</li>
-          <li>Coverage block shows RSM 1, RSM 2, RM, RIM officer names from the list.</li>
-          <li>Tap any email → a pre-addressed mail draft opens.</li>
-          <li>A borrower with a <strong>blank</strong> email (or blank 2nd office email) → that row is hidden, no empty gap.</li>
-          <li>Switch borrowers quickly → the right panel always matches the selection, no stale values.</li>
+          <li>Select the L4 test borrower → card + navy purpose headings; <strong>only</strong> the purposes that have contacts show.</li>
+          <li><strong>Test Contact One</strong> appears under both Audit Confirmations <em>and</em> Legal Notices.</li>
+          <li><strong>Test Contact Two</strong> (inactive) appears <strong>nowhere</strong>; flip them to Active in SharePoint, reselect the borrower → they appear.</li>
+          <li>A borrower <em>without</em> matrix rows → <strong>"No contacts recorded for this borrower"</strong>.</li>
+          <li>Add a <strong>new purpose row</strong> in the Purpose Master, link a contact in the Matrix, reselect → the new heading appears with <strong>no app change</strong>.</li>
+          <li>Coverage block shows RSM 1, RSM 2, RM, RIM officer names from the Master List.</li>
+          <li>Tap any email — contact, RSM, or office → a pre-addressed mail draft opens.</li>
+          <li>A blank email anywhere → that row is hidden, no empty gap.</li>
+          <li>Switch borrowers quickly → the right panel always matches the selection, no stale contacts.</li>
           <li>App checker (stethoscope) → <strong>no delegation warnings</strong> on <code class="cc">galBorrowers</code>.</li>
         </ul>
-        <div class="note check"><b>Check before moving on</b>Eleven for eleven. Any miss → the step that built that piece has the formula to re-check.</div>
+        <div class="note tip"><b>All green?</b>Delete the L4 test rows (two contacts, four matrix rows — keep the six purposes) before publishing.</div>
+        <div class="note check"><b>Check before moving on</b>Fifteen for fifteen. Any miss → the step that built that piece has the formula to re-check.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
-    <details class="step" id="s12">
-      <summary><span class="dot"></span><span class="num">S12</span><span class="stitle">Publish &amp; share — the victory lap</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="s16">
+      <summary><span class="dot"></span><span class="num">S16</span><span class="stitle">Publish &amp; share — the victory lap</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
           <li>File → <strong>Save</strong> → <strong>Publish</strong> → <strong>Publish this version</strong>.</li>
           <li>Power Apps home → the app's <strong>⋯</strong> menu → <strong>Share</strong> → add the IBD users or their security group as <strong>User</strong> (not Co-owner).</li>
           <li>Hand the BMO team this guide plus your filled-in V1 checklist, so future maintainers know the app's exact column dependencies.</li>
         </ol>
-        <div class="note warn"><b>Sharing the app does not grant list access</b>Users also need <strong>Read</strong> on the <code class="cc">Master List of Exposures</code> — grant it on the BMO site. The app is view-only, so Read is all they need; don't grant Edit.</div>
+        <div class="note warn"><b>Sharing the app does not grant list access</b>Users also need <strong>Read</strong> on all four SharePoint lists — grant it on the BMO site. The app is view-only, so Read is all they need; don't grant Edit. (The BMO maintainers who add contacts and matrix rows need <strong>Edit</strong> on the three new lists — but not through the app.)</div>
         <div class="note check"><b>Done</b>A colleague opens the app from office.com, types a RIM, and reads the contacts — without asking you anything. That's the whole job. 🏁</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -731,8 +994,8 @@
   </section>
 
   <footer>
-    IBD Client Contact Repository — view-only Power Apps over the Master List of Exposures · Owner: BMO<br>
-    One verification pass, three foundation steps, six build steps, polish, then test and publish.
+    IBD Client Contact Repository — three SharePoint lists + view-only Power Apps · spec v3.0 · Owner: BMO<br>
+    One verification pass, four list-building steps, three foundation steps, ten build steps, polish, then test and publish.
   </footer>
 </main>
 
@@ -745,7 +1008,7 @@
     set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
     del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
   };
-  var KEY="ibdContactRepoGuide_v2";
+  var KEY="ibdContactRepoGuide_v3";
 
   function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
   function copyText(text,onDone){
