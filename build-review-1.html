@@ -282,7 +282,7 @@ Set(varLoading, false)</code></div>
         </dl>
         <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
         <dl class="props">
-          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master', CountRows(Filter(colMatrix, Purpose.Value = Title)) > 0)</code></dd></div>
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master' As PurposeRow, CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the purposes section takes the panel between the card and the coverage blocks, and scrolls inside itself</dd></div>
           <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">140</code> for now — S10 replaces this with a formula that sizes each group to its contact count</dd></div>
           <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
@@ -299,7 +299,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
         </dl>
-        <div class="note why"><b>Why <code>Purpose.Value</code> just works</b>Purpose is the Lookup you created in L3-e — a lookup exposes its text through <code>.Value</code>. And because the Items formula reads the Purpose Master list, a purpose with no contacts for this borrower simply doesn't render, and a brand-new purpose row shows up with zero app changes (spec §9).</div>
+        <div class="note why"><b>Why the <code>As PurposeRow</code> alias is load-bearing</b>Both the Purpose Master <em>and</em> the Matrix rows in <code>colMatrix</code> have a column named Title (the Matrix's is the optional blank one from L3-b). Inside the inner Filter, a bare <code>Title</code> would grab the Matrix row's blank one and every purpose would count zero — no headings at all. <code>As PurposeRow</code> names the outer row so <code>PurposeRow.Title</code> is unambiguous. Beyond that: <code>Purpose.Value</code> is the L3-e lookup's text, purposes with no contacts don't render, and a brand-new purpose row shows up with zero app changes (spec §9).</div>
         <div class="note check"><b>Check before moving on</b>Selecting your L4 test borrower shows navy headings for exactly the purposes that have rows — Audit Confirmations, Legal Notices, Covenant Reporting — and none of the other three.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
