@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F3B6E">
+<title>IBD Contact Repository — Build review №1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3B6E; --navy-deep:#142a52; --ink:#0f1f3d;
+    --amber:#E08A1E; --amber-soft:#fbe8cd;
+    --paper:#F4F5F8; --card:#fff; --line:#e3e6ee; --line-soft:#eef1f7;
+    --navy-tint:#eef0f6; --faint:#97a1b4;
+    --text:#1b2436; --muted:#5b6678;
+    --code-bg:#0f1f3d; --code-text:#e9edf7;
+    --ok:#1f8a52; --ok-soft:#e3f3ea;
+    --green:#228b57; --red:#c83737; --gray:#788291;
+    --radius:14px; --tap:46px; --sh-sm:0 1px 2px rgba(16,31,61,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:24px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+
+  header.mast{background:radial-gradient(120% 140% at 100% 0%, rgba(224,138,30,.22), transparent 55%),linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;padding:calc(28px + env(safe-area-inset-top)) 0 26px;border-bottom:3px solid var(--amber)}
+  .mast-inner{display:flex;gap:18px;align-items:center}
+  .mast-copy{flex:1;min-width:0}
+  .brandmark{flex:none;width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,#274982,#1a345f);border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);display:grid;place-items:center}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:500;margin:0 0 10px}
+  .mast h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:42px;line-height:1.12;margin:0 0 8px;letter-spacing:-.01em}
+  .mast p.sub{margin:0;color:#c7d2e8;font-size:21px;max-width:48ch}
+  .mast .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .mast .meta span{font-family:"IBM Plex Mono",monospace;font-size:16px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);padding:5px 9px;border-radius:999px;color:#dde6f5}
+  .mast .meta span b{color:#fff;font-weight:600}
+  @media(max-width:480px){ .brandmark{width:50px;height:50px} .mast h1{font-size:34px} }
+
+  .sticky{position:sticky;top:0;z-index:40;background:rgba(244,245,248,.86);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .progress{height:5px;background:var(--line);overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--amber));transition:width .35s ease}
+  .progtext{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding:6px 0 8px;display:flex;justify-content:space-between;align-items:center}
+  .progtext button{background:none;border:none;color:var(--navy);font-family:inherit;font-size:15px;cursor:pointer;text-decoration:underline;padding:4px}
+
+  section.block{margin:26px 0}
+  section.block > h2.sec{font-family:"IBM Plex Serif",serif;font-size:29px;font-weight:600;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em;scroll-margin-top:120px}
+  section.block > p.lead{margin:0 0 14px;color:var(--muted);font-size:21px}
+
+  .tldr{background:#fffdf8;border:1px dashed #ecd6ad;border-radius:12px;padding:13px 15px;margin:0 0 15px;font-size:20px}
+  .tldr b{display:block;font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#a4651a;margin-bottom:4px}
+
+  details.step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:12px 0;overflow:hidden;scroll-margin-top:118px;box-shadow:var(--sh-sm)}
+  details.step[open]{box-shadow:0 6px 24px -12px rgba(16,31,61,.28);border-color:#d4dae8}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:var(--tap);user-select:none;-webkit-tap-highlight-color:transparent}
+  summary::-webkit-details-marker{display:none}
+  summary .num{flex:none;min-width:30px;height:30px;padding:0 5px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:18px}
+  details.isdone summary .num{background:var(--ok)}
+  summary .stitle{flex:1;font-weight:600;font-size:22px;line-height:1.3}
+  summary .chev{flex:none;color:var(--muted);transition:transform .2s ease}
+  details[open] summary .chev{transform:rotate(90deg)}
+  summary .dot{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid var(--line)}
+  details.isdone summary .dot{background:var(--ok);border-color:var(--ok)}
+  .body{padding:2px 16px 18px;border-top:1px solid var(--line-soft)}
+  .body > *:first-child{margin-top:14px}
+  .body p{margin:0 0 12px}
+  p.do{margin:0 0 12px}
+  .body ul,.body ol{margin:0 0 12px;padding-left:22px}.body li{margin:0 0 8px}
+  ol.steps2{counter-reset:s2;list-style:none;padding-left:0}
+  ol.steps2 > li{position:relative;padding:2px 0 10px 40px;margin:0}
+  ol.steps2 > li::before{counter-increment:s2;content:counter(s2);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:8px;background:var(--navy-tint);color:var(--navy);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;display:grid;place-items:center;border:1px solid #dbe3f5}
+
+  dl.props{margin:0 0 13px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  dl.props > div{display:grid;grid-template-columns:210px 1fr;border-top:1px solid var(--line-soft)}
+  dl.props > div:first-child{border-top:none}
+  dl.props dt{background:#f7f9fc;padding:9px 12px;font-family:"IBM Plex Mono",monospace;font-size:18px;color:var(--navy);font-weight:500;border-right:1px solid var(--line-soft)}
+  dl.props dd{margin:0;padding:9px 12px;font-size:20px}
+  dl.props dd code{font-family:"IBM Plex Mono",monospace;font-size:18px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  @media(max-width:430px){dl.props > div{grid-template-columns:130px 1fr}dl.props dt{font-size:15px;padding:8px 9px}dl.props dd{font-size:18px;padding:8px 10px}}
+
+  .fxlabel{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin:0 0 5px;font-weight:500}
+  .fx{position:relative;margin:0 0 13px}
+  .fx code{display:block;background:var(--code-bg);color:var(--code-text);font-family:"IBM Plex Mono",monospace;font-size:18px;line-height:1.55;padding:14px 84px 14px 16px;border-radius:11px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #1c3360}
+  .fx .copy{position:absolute;top:8px;right:8px;height:34px;min-width:34px;padding:0 11px;border:none;border-radius:8px;background:rgba(224,138,30,.95);color:#1b1206;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .fx .copy:active{transform:scale(.96)}
+  .fx .copy.copied{background:var(--ok);color:#fff}
+  .fxgroup{border:1px solid var(--line);border-radius:12px;padding:12px 13px 2px;margin:0 0 14px;background:#fcfdff}
+  .fxgroup > .gh{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;color:var(--navy);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .fxgroup > .gh::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--amber)}
+
+  .pane{background:#f4f6fb;border:1px solid #dbe2f1;border-left:4px solid var(--navy);border-radius:11px;padding:12px 14px;margin:0 0 13px}
+  .pane > .ph{font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);font-weight:600;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .pane > .ph::before{content:"\2699";font-size:16px;line-height:1}
+  .pane ol,.pane ul{margin:0;padding-left:20px}.pane li{margin:0 0 6px;font-size:19px}
+  .pane p{margin:0 0 8px;font-size:19px}
+  .pane code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#e7ecf7;color:var(--navy);padding:1px 6px;border-radius:5px}
+
+  .note{border-radius:11px;padding:12px 14px;margin:0 0 13px;font-size:20px;border:1px solid;line-height:1.55}
+  .note b{display:block;font-size:17px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;font-family:"IBM Plex Mono",monospace}
+  .note.why{background:#eef2fb;border-color:#d5def3;color:#23365e}.note.why b{color:var(--navy)}
+  .note.warn{background:#fbe8cd33;border-color:var(--amber-soft);color:#6b4410}.note.warn b{color:#a4651a}
+  .note.tip{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.tip b{color:var(--ok)}
+  .note.check{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.check b{color:var(--ok)}
+  .note.check b::before{content:"✅ ";}
+  .note code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px}
+
+  /* tap-to-copy chips: every code chip outside a dark .fx box is copyable */
+  code.cc{cursor:copy;position:relative;-webkit-tap-highlight-color:transparent}
+  code.cc::after{content:"⧉";font-size:.78em;margin-left:5px;opacity:.55}
+  code.cc.copied{background:var(--ok) !important;color:#fff !important}
+  code.cc.copied::after{content:"✓";opacity:1}
+
+  .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
+  .done:active{background:var(--line-soft)}
+  details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  table.cols{width:100%;border-collapse:collapse;margin:0 0 13px;background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:19px}
+  table.cols th,table.cols td{border-top:1px solid var(--line-soft);padding:8px 11px;text-align:left;vertical-align:top}
+  table.cols tr:first-child th{border-top:none}
+  table.cols th{background:#f7f9fc;font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  table.cols td:first-child{font-weight:600;white-space:nowrap}
+  table.cols code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:0 0 13px}
+  .tablewrap table.cols{margin:0}
+
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 13px}
+  .flow .fnode{border:1.5px solid var(--navy);border-radius:10px;padding:7px 11px;background:var(--navy-tint);font-size:17px;font-weight:600;color:var(--navy);text-align:center;line-height:1.35}
+  .flow .fnode small{display:block;font-weight:400;color:var(--muted);font-size:15px}
+  .flow .fnode.hot{border-color:var(--amber);background:#fdf6ea;color:#8a5200}
+  .flow .farrow{color:var(--faint);font-size:20px}
+
+  footer{margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:18px;text-align:center;line-height:1.6}
+  footer a{color:var(--navy);font-weight:600}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-inner">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="46" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="16" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/>
+        <path d="M17 20l4 4 10-10M17 30h9" stroke="rgba(224,138,30,.95)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="mast-copy">
+      <p class="kicker">IBD · Client Contact Repository · Build review №1</p>
+      <h1>Your build, reviewed</h1>
+      <p class="sub">Audit of the app exported <strong>15 July</strong>. The bones are good — search, borrower card, coverage and office blocks are all <strong>exactly right</strong>. Four things need fixing, and this page walks every one of them, copy-paste ready. Work top to bottom; <strong>F1 first</strong> — two later formulas depend on it.</p>
+      <div class="meta">
+        <span><b>4</b> real fixes</span>
+        <span><b>4</b> guide steps to build</span>
+        <span><b>~40</b> min</span>
+        <span>then re-test ✅</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="sticky">
+  <div class="wrap">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="progtext"><span id="progLabel">0 of 10 steps done</span><button id="reset" type="button">Reset</button></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section class="block" id="verdict">
+    <h2 class="sec">The verdict</h2>
+    <div class="note tip"><b>What you got right — most of it</b>S1–S4 foundation and search (including the correct number-variant RIM formula), S6, the S7 card <em>with</em> the growing-name formula, the S12 coverage block and S13 office block with every <code>.Value</code> / <code>.DisplayName</code> exactly right, the S14 polish, the row-template labels properly <em>inside</em> the gallery this time, fixed anchors throughout. That's a clean build of everything you attempted.</div>
+    <div class="note warn"><b>The four problems, in dependency order</b>
+    ① The app is connected to the <strong>wrong three lists</strong> — <em>BMO Email tracker</em>, <em>BMO Resources</em> and <em>BMO Status list</em> instead of the three IBD contact lists (plus a leftover <em>CustomGallerySample</em>).
+    ② The <strong>S5 selection formula was never installed</strong> — <code>galBorrowers.OnSelect</code> is still the old one-liner, so <code>colMatrix</code> never exists; that's exactly the two red errors your app checker shows on <code>scrMain.OnVisible</code>, and why it flags <code>varLoading</code> as unused.
+    ③ The <strong>purpose-grouped contacts section (S8–S11) hasn't been built</strong> — the spec's centerpiece.
+    ④ <code>conRight</code> has <code>LayoutAlignItems</code> set to <strong>Center</strong> again — the squeeze bug from your first build: everything on the right floats narrow and centered instead of filling the panel.</div>
+    <div class="note why"><b>How this page works</b>F-steps are fixes to what exists; the four S-steps reproduced from the main guide build what's missing — in full, so you never have to switch pages mid-build. Same copy buttons, same chips, same done-tracking (progress here is separate from the main guide's).</div>
+  </section>
+
+  <section class="block" id="fixes1">
+    <h2 class="sec">The fixes</h2>
+
+    <details class="step" id="f1" open>
+      <summary><span class="dot"></span><span class="num">F1</span><span class="stitle">Connect the right three lists</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) First, confirm the three IBD lists exist in SharePoint.</strong> Open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → gear → <strong>Site contents</strong> → look for <code class="cc">Borrower Contact Directory</code>, <code class="cc">Communication Purpose Master</code>, <code class="cc">Contact Communication Matrix</code>.</p>
+        <div class="note warn"><b>Not there?</b>Then stop here and build them first — <a href="IBD_Contact_Repository_Build_Guide.html#l1">Phase 0.5 of the main guide (L1–L4)</a> creates all three click-by-click, seeds the six purposes and the test data. Come back to F1-b when Site contents shows all three.</div>
+        <p class="do"><strong>b) Remove the four wrong connections.</strong> In Power Apps Studio: left rail → <strong>Data</strong>. For each of <code class="cc">BMO Email tracker</code>, <code class="cc">BMO Resources</code>, <code class="cc">BMO Status list</code> and <code class="cc">CustomGallerySample</code>: hover it → click the <strong>⋯</strong> that appears → <strong>Remove</strong>. <em>You should now see</em> only <code>Master List of Exposures</code> left under Data.</p>
+        <p class="do"><strong>c) Add the right three.</strong> Still in Data: <strong>Add data</strong> → search <code class="cc">SharePoint</code> → pick the connector → site <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → tick exactly three: <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code> → <strong>Connect</strong>.</p>
+        <div class="note check"><b>Check before moving on</b>The Data rail lists exactly four sources: Master List of Exposures and the three IBD lists. Nothing named "BMO Email tracker / Resources / Status list", no CustomGallerySample.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f2">
+      <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Un-squeeze the right panel</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Select <code class="cc">conRight</code> in the Tree view → property dropdown → <code class="cc">LayoutAlignItems</code> → replace <code>Center</code> with:</p>
+        <p class="fxlabel">conRight · LayoutAlignItems</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>LayoutAlignItems.Stretch</code></div>
+        <div class="note why"><b>Same bug as round one</b>Center makes every child shrink to its minimum width and float in the middle — the card, coverage and office blocks end up in a skinny centered column. Stretch makes them fill the panel edge-to-edge. If a layout ever looks pinched, this property is always the first suspect.</div>
+        <div class="note check"><b>Check before moving on</b>Select any borrower in Preview: the grey card spans the full width of the right panel.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f3">
+      <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Install the real selection formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Your <code class="cc">galBorrowers</code> → <code class="cc">OnSelect</code> still holds the old one-liner. Replace it entirely with this — it fills <code class="cc">colMatrix</code> with the selected borrower's matrix rows, each enriched with the full contact record (this is what makes your two app-checker errors and the "unused varLoading" warning disappear):</p>
+        <p class="fxlabel">galBorrowers · OnSelect — replace everything</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem);
+Set(varLoading, true);
+ClearCollect(colMatrix,
+    AddColumns(
+        Filter('Contact Communication Matrix', 'Borrower RIM'.Id = varBorrower.ID),
+        ContactRec, LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)
+    )
+);
+Set(varLoading, false)</code></div>
+        <div class="note warn"><b>Red squiggles until F1 is done</b>This formula names the two lists F1 connects — paste it after F1 or it can't resolve them.</div>
+        <div class="note check"><b>Check before moving on</b>Select your test borrower in Preview → Variables pane: <code>colMatrix</code> holds that borrower's matrix rows with a <code>ContactRec</code> record in each. App checker (stethoscope): the two <code>scrMain.OnVisible</code> errors are gone.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="build">
+    <h2 class="sec">Build what's missing — S8 to S11, reproduced from the main guide</h2>
+    <p class="lead">The purpose-grouped contacts: the spec's centerpiece. These four steps are identical to the main guide's — in full, so everything you need is on this page.</p>
+    <details class="step" id="s8">
+      <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">Loading line &amp; the purposes gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc">lblLoading</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Loading contacts…"</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Italic</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">varLoading</code></dd></div>
+        </dl>
+        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master', CountRows(Filter(colMatrix, Purpose.Value = Title)) > 0)</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the purposes section takes the panel between the card and the coverage blocks, and scrolls inside itself</dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">140</code> for now — S10 replaces this with a formula that sizes each group to its contact count</dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading</code></dd></div>
+        </dl>
+        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">24</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">15</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+        </dl>
+        <div class="note why"><b>Why <code>Purpose.Value</code> just works</b>Purpose is the Lookup you created in L3-e — a lookup exposes its text through <code>.Value</code>. And because the Items formula reads the Purpose Master list, a purpose with no contacts for this borrower simply doesn't render, and a brand-new purpose row shows up with zero app changes (spec §9).</div>
+        <div class="note check"><b>Check before moving on</b>Selecting your L4 test borrower shows navy headings for exactly the purposes that have rows — Audit Confirmations, Legal Notices, Covenant Reporting — and none of the other three.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s9">
+      <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The contacts inside each purpose</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc">galPurposes</code> template still selected (pencil icon), below <code class="cc">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galContacts</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code> — 4 + the 24px heading + 4</dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">100</code> for now — S10 replaces it</dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">92</code></dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code> — it will size itself to its rows, so there's nothing to scroll</dd></div>
+        </dl>
+        <div class="note why"><b>The Active Status filter is exact by construction</b><code>ContactRec.'Active Status'</code> is the Yes/No column you created in L1 — a clean boolean, no string comparison, no variants. Flip a contact to No in SharePoint and they vanish from every purpose group.</div>
+        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
+        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">20</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+          <div><dt><code class="cc">Underline</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
+        </dl>
+        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <div class="note tip"><b>The row math</b>6 + 22 + 18 + 20 + 18 = 84 of the 92px template — same fixed-anchor discipline as the borrower list: every contact row identical, the email always in the same spot.</div>
+        <div class="note check"><b>Check before moving on</b>Each purpose heading lists its contacts: bold name, grey job title, tappable navy email, phone line. Test Contact One appears under <em>both</em> Audit Confirmations and Legal Notices; Test Contact Two (inactive) appears nowhere.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s10">
+      <summary><span class="dot"></span><span class="num">S10</span><span class="stitle">Make the nested rows size themselves</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Two pastes replace the two placeholder numbers from S8/S9, so each purpose group grows with its contact count instead of clipping or leaving dead space:</p>
+        <p class="fxlabel">galContacts · Height — replaces the 100</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></div>
+        <p class="fxlabel">galPurposes · TemplateSize — replaces the 140</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>lblPurposeHeader.Height + galContacts.Height + 16</code></div>
+        <div class="note check"><b>Check before moving on</b>Audit Confirmations (one active contact) takes one contact-row of space; a purpose with three would take three — no clipped rows, no gaps between groups.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="s11">
+      <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">"No contacts recorded"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc">lblNoContacts</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
+          <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">40</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></dd></div>
+        </dl>
+        <div class="note check"><b>Check before moving on</b>A borrower with no matrix rows shows the message; your test borrower shows the grouped contacts instead. The coverage blocks (next two steps) still show for both — they come from the Master List, not the matrix.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="fixes2">
+    <h2 class="sec">Finish up</h2>
+
+    <details class="step" id="f4">
+      <summary><span class="dot"></span><span class="num">F4</span><span class="stitle">Put the blocks back in order</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">New controls land at the <em>bottom</em> of their container, so after S8–S11 your right panel reads: card → coverage → office → loading → purposes → "no contacts". The purposes section belongs above the coverage blocks. In auto-layout containers, <strong>Tree-view order = visual order</strong>, so fix it there:</p>
+        <ol class="steps2">
+          <li>In the Tree view, expand <code class="cc">conRight</code>. <em>You should now see</em> its children top to bottom: lblPlaceholder, conBorrowerCard, conCoverage, conOffice, lblLoading, galPurposes, lblNoContacts.</li>
+          <li>Right-click <code class="cc">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong>. Repeat until it has moved down <strong>four times</strong>.</li>
+          <li>Right-click <code class="cc">conOffice</code> → <strong>Reorder</strong> → <strong>Move down</strong>, also <strong>four times</strong>.</li>
+        </ol>
+        <div class="note check"><b>Check before moving on</b>conRight's children now read, top to bottom: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galPurposes · lblNoContacts · conCoverage · conOffice</strong> — and in Preview the purpose groups sit between the card and "BMO coverage team".</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f5">
+      <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">Small true-ups</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Cosmetic drift from the guide's spec — three quick property pastes:</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>Control</th><th>Property</th><th>Set to</th><th>Why</th></tr>
+          <tr><td><code class="cc">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td><td>it's at the default (13) — the name should outrank the RIM line</td></tr>
+          <tr><td rowspan="4"><code class="cc">lblNoResults</code></td><td><code class="cc">Color</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code></td><td rowspan="4">it's default dark, left-aligned, auto-sized — the guide's empty-state is grey, centered, 13px in a 40px row</td></tr>
+          <tr><td><code class="cc">Align</code></td><td><code class="cc">Align.Center</code></td></tr>
+          <tr><td><code class="cc">Size</code></td><td><code class="cc">13</code></td></tr>
+          <tr><td><code class="cc">Height</code></td><td><code class="cc">40</code></td></tr>
+          <tr><td><code class="cc">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td><td>it has no height, so conCoverage's 216px math is slightly off</td></tr>
+        </table></div>
+        <div class="note tip"><b>Optional, purely cosmetic</b>Your <code>conLeft</code> uses gap 12 / padding 16 where the guide says gap <code class="cc">8</code> / padding <code class="cc">12</code>. Both look fine — change only if you want pixel-parity with the guide. The app checker's accessibility notes (missing TabIndex / AccessibleLabel) are advisory; for an internal tool you can ignore them, or set <code class="cc">TabIndex</code> → <code class="cc">0</code> on the six email labels to make them keyboard-reachable.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f6">
+      <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">Re-test the new pieces</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">F5 from <code class="cc">scrMain</code>. These six exercise everything this page changed (L4's seed data provides the shapes):</p>
+        <ul>
+          <li>Select the L4 test borrower → navy purpose headings appear between the card and the coverage block; <strong>only</strong> purposes with contacts show.</li>
+          <li><strong>Test Contact One</strong> appears under both Audit Confirmations <em>and</em> Legal Notices.</li>
+          <li><strong>Test Contact Two</strong> (inactive) appears nowhere.</li>
+          <li>A borrower without matrix rows → <strong>"No contacts recorded for this borrower"</strong>; coverage and office blocks still show.</li>
+          <li>The right panel fills its full width — card and blocks edge-to-edge (F2).</li>
+          <li>App checker → the <code>scrMain.OnVisible</code> errors and the <code>varLoading</code> warning are gone; no delegation warnings on <code class="cc">galBorrowers</code>.</li>
+        </ul>
+        <p class="do">All six green → run the main guide's full <a href="IBD_Contact_Repository_Build_Guide.html#s15">S15 checklist (fifteen items)</a>, then delete the L4 test rows and publish via <a href="IBD_Contact_Repository_Build_Guide.html#s16">S16</a>. 🏁</p>
+        <div class="note check"><b>Done</b>Six for six here, fifteen for fifteen on S15 — the build matches the spec and the guide.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    Build review №1 — audit of the 15 July export · IBD Client Contact Repository · Owner: BMO<br>
+    Back to the <a href="IBD_Contact_Repository_Build_Guide.html">full build guide</a>.
+  </footer>
+</main>
+<script>
+(function(){
+  "use strict";
+  var mem={};
+  var store={
+    get:function(k){try{return localStorage.getItem(k);}catch(e){return (k in mem)?mem[k]:null;}},
+    set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
+    del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
+  };
+  var KEY="ibdBuildReview1_v1";
+
+  function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+  function copyText(text,onDone){
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(onDone,function(){fallbackCopy(text);onDone();});}
+    else{fallbackCopy(text);onDone();}
+  }
+  document.querySelectorAll(".fx .copy").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var code=btn.parentElement.querySelector("code");
+      copyText(code?code.textContent:"",function(){
+        btn.classList.add("copied");btn.textContent="✓";
+        setTimeout(function(){btn.classList.remove("copied");btn.textContent="Copy";},1300);
+      });
+    });
+  });
+  document.querySelectorAll("code.cc").forEach(function(chip){
+    chip.setAttribute("title","Tap to copy");
+    chip.addEventListener("click",function(){
+      copyText(chip.textContent,function(){
+        chip.classList.add("copied");
+        setTimeout(function(){chip.classList.remove("copied");},1100);
+      });
+    });
+  });
+
+  var steps=Array.prototype.slice.call(document.querySelectorAll("details.step"));
+  var total=steps.length;
+  var bar=document.getElementById("bar");
+  var label=document.getElementById("progLabel");
+  function loadDone(){var raw=store.get(KEY);if(!raw)return {};try{return JSON.parse(raw)||{};}catch(e){return {};}}
+  function saveDone(obj){store.set(KEY,JSON.stringify(obj));}
+  var doneMap=loadDone();
+  function refreshProgress(){
+    var n=0;
+    steps.forEach(function(d){if(d.classList.contains("isdone"))n++;});
+    bar.style.width=(total?Math.round(n/total*100):0)+"%";
+    label.textContent=n+" of "+total+" steps done";
+  }
+  steps.forEach(function(d){
+    if(doneMap[d.id])d.classList.add("isdone");
+    var btn=d.querySelector(".done");
+    function syncBtn(){btn.textContent=d.classList.contains("isdone")?"✓ Done — tap to undo":"Mark step done";}
+    syncBtn();
+    btn.addEventListener("click",function(){d.classList.toggle("isdone");doneMap[d.id]=d.classList.contains("isdone");saveDone(doneMap);syncBtn();refreshProgress();});
+  });
+  refreshProgress();
+  document.getElementById("reset").addEventListener("click",function(){
+    steps.forEach(function(d){d.classList.remove("isdone");d.querySelector(".done").textContent="Mark step done";});
+    doneMap={};store.del(KEY);refreshProgress();
+  });
+})();
+</script>
+</body>
+</html>
