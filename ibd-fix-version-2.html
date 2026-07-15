@@ -111,6 +111,10 @@
   code.cc.copied{background:var(--ok) !important;color:#fff !important}
   code.cc.copied::after{content:"✓";opacity:1}
 
+  /* element chips: names of controls that live in the Tree view */
+  code.el{background:#e8edf8 !important;color:#1F3B6E !important;border:1px solid #c9d6ef;font-weight:600}
+  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
+
   .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
   .done:active{background:var(--line-soft)}
   details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -172,15 +176,15 @@
 
   <section class="block" id="verdict">
     <h2 class="sec">The verdict</h2>
-    <div class="note tip"><b>Fixed since review №1 — genuinely well done</b>All four correct lists connected, and L1–L3 were executed well (the Matrix's lookups, the additional Borrower field, the Directory columns — all right). The full <code>ClearCollect(colMatrix, …)</code> selection formula is installed and exact. <code>conRight</code> is back on Stretch. <code>lblLoading</code> and <code>galPurposes</code> exist with the right Visible and TemplateSize.</div>
+    <div class="note tip"><b>Fixed since review №1 — genuinely well done</b>All four correct lists connected, and L1–L3 were executed well (the Matrix's lookups, the additional Borrower field, the Directory columns — all right). The full <code>ClearCollect(colMatrix, …)</code> selection formula is installed and exact. <code class="el">conRight</code> is back on Stretch. <code class="el">lblLoading</code> and <code class="el">galPurposes</code> exist with the right Visible and TemplateSize.</div>
     <div class="note warn"><b>The five problems this round</b>
-    ① <strong>galPurposes' template is empty</strong> — <code>lblPurposeHeader</code> was never created <em>inside</em> it. The same template trap as round one: the label must be inserted with the gallery's first row selected.
+    ① <strong>galPurposes' template is empty</strong> — <code class="el">lblPurposeHeader</code> was never created <em>inside</em> it. The same template trap as round one: the label must be inserted with the gallery's first row selected.
     ② <strong>galContacts sits <em>next to</em> galPurposes</strong>, directly in conRight, instead of <em>inside</em> galPurposes' template. The nesting is the whole mechanism — one contact list <em>per purpose row</em>. As a sibling it can't work.
-    ③ <strong>galContacts was inserted with a sample layout, not Blank</strong> — the evidence is a leftover <code>Label8</code> reading <code>ThisItem.SampleHeading</code> and <code>CustomGallerySample</code> re-appearing in your data sources.
+    ③ <strong>galContacts was inserted with a sample layout, not Blank</strong> — the evidence is a leftover <code class="el">Label8</code> reading <code>ThisItem.SampleHeading</code> and <code>CustomGallerySample</code> re-appearing in your data sources.
     ④ <strong>Active Status in SharePoint is a Choice column, not Yes/No</strong> — L1 specified Yes/No; the contacts filter expects a true/false. This one's a two-minute SharePoint fix.
     ⑤ <strong>galPurposes' Items has a bug that was the guide's fault</strong> — a name collision the guide has since corrected; you built from the pre-fix version. One paste fixes it.
     Plus the leftovers from review №1 you haven't reached yet: the block reorder, the three cosmetic true-ups, and S10/S11.</div>
-    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). Property workflow, same as always: select the control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
+    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">galPurposes</code> is an <em>element</em> — a control in your Tree view; a plain grey chip is a name or value you paste. Property workflow, same as always: select the ▣ control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
   </section>
 
   <section class="block" id="fixes">
@@ -210,7 +214,7 @@
         <ol class="steps2">
           <li>Open the app in Studio → left rail → <strong>Data</strong>. Hover <code class="cc">Borrower Contact Directory</code> → <strong>⋯</strong> → <strong>Refresh</strong>, so Power Apps picks up the remade Active Status column.</li>
           <li>Hover <code class="cc">CustomGallerySample</code> → <strong>⋯</strong> → <strong>Remove</strong>. (It sneaked back in when a gallery was inserted with a sample layout — F4 explains how to avoid that.)</li>
-          <li>In the <strong>Tree view</strong>, right-click <code class="cc">galContacts</code> (the one sitting directly under conRight, with <code>Label8</code> inside) → <strong>Delete</strong>. <em>You should now see</em> it and Label8 gone. It has to be rebuilt <em>inside</em> galPurposes — a gallery can't be moved into another gallery's template, only created there.</li>
+          <li>In the <strong>Tree view</strong>, right-click <code class="cc el">galContacts</code> (the one sitting directly under conRight, with <code class="el">Label8</code> inside) → <strong>Delete</strong>. <em>You should now see</em> it and Label8 gone. It has to be rebuilt <em>inside</em> galPurposes — a gallery can't be moved into another gallery's template, only created there.</li>
         </ol>
         <div class="note check"><b>Check before moving on</b>Data shows exactly four sources; the Tree view under conRight has no galContacts and no Label8.</div>
         <button class="done" type="button">Mark step done</button>
@@ -220,7 +224,7 @@
     <details class="step" id="f3">
       <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Paste the corrected galPurposes formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Your Items formula is the guide's old version, which had a genuine bug (a bare <code>Title</code> inside the inner Filter gets captured by the Matrix rows' own blank Title — every purpose counts zero, so no headings ever render). Select <code class="cc">galPurposes</code> → property dropdown → <code class="cc">Items</code> → select everything → paste:</p>
+        <p class="do">Your Items formula is the guide's old version, which had a genuine bug (a bare <code>Title</code> inside the inner Filter gets captured by the Matrix rows' own blank Title — every purpose counts zero, so no headings ever render). Select <code class="cc el">galPurposes</code> → property dropdown → <code class="cc">Items</code> → select everything → paste:</p>
         <p class="fxlabel">galPurposes · Items — the As PurposeRow alias is the fix</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Communication Purpose Master' As PurposeRow,
     CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></div>
@@ -234,8 +238,8 @@
       <div class="body">
         <div class="note warn"><b>The trap that's caught you twice — read before clicking</b>Select the gallery, then click <em>once more into its first row</em> until a <strong>pencil icon</strong> appears on that row — <em>that</em> is the template being selected. Only then Insert. If the new control lands <em>next to</em> the gallery in the Tree view instead of <em>under</em> it, it's outside — delete it and try again. Placed right, it repeats once per row automatically.</div>
         <ol class="steps2">
-          <li>In the Tree view click <code class="cc">galPurposes</code>, then click into the gallery's first row on the canvas until the pencil shows.</li>
-          <li>Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. <em>You should now see</em> it nested <strong>under galPurposes</strong> in the Tree view.</li>
+          <li>In the Tree view click <code class="cc el">galPurposes</code>, then click into the gallery's first row on the canvas until the pencil shows.</li>
+          <li>Insert → <strong>Text label</strong> → rename to <code class="cc el">lblPurposeHeader</code>. <em>You should now see</em> it nested <strong>under galPurposes</strong> in the Tree view.</li>
         </ol>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
@@ -255,9 +259,9 @@
       <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">Rebuild galContacts — inside the template, BLANK layout</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
-          <li>Click into <code class="cc">galPurposes</code>' first row again until the pencil shows (the template must be selected, same as F4).</li>
+          <li>Click into <code class="cc el">galPurposes</code>' first row again until the pencil shows (the template must be selected, same as F4).</li>
           <li>Insert → <strong>Vertical gallery</strong> → in the layout picker choose <strong>Blank</strong>. <em>You should now see</em> an empty gallery — <strong>no</strong> placeholder text. If you see sample headings/text, you picked a sample layout (that's what re-added CustomGallerySample last time): press Ctrl+Z and pick Blank.</li>
-          <li>Rename it <code class="cc">galContacts</code>. <em>You should now see</em> it nested under galPurposes in the Tree view, below lblPurposeHeader.</li>
+          <li>Rename it <code class="cc el">galContacts</code>. <em>You should now see</em> it nested under galPurposes in the Tree view, below lblPurposeHeader.</li>
         </ol>
         <dl class="props">
           <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
@@ -268,7 +272,7 @@
           <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code></dd></div>
         </dl>
-        <div class="note why"><b>Why this formula now works end-to-end</b><code>lblPurposeHeader</code> exists (F4), <code>colMatrix</code> fills on selection (your OnSelect is already right), and <code>ContactRec.'Active Status'</code> is a real Yes/No again (F1). Three fixes, one working line.</div>
+        <div class="note why"><b>Why this formula now works end-to-end</b><code class="el">lblPurposeHeader</code> exists (F4), <code>colMatrix</code> fills on selection (your OnSelect is already right), and <code>ContactRec.'Active Status'</code> is a real Yes/No again (F1). Three fixes, one working line.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -277,7 +281,7 @@
       <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">The four contact labels</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <p class="do">All four go <em>inside the galContacts template</em> — click into <em>its</em> first row until the pencil shows (a template inside a template; same rule, one level deeper). Fixed anchors, identical in every row.</p>
-        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <p class="do">First → rename to <code class="cc el">lblContactName</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
@@ -287,7 +291,7 @@
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblContactJob</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
@@ -296,7 +300,7 @@
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblContactEmail</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
@@ -308,7 +312,7 @@
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <p class="do">Fourth → rename to <code class="cc el">lblContactPhones</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
@@ -338,7 +342,7 @@
     <details class="step" id="f8">
       <summary><span class="dot"></span><span class="num">F8</span><span class="stitle">"No contacts" label &amp; block order</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a)</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblNoContacts</code>:</p>
+        <p class="do"><strong>a)</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblNoContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -348,7 +352,7 @@
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></dd></div>
         </dl>
-        <p class="do"><strong>b) Reorder the blocks.</strong> In the Tree view, conRight currently reads: lblPlaceholder · conBorrowerCard · conCoverage · conOffice · lblLoading · galPurposes · lblNoContacts. Right-click <code class="cc">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong> <strong>four times</strong>; then <code class="cc">conOffice</code> → Move down <strong>four times</strong>.</p>
+        <p class="do"><strong>b) Reorder the blocks.</strong> In the Tree view, conRight currently reads: lblPlaceholder · conBorrowerCard · conCoverage · conOffice · lblLoading · galPurposes · lblNoContacts. Right-click <code class="cc el">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong> <strong>four times</strong>; then <code class="cc el">conOffice</code> → Move down <strong>four times</strong>.</p>
         <div class="note check"><b>Check before moving on</b>conRight now reads: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galPurposes · lblNoContacts · conCoverage · conOffice</strong> — purposes between the card and the coverage team.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -360,9 +364,9 @@
         <p class="do"><strong>a)</strong> Three property pastes still pending from review №1:</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>Control</th><th>Property</th><th>Set to</th></tr>
-          <tr><td><code class="cc">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td></tr>
-          <tr><td><code class="cc">lblNoResults</code></td><td><code class="cc">Color</code> · <code class="cc">Align</code> · <code class="cc">Size</code> · <code class="cc">Height</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code> · <code class="cc">Align.Center</code> · <code class="cc">13</code> · <code class="cc">40</code></td></tr>
-          <tr><td><code class="cc">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td></tr>
+          <tr><td><code class="cc el">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td></tr>
+          <tr><td><code class="cc el">lblNoResults</code></td><td><code class="cc">Color</code> · <code class="cc">Align</code> · <code class="cc">Size</code> · <code class="cc">Height</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code> · <code class="cc">Align.Center</code> · <code class="cc">13</code> · <code class="cc">40</code></td></tr>
+          <tr><td><code class="cc el">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td></tr>
         </table></div>
         <p class="do"><strong>b)</strong> F5 (Preview) and run:</p>
         <ul>

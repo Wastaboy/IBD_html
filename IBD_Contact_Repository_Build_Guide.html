@@ -111,6 +111,10 @@
   code.cc.copied{background:var(--ok) !important;color:#fff !important}
   code.cc.copied::after{content:"✓";opacity:1}
 
+  /* element chips: names of controls that live in the Tree view */
+  code.el{background:#e8edf8 !important;color:#1F3B6E !important;border:1px solid #c9d6ef;font-weight:600}
+  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
+
   .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
   .done:active{background:var(--line-soft)}
   details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -186,7 +190,7 @@
       <div class="fnode hot">Power Apps front end<small>S1–S16</small></div>
     </div>
     <div class="note tip"><b>Every name and type in this guide is deterministic</b>Master List column names and types are confirmed against the live connector schema (from a working app on the real list). The three new lists' types are whatever <em>you</em> create in Phase 0.5 — the guide fixes each one, so every formula later is single-variant. No either/or anywhere.</div>
-    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> — including every size, color and spacing value in the property tables — is tap-to-copy; the ⧉ mark is the reminder. Paste, never retype.</div>
+    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip — including every size, color and spacing value in the property tables — is tap-to-copy; the ⧉ mark is the reminder. Two kinds: a <strong>navy chip with a ▣ mark</strong> like <code class="cc el">galBorrowers</code> is an <em>element</em> — a control that exists in your Tree view (galleries, labels, containers, inputs). A plain grey chip like <code class="cc">RGBA(31, 59, 110, 1)</code> is a name or value you paste. See ▣ → find it in the Tree view; see grey → paste it somewhere.</div>
     <div class="note tip"><b>Already built the app? Read the build review</b>The 15 July export was audited against this guide: what's right, the four things to fix, and every fix copy-paste ready → <a href="build-review-1.html"><strong>Build review №1</strong></a> (same password).</div>
     <div class="pane">
       <div class="ph">The visual system — five values you'll reuse everywhere</div>
@@ -409,10 +413,10 @@
         <ol class="steps2">
           <li>Go to <code class="cc">make.powerapps.com</code> → check you're in the client's environment (top-right) → <strong>Create</strong> → <strong>Blank app</strong> → <strong>Blank canvas app</strong>.</li>
           <li>Name: <code class="cc">IBD Client Contact Repository</code> · Format: <strong>Tablet</strong> → <strong>Create</strong>.</li>
-          <li>Tree view → double-click <code class="cc">Screen1</code> → rename to <code class="cc">scrMain</code>.</li>
+          <li>Tree view → double-click <code class="cc">Screen1</code> → rename to <code class="cc el">scrMain</code>.</li>
           <li>Settings (gear) → <strong>Display</strong> → turn <strong>Scale to fit</strong> off and <strong>Lock aspect ratio</strong> off, so the layout resizes with the window. Save (Ctrl+S).</li>
         </ol>
-        <div class="note check"><b>Check before moving on</b>Studio open on an empty screen named <code>scrMain</code>, app saved under the right name.</div>
+        <div class="note check"><b>Check before moving on</b>Studio open on an empty screen named <code class="el">scrMain</code>, app saved under the right name.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -435,10 +439,10 @@
       <summary><span class="dot"></span><span class="num">S3</span><span class="stitle">Build the container skeleton</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <p class="do">Auto-layout containers so the screen resizes cleanly: a vertical root, header bar on top, then a horizontal body split into the search panel (left) and the detail panel (right). Each control below gets a full property table — set <em>every row</em>, in order, before moving to the next control.</p>
-        <p class="do"><strong>a) The screen itself.</strong> Select <code class="cc">scrMain</code> → in the formula bar set its Fill (this is the light grey that shows between the panels):</p>
+        <p class="do"><strong>a) The screen itself.</strong> Select <code class="cc el">scrMain</code> → in the formula bar set its Fill (this is the light grey that shows between the panels):</p>
         <p class="fxlabel">scrMain · Fill</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>RGBA(237, 239, 244, 1)</code></div>
-        <p class="do"><strong>b) Root.</strong> With <code class="cc">scrMain</code> selected: <strong>Insert</strong> → <strong>Layout</strong> → <strong>Vertical container</strong> → rename to <code class="cc">conRoot</code>. Then set, property by property:</p>
+        <p class="do"><strong>b) Root.</strong> With <code class="cc el">scrMain</code> selected: <strong>Insert</strong> → <strong>Layout</strong> → <strong>Vertical container</strong> → rename to <code class="cc el">conRoot</code>. Then set, property by property:</p>
         <dl class="props">
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.Width</code></dd></div>
@@ -449,7 +453,7 @@
           <div><dt><code class="cc">PaddingTop</code> <code class="cc">PaddingBottom</code> <code class="cc">PaddingLeft</code> <code class="cc">PaddingRight</code></dt><dd><code class="cc">0</code> in each</dd></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(0, 0, 0, 0)</code> — transparent</dd></div>
         </dl>
-        <p class="do"><strong>c) Header bar.</strong> Select <code class="cc">conRoot</code> → Insert → <strong>Horizontal container</strong> → rename to <code class="cc">conHeader</code>:</p>
+        <p class="do"><strong>c) Header bar.</strong> Select <code class="cc el">conRoot</code> → Insert → <strong>Horizontal container</strong> → rename to <code class="cc el">conHeader</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code> — the "Flexible height off" toggle; the bar keeps a fixed height</dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">64</code></dd></div>
@@ -457,7 +461,7 @@
           <div><dt><code class="cc">PaddingLeft</code></dt><dd><code class="cc">16</code> (<code class="cc">PaddingTop</code> <code class="cc">PaddingBottom</code> <code class="cc">PaddingRight</code> = <code class="cc">0</code>)</dd></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
         </dl>
-        <p class="do">Select <code class="cc">conHeader</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblAppTitle</code>:</p>
+        <p class="do">Select <code class="cc el">conHeader</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblAppTitle</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"IBD Client Contact Repository"</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">18</code></dd></div>
@@ -465,7 +469,7 @@
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">450</code></dd></div>
         </dl>
-        <p class="do"><strong>d) Body.</strong> Select <code class="cc">conRoot</code> → Insert → <strong>Horizontal container</strong> (it lands below the header) → rename to <code class="cc">conBody</code>:</p>
+        <p class="do"><strong>d) Body.</strong> Select <code class="cc el">conRoot</code> → Insert → <strong>Horizontal container</strong> (it lands below the header) → rename to <code class="cc el">conBody</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — "Flexible height on": the body takes every pixel below the bar; <code>0</code> gives you a squashed strip</dd></div>
           <div><dt><code class="cc">LayoutAlignItems</code></dt><dd><code class="cc">LayoutAlignItems.Stretch</code> — both panels always reach the bottom</dd></div>
@@ -473,7 +477,7 @@
           <div><dt><code class="cc">PaddingTop</code> <code class="cc">PaddingBottom</code> <code class="cc">PaddingLeft</code> <code class="cc">PaddingRight</code></dt><dd><code class="cc">12</code> in each</dd></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(0, 0, 0, 0)</code> — the screen grey shows through as the gutter</dd></div>
         </dl>
-        <p class="do"><strong>e) The two panels.</strong> Select <code class="cc">conBody</code> → Insert → <strong>Vertical container</strong>, twice. First one → rename to <code class="cc">conLeft</code>:</p>
+        <p class="do"><strong>e) The two panels.</strong> Select <code class="cc el">conBody</code> → Insert → <strong>Vertical container</strong>, twice. First one → rename to <code class="cc el">conLeft</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — ⅓ of the width (portions are relative: 1 vs conRight's 2)</dd></div>
           <div><dt><code class="cc">LayoutAlignItems</code></dt><dd><code class="cc">LayoutAlignItems.Stretch</code> — the search box and gallery fill the panel edge-to-edge</dd></div>
@@ -481,7 +485,7 @@
           <div><dt><code class="cc">PaddingTop</code> <code class="cc">PaddingBottom</code> <code class="cc">PaddingLeft</code> <code class="cc">PaddingRight</code></dt><dd><code class="cc">12</code> in each</dd></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
         </dl>
-        <p class="do">Second one → rename to <code class="cc">conRight</code>:</p>
+        <p class="do">Second one → rename to <code class="cc el">conRight</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">2</code> — ⅔ of the width</dd></div>
           <div><dt><code class="cc">LayoutAlignItems</code></dt><dd><code class="cc">LayoutAlignItems.Stretch</code></dd></div>
@@ -504,7 +508,7 @@
     <details class="step" id="s4">
       <summary><span class="dot"></span><span class="num">S4</span><span class="stitle">Search box &amp; borrower list</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The search box.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Text input</strong> → rename to <code class="cc">txtSearch</code>:</p>
+        <p class="do"><strong>a) The search box.</strong> Select <code class="cc el">conLeft</code> → Insert → <strong>Text input</strong> → rename to <code class="cc el">txtSearch</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code> — fixed height</dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">44</code></dd></div>
@@ -515,7 +519,7 @@
           <div><dt><code class="cc">RadiusTopLeft</code> <code class="cc">RadiusTopRight</code> <code class="cc">RadiusBottomLeft</code> <code class="cc">RadiusBottomRight</code></dt><dd><code class="cc">8</code> in each</dd></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(255, 255, 255, 1)</code></dd></div>
         </dl>
-        <p class="do"><strong>b) The results list.</strong> Select <code class="cc">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galBorrowers</code>:</p>
+        <p class="do"><strong>b) The results list.</strong> Select <code class="cc el">conLeft</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc el">galBorrowers</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the gallery takes all the panel below the search box</dd></div>
           <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">84</code> — room for a name that wraps to two lines, plus the RIM line</dd></div>
@@ -529,7 +533,7 @@
     || (IsNumeric(txtSearch.Text) &amp;&amp; RIM = Value(txtSearch.Text)))</code></div>
         <p class="do"><strong>c) The row template.</strong> Two labels <em>inside the gallery template</em> — name on top, RIM under it. Inside a gallery template controls are positioned by X/Y, so both tables below include exact coordinates.</p>
         <div class="note warn"><b>The #1 trap in this whole build — put the labels IN the template</b>Click <em>into the gallery's first row</em> (the pencil icon that appears on it) so the template is selected, <em>then</em> Insert → Text label. If you insert while the panel container is selected, the label lands <em>next to</em> the gallery, <code>ThisItem</code> errors with "name isn't recognized", and the gallery rows stay blank. Placed right, the label repeats once per row automatically.</div>
-        <p class="do">First label → rename to <code class="cc">lblRowName</code>. A fixed <strong>two-line box, anchored to the top</strong>: short names take the first line, long names wrap into the second — the box itself never moves or resizes:</p>
+        <p class="do">First label → rename to <code class="cc el">lblRowName</code>. A fixed <strong>two-line box, anchored to the top</strong>: short names take the first line, long names wrap into the second — the box itself never moves or resizes:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Borrower</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
@@ -541,7 +545,7 @@
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second label → rename to <code class="cc">lblRowRIM</code>. <strong>Anchored near the bottom</strong> — the same spot in every single row, whether the name above it took one line or two:</p>
+        <p class="do">Second label → rename to <code class="cc el">lblRowRIM</code>. <strong>Anchored near the bottom</strong> — the same spot in every single row, whether the name above it took one line or two:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RIM: " &amp; ThisItem.RIM</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">58</code> — 84 − 20 − 6: pinned 6px off the row's bottom edge</dd></div>
@@ -552,7 +556,7 @@
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
         <div class="note why"><b>Why fixed anchors beat "smart" positioning</b>An earlier revision moved the RIM line up and down with each name's height — technically correct, visually noisy: the grey line sat at a different height in every row and the list looked cluttered. Fixed anchors (name top, RIM bottom) mean every row has identical geometry, so the RIM column reads as a clean vertical rhythm. Short names simply get a little breathing room between the two lines — whitespace is calm, misalignment is clutter.</div>
-        <div class="note tip"><b>The escape hatches</b>A name longer than two lines clips at the end of line two — if that ever actually happens, raise <code class="cc">TemplateSize</code> to <code class="cc">104</code>, <code class="cc">lblRowName</code> <code class="cc">Height</code> to <code class="cc">66</code>, and <code class="cc">lblRowRIM</code> <code class="cc">Y</code> to <code class="cc">78</code> — three lines, same anchoring.</div>
+        <div class="note tip"><b>The escape hatches</b>A name longer than two lines clips at the end of line two — if that ever actually happens, raise <code class="cc">TemplateSize</code> to <code class="cc">104</code>, <code class="cc el">lblRowName</code> <code class="cc">Height</code> to <code class="cc">66</code>, and <code class="cc el">lblRowRIM</code> <code class="cc">Y</code> to <code class="cc">78</code> — three lines, same anchoring.</div>
         <div class="note check"><b>Check before moving on</b>In Preview, typing narrows the borrower list as you type — by name, or by typing a full RIM. Every visible row shows a bold name with a grey RIM line directly beneath it (blank rows = the trap above). Find your longest borrower name: it wraps to a second line while the RIM line stays put at the bottom — and every row's RIM line sits at exactly the same height.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -581,7 +585,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s6">
       <summary><span class="dot"></span><span class="num">S6</span><span class="stitle">"No borrowers found"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Select <code class="cc">conLeft</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc">lblNoResults</code>:</p>
+        <p class="do">Select <code class="cc el">conLeft</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc el">lblNoResults</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No borrowers found"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -606,7 +610,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s7">
       <summary><span class="dot"></span><span class="num">S7</span><span class="stitle">Placeholder &amp; borrower card</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) Before any selection.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblPlaceholder</code>:</p>
+        <p class="do"><strong>a) Before any selection.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblPlaceholder</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Search for a borrower to see their contacts"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -616,7 +620,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">IsBlank(varBorrower)</code></dd></div>
         </dl>
-        <p class="do"><strong>b) The card.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> → rename to <code class="cc">conBorrowerCard</code>:</p>
+        <p class="do"><strong>b) The card.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Vertical container</strong> → rename to <code class="cc el">conBorrowerCard</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">130</code> for now — step d) below replaces this with a formula once the name label exists</dd></div>
@@ -627,8 +631,8 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">RadiusTopLeft</code> <code class="cc">RadiusTopRight</code> <code class="cc">RadiusBottomLeft</code> <code class="cc">RadiusBottomRight</code></dt><dd><code class="cc">8</code> in each</dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower)</code></dd></div>
         </dl>
-        <p class="do"><strong>c) Its three labels.</strong> All three go <em>inside</em> <code class="cc">conBorrowerCard</code>, top to bottom. Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere.</p>
-        <p class="do">First → rename to <code class="cc">lblBorrowerName</code>. Same long-name treatment as the gallery row: <code>AutoHeight</code> instead of a fixed height, so a two-line name never clips:</p>
+        <p class="do"><strong>c) Its three labels.</strong> All three go <em>inside</em> <code class="cc el">conBorrowerCard</code>, top to bottom. Everything reads from <code class="cc">varBorrower</code> — straight from the Master List, copied nowhere.</p>
+        <p class="do">First → rename to <code class="cc el">lblBorrowerName</code>. Same long-name treatment as the gallery row: <code>AutoHeight</code> instead of a fixed height, so a two-line name never clips:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Wrap</code></dt><dd><code class="cc">true</code></dd></div>
@@ -639,7 +643,7 @@ Set(varLoading, false)</code></div>
         </dl>
         <p class="fxlabel">lblBorrowerName · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>varBorrower.Borrower</code></div>
-        <p class="do">Second → rename to <code class="cc">lblBorrowerMeta</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblBorrowerMeta</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
@@ -648,7 +652,7 @@ Set(varLoading, false)</code></div>
         </dl>
         <p class="fxlabel">lblBorrowerMeta · Text</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"RIM: " &amp; varBorrower.RIM &amp; "   ·   " &amp; varBorrower.Office &amp; "   ·   " &amp; varBorrower.'Facility Type' &amp; "   ·   Grade " &amp; varBorrower.Grade</code></div>
-        <p class="do">Third → rename to <code class="cc">lblBorrowerFacility</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblBorrowerFacility</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">24</code></dd></div>
@@ -659,7 +663,7 @@ Set(varLoading, false)</code></div>
         <div class="fx"><button class="copy" type="button">Copy</button><code>"Limit " &amp; Text(varBorrower.'Total Limit', "#,##0") &amp;
 "   ·   Exposure " &amp; Text(varBorrower.'Current Exposure', "#,##0") &amp;
 "   ·   Utilization " &amp; varBorrower.'Overall Utilization %' &amp; "%"</code></div>
-        <p class="do"><strong>d) Let the card grow with long names.</strong> Now that <code class="cc">lblBorrowerName</code> exists, select <code class="cc">conBorrowerCard</code> → property <code class="cc">Height</code> → replace the 130 with this formula (name height + 22 meta + 24 facility + two 4px gaps + 24px padding = the card always fits exactly):</p>
+        <p class="do"><strong>d) Let the card grow with long names.</strong> Now that <code class="cc el">lblBorrowerName</code> exists, select <code class="cc el">conBorrowerCard</code> → property <code class="cc">Height</code> → replace the 130 with this formula (name height + 22 meta + 24 facility + two 4px gaps + 24px padding = the card always fits exactly):</p>
         <p class="fxlabel">conBorrowerCard · Height</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>lblBorrowerName.Height + 78</code></div>
         <div class="note tip"><b>Formatting the numbers</b>All four figures are Number columns (confirmed), so <code>Text(..., "#,##0")</code> works as-is. One judgment call: if Utilization is stored as a fraction (0.85 rather than 85), use <code>Text(varBorrower.'Overall Utilization %', "0%")</code> instead — one glance at the list data tells you which.</div>
@@ -672,7 +676,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s8">
       <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">Loading line &amp; the purposes gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc">lblLoading</code>:</p>
+        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc el">lblLoading</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Loading contacts…"</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -682,7 +686,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">varLoading</code></dd></div>
         </dl>
-        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
+        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc el">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
         <dl class="props">
           <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master' As PurposeRow, CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the purposes section takes the panel between the card and the coverage blocks, and scrolls inside itself</dd></div>
@@ -691,7 +695,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">true</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading</code></dd></div>
         </dl>
-        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
+        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
@@ -710,7 +714,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s9">
       <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The contacts inside each purpose</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc">galPurposes</code> template still selected (pencil icon), below <code class="cc">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galContacts</code>:</p>
+        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc el">galPurposes</code> template still selected (pencil icon), below <code class="cc el">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc el">galContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code> — 4 + the 24px heading + 4</dd></div>
@@ -721,8 +725,8 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code> — it will size itself to its rows, so there's nothing to scroll</dd></div>
         </dl>
         <div class="note why"><b>The Active Status filter is exact by construction</b><code>ContactRec.'Active Status'</code> is the Yes/No column you created in L1 — a clean boolean, no string comparison, no variants. Flip a contact to No in SharePoint and they vanish from every purpose group.</div>
-        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
-        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc el">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
+        <p class="do">First → rename to <code class="cc el">lblContactName</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
@@ -732,7 +736,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblContactJob</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
@@ -741,7 +745,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblContactEmail</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
@@ -753,7 +757,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <p class="do">Fourth → rename to <code class="cc el">lblContactPhones</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
@@ -784,7 +788,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s11">
       <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">"No contacts recorded"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc">lblNoContacts</code>:</p>
+        <p class="do">Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc el">lblNoContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -803,7 +807,7 @@ Set(varLoading, false)</code></div>
       <summary><span class="dot"></span><span class="num">S12</span><span class="stitle">The BMO coverage team</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <div class="note tip"><b>These two blocks (S12–S13) are extras beyond the spec</b>They surface the coverage data that already lives on the Master List row — genuinely useful, but not in spec §8. If the client prefers the purposes section to get the whole panel (or small screens feel tight), skip S12–S13 entirely; nothing else depends on them.</div>
-        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below the "No contacts" label) → rename to <code class="cc">conCoverage</code>. Grouping the block in its own container is what keeps the name/email pairs tight (gap 4 inside) while the blocks stay clearly separated (conRight's gap 12 outside):</p>
+        <p class="do"><strong>a) The block container.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below the "No contacts" label) → rename to <code class="cc el">conCoverage</code>. Grouping the block in its own container is what keeps the name/email pairs tight (gap 4 inside) while the blocks stay clearly separated (conRight's gap 12 outside):</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">216</code></dd></div>
@@ -813,7 +817,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(0, 0, 0, 0)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower)</code> — set once here; everything inside inherits it</dd></div>
         </dl>
-        <p class="do"><strong>b) The heading.</strong> Select <code class="cc">conCoverage</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblCoverageHeader</code>:</p>
+        <p class="do"><strong>b) The heading.</strong> Select <code class="cc el">conCoverage</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblCoverageHeader</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"BMO coverage team"</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -822,8 +826,8 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
         </dl>
-        <p class="do"><strong>c) The seven rows</strong>, all inside <code class="cc">conCoverage</code>, top to bottom, each with its complete table — nothing carried over from anywhere. (Time-saver that changes nothing: after the first name row and the first email row, Ctrl+C / Ctrl+V the label and only its name and <code>Text</code> differ — the tables below let you verify every value either way.) Both RSM columns are <strong>Lookups</strong> (name via <code>.Value</code>, email via its expansion column's <code>.Value</code>); <code class="cc">Rim Officer Name</code> is a <strong>Person</strong> column.</p>
-        <p class="do">Row 1 → rename to <code class="cc">lblRSM1</code>:</p>
+        <p class="do"><strong>c) The seven rows</strong>, all inside <code class="cc el">conCoverage</code>, top to bottom, each with its complete table — nothing carried over from anywhere. (Time-saver that changes nothing: after the first name row and the first email row, Ctrl+C / Ctrl+V the label and only its name and <code>Text</code> differ — the tables below let you verify every value either way.) Both RSM columns are <strong>Lookups</strong> (name via <code>.Value</code>, email via its expansion column's <code>.Value</code>); <code class="cc">Rim Officer Name</code> is a <strong>Person</strong> column.</p>
+        <p class="do">Row 1 → rename to <code class="cc el">lblRSM1</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RSM 1  ·  " &amp; varBorrower.'BMO RSM 1'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -832,7 +836,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Normal</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Row 2 → rename to <code class="cc">lblRSM1Email</code>:</p>
+        <p class="do">Row 2 → rename to <code class="cc el">lblRSM1Email</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'BMO RSM 1: Email Address'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -844,7 +848,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code> — a blank email disappears, no empty gap</dd></div>
         </dl>
-        <p class="do">Row 3 → rename to <code class="cc">lblRSM2</code>:</p>
+        <p class="do">Row 3 → rename to <code class="cc el">lblRSM2</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RSM 2  ·  " &amp; varBorrower.'BMO RSM 2'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -853,7 +857,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Normal</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Row 4 → rename to <code class="cc">lblRSM2Email</code>:</p>
+        <p class="do">Row 4 → rename to <code class="cc el">lblRSM2Email</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'BMO RSM 2: Email Address'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -865,7 +869,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Row 5 → rename to <code class="cc">lblRM</code>:</p>
+        <p class="do">Row 5 → rename to <code class="cc el">lblRM</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RM  ·  " &amp; varBorrower.RM</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -874,7 +878,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Normal</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Row 6 → rename to <code class="cc">lblRimOfficer</code>:</p>
+        <p class="do">Row 6 → rename to <code class="cc el">lblRimOfficer</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"RIM officer  ·  " &amp; varBorrower.'Rim Officer Name'.DisplayName</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -883,7 +887,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Normal</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Row 7 → rename to <code class="cc">lblRimOfficerEmail</code>:</p>
+        <p class="do">Row 7 → rename to <code class="cc el">lblRimOfficerEmail</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'Rim Officer Name'.Email</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -896,7 +900,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
         <div class="note why"><b>Why <code>.Value</code> here but <code>.DisplayName</code> there</b>The RSM columns are <em>Lookups</em> — they carry their text through <code>.Value</code>, and their extra fields arrive as separate read-only columns (<code>'BMO RSM 1: Email Address'</code>, also a <code>.Value</code>). <code>Rim Officer Name</code> is a <em>Person</em> column — it carries the whole person record: <code>.DisplayName</code>, <code>.Email</code>. Confirmed from the live connector schema; IntelliSense will agree as you type.</div>
-        <div class="note tip"><b>A blank name making an awkward row?</b>Hide that row the same way the email rows do — e.g. <code>lblRM</code> · <code class="cc">Visible</code> → <code class="cc">!IsBlank(varBorrower.RM)</code>. (The container already handles the no-selection case.)</div>
+        <div class="note tip"><b>A blank name making an awkward row?</b>Hide that row the same way the email rows do — e.g. <code class="el">lblRM</code> · <code class="cc">Visible</code> → <code class="cc">!IsBlank(varBorrower.RM)</code>. (The container already handles the no-selection case.)</div>
         <div class="note tip"><b>Sizing sanity check</b>conCoverage's 216 = heading 24 + rows (22+20+22+20+22+22+20) + seven 4px gaps + 16px padding. If you add or remove a row, adjust the height by that row + 4.</div>
         <div class="note check"><b>Check before moving on</b>Selecting a borrower shows RSM 1, RSM 2, RM and RIM officer with their names from the list; tapping an RSM or RIM-officer email opens a mail draft to that address.</div>
         <button class="done" type="button">Mark step done</button>
@@ -906,7 +910,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s13">
       <summary><span class="dot"></span><span class="num">S13</span><span class="stitle">The borrower's office contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The block container.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below <code class="cc">conCoverage</code>) → rename to <code class="cc">conOffice</code>. Same idea as S8-a: tight inside, separated outside.</p>
+        <p class="do"><strong>a) The block container.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Vertical container</strong> (it lands below <code class="cc el">conCoverage</code>) → rename to <code class="cc el">conOffice</code>. Same idea as S8-a: tight inside, separated outside.</p>
         <dl class="props">
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">136</code></dd></div>
@@ -916,7 +920,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(0, 0, 0, 0)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower)</code></dd></div>
         </dl>
-        <p class="do"><strong>b) The heading.</strong> Select <code class="cc">conOffice</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblOfficeHeader</code>:</p>
+        <p class="do"><strong>b) The heading.</strong> Select <code class="cc el">conOffice</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblOfficeHeader</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Borrower office contacts"</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -925,7 +929,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
         </dl>
-        <p class="do"><strong>c) The office name.</strong> Select <code class="cc">conOffice</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblOfficeName</code>. Grey, since it's context rather than a person; the lookup shows its text through <code>.Value</code>:</p>
+        <p class="do"><strong>c) The office name.</strong> Select <code class="cc el">conOffice</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblOfficeName</code>. Grey, since it's context rather than a person; the lookup shows its text through <code>.Value</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'Office (list)'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -933,8 +937,8 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <p class="do"><strong>d) The three email labels</strong>, inside <code class="cc">conOffice</code>, top to bottom. The first two are extra fields riding on the <code class="cc">Office (list)</code> lookup — they arrive lookup-shaped, so read them via <code>.Value</code>. The third is the plain <code class="cc">office email</code> column (the lower-case name is real).</p>
-        <p class="do">First → rename to <code class="cc">lblOfficeEmail1</code>:</p>
+        <p class="do"><strong>d) The three email labels</strong>, inside <code class="cc el">conOffice</code>, top to bottom. The first two are extra fields riding on the <code class="cc">Office (list)</code> lookup — they arrive lookup-shaped, so read them via <code>.Value</code>. The third is the plain <code class="cc">office email</code> column (the lower-case name is real).</p>
+        <p class="do">First → rename to <code class="cc el">lblOfficeEmail1</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'Office (list):1st Email Address'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -946,7 +950,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Second → rename to <code class="cc">lblOfficeEmail2</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblOfficeEmail2</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'Office (list):2nd Email Address'.Value</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -958,7 +962,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Third → rename to <code class="cc">lblOfficeEmail3</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblOfficeEmail3</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">varBorrower.'office email'</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -1000,7 +1004,7 @@ Clear(colMatrix)</code></div>
     <details class="step" id="s15">
       <summary><span class="dot"></span><span class="num">S15</span><span class="stitle">Test everything</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">F5 from <code class="cc">scrMain</code> and run all fifteen. The L4 seed data covers the purpose-grouping cases. All must pass before publishing:</p>
+        <p class="do">F5 from <code class="cc el">scrMain</code> and run all fifteen. The L4 seed data covers the purpose-grouping cases. All must pass before publishing:</p>
         <ul>
           <li>Open with nothing typed → full borrower list left, placeholder line right.</li>
           <li>Your <strong>longest borrower name</strong> → wraps to two lines in the list, every row's RIM line sits at the same height, and the card grows to fit the name.</li>
@@ -1016,7 +1020,7 @@ Clear(colMatrix)</code></div>
           <li>Tap any email — contact, RSM, or office → a pre-addressed mail draft opens.</li>
           <li>A blank email anywhere → that row is hidden, no empty gap.</li>
           <li>Switch borrowers quickly → the right panel always matches the selection, no stale contacts.</li>
-          <li>App checker (stethoscope) → <strong>no delegation warnings</strong> on <code class="cc">galBorrowers</code>.</li>
+          <li>App checker (stethoscope) → <strong>no delegation warnings</strong> on <code class="cc el">galBorrowers</code>.</li>
         </ul>
         <div class="note tip"><b>All green?</b>Delete the L4 test rows (two contacts, four matrix rows — keep the six purposes) before publishing.</div>
         <div class="note check"><b>Check before moving on</b>Fifteen for fifteen. Any miss → the step that built that piece has the formula to re-check.</div>

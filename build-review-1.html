@@ -111,6 +111,10 @@
   code.cc.copied{background:var(--ok) !important;color:#fff !important}
   code.cc.copied::after{content:"✓";opacity:1}
 
+  /* element chips: names of controls that live in the Tree view */
+  code.el{background:#e8edf8 !important;color:#1F3B6E !important;border:1px solid #c9d6ef;font-weight:600}
+  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
+
   .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
   .done:active{background:var(--line-soft)}
   details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -177,9 +181,9 @@
     ① The app is connected to the <strong>wrong three lists</strong> — <em>BMO Email tracker</em>, <em>BMO Resources</em> and <em>BMO Status list</em> instead of the three IBD contact lists (plus a leftover <em>CustomGallerySample</em>).
     ② The <strong>S5 selection formula was never installed</strong> — <code>galBorrowers.OnSelect</code> is still the old one-liner, so <code>colMatrix</code> never exists; that's exactly the two red errors your app checker shows on <code>scrMain.OnVisible</code>, and why it flags <code>varLoading</code> as unused.
     ③ The <strong>purpose-grouped contacts section (S8–S11) hasn't been built</strong> — the spec's centerpiece.
-    ④ <code>conRight</code> has <code>LayoutAlignItems</code> set to <strong>Center</strong> again — the squeeze bug from your first build: everything on the right floats narrow and centered instead of filling the panel.</div>
+    ④ <code class="el">conRight</code> has <code>LayoutAlignItems</code> set to <strong>Center</strong> again — the squeeze bug from your first build: everything on the right floats narrow and centered instead of filling the panel.</div>
     <div class="note why"><b>How this page works</b>F-steps are fixes to what exists; the four S-steps reproduced from the main guide build what's missing — in full, so you never have to switch pages mid-build. Same copy buttons, same chips, same done-tracking (progress here is separate from the main guide's).</div>
-    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> is tap-to-copy — the ⧉ mark is the reminder. Paste, never retype.</div>
+    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">galBorrowers</code> is an <em>element</em> — a control in your Tree view. A plain grey chip is a name or value you paste.</div>
     <div class="pane">
       <div class="ph">Setting any Power Apps property — the same three pastes, always</div>
       <ol>
@@ -226,7 +230,7 @@
       <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Un-squeeze the right panel</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
-          <li>In the <strong>Tree view</strong> (left rail), click <code class="cc">conRight</code>. <em>You should now see</em> it highlighted on the canvas and its name in the property dropdown at the top-left of the formula bar.</li>
+          <li>In the <strong>Tree view</strong> (left rail), click <code class="cc el">conRight</code>. <em>You should now see</em> it highlighted on the canvas and its name in the property dropdown at the top-left of the formula bar.</li>
           <li>Click that <strong>property dropdown</strong> → type <code class="cc">LayoutAlignItems</code> → select it. <em>You should now see</em> the formula bar showing <code>LayoutAlignItems.Center</code>.</li>
           <li>Select everything in the formula bar and paste over it:</li>
         </ol>
@@ -241,9 +245,9 @@
     <details class="step" id="f3">
       <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Install the real selection formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Your <code class="cc">galBorrowers</code> <code class="cc">OnSelect</code> still holds the old one-liner. This paste fills <code class="cc">colMatrix</code> with the selected borrower's matrix rows, each enriched with the full contact record — it's what makes your two app-checker errors and the "unused varLoading" warning disappear:</p>
+        <p class="do">Your <code class="cc el">galBorrowers</code> <code class="cc">OnSelect</code> still holds the old one-liner. This paste fills <code class="cc">colMatrix</code> with the selected borrower's matrix rows, each enriched with the full contact record — it's what makes your two app-checker errors and the "unused varLoading" warning disappear:</p>
         <ol class="steps2">
-          <li>In the <strong>Tree view</strong>, click <code class="cc">galBorrowers</code> (inside conLeft). <em>You should now see</em> the gallery selected on the canvas.</li>
+          <li>In the <strong>Tree view</strong>, click <code class="cc el">galBorrowers</code> (inside conLeft). <em>You should now see</em> the gallery selected on the canvas.</li>
           <li>Click the <strong>property dropdown</strong> (top-left of the formula bar) → type <code class="cc">OnSelect</code> → select it. <em>You should now see</em> the formula bar showing <code>Set(varBorrower, ThisItem)</code>.</li>
           <li>Click into the formula bar → select <strong>everything</strong> (Ctrl+A) → paste:</li>
         </ol>
@@ -270,7 +274,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s8">
       <summary><span class="dot"></span><span class="num">S8</span><span class="stitle">Loading line &amp; the purposes gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc">lblLoading</code>:</p>
+        <p class="do"><strong>a) The loading line.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> (below the card) → rename to <code class="cc el">lblLoading</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"Loading contacts…"</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
@@ -280,7 +284,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">varLoading</code></dd></div>
         </dl>
-        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
+        <p class="do"><strong>b) The purposes gallery.</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc el">galPurposes</code>. This is the outer of two nested galleries: one row per purpose <em>that actually has contacts</em> for the selected borrower:</p>
         <dl class="props">
           <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter('Communication Purpose Master' As PurposeRow, CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></dd></div>
           <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code> — the purposes section takes the panel between the card and the coverage blocks, and scrolls inside itself</dd></div>
@@ -289,7 +293,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">true</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading</code></dd></div>
         </dl>
-        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
+        <p class="do"><strong>c) The purpose heading.</strong> Click <em>into the gallery's first row</em> (pencil icon — the same S4 trap applies here) → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblPurposeHeader</code>. Fixed anchor, same spot in every group:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
@@ -308,7 +312,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s9">
       <summary><span class="dot"></span><span class="num">S9</span><span class="stitle">The contacts inside each purpose</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc">galPurposes</code> template still selected (pencil icon), below <code class="cc">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc">galContacts</code>:</p>
+        <p class="do"><strong>a) The inner gallery.</strong> With the <code class="cc el">galPurposes</code> template still selected (pencil icon), below <code class="cc el">lblPurposeHeader</code>: Insert → <strong>Vertical gallery</strong> (Blank layout) → rename to <code class="cc el">galContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code> — 4 + the 24px heading + 4</dd></div>
@@ -319,8 +323,8 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code> — it will size itself to its rows, so there's nothing to scroll</dd></div>
         </dl>
         <div class="note why"><b>The Active Status filter is exact by construction</b><code>ContactRec.'Active Status'</code> is the Yes/No column you created in L1 — a clean boolean, no string comparison, no variants. Flip a contact to No in SharePoint and they vanish from every purpose group.</div>
-        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
-        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <p class="do"><strong>b) The four contact labels</strong>, inside the <code class="cc el">galContacts</code> template (pencil icon again — nested template, same trap). Fixed anchors, identical in every row:</p>
+        <p class="do">First → rename to <code class="cc el">lblContactName</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
@@ -330,7 +334,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblContactJob</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
@@ -339,7 +343,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblContactEmail</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
@@ -351,7 +355,7 @@ Set(varLoading, false)</code></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
         </dl>
-        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <p class="do">Fourth → rename to <code class="cc el">lblContactPhones</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
           <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
@@ -382,7 +386,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="s11">
       <summary><span class="dot"></span><span class="num">S11</span><span class="stitle">"No contacts recorded"</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc">lblNoContacts</code>:</p>
+        <p class="do">Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> (it lands below the gallery) → rename to <code class="cc el">lblNoContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -406,9 +410,9 @@ Set(varLoading, false)</code></div>
       <div class="body">
         <p class="do">New controls land at the <em>bottom</em> of their container, so after S8–S11 your right panel reads: card → coverage → office → loading → purposes → "no contacts". The purposes section belongs above the coverage blocks. In auto-layout containers, <strong>Tree-view order = visual order</strong>, so fix it there:</p>
         <ol class="steps2">
-          <li>In the Tree view, expand <code class="cc">conRight</code>. <em>You should now see</em> its children top to bottom: lblPlaceholder, conBorrowerCard, conCoverage, conOffice, lblLoading, galPurposes, lblNoContacts.</li>
-          <li>Right-click <code class="cc">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong>. Repeat until it has moved down <strong>four times</strong>.</li>
-          <li>Right-click <code class="cc">conOffice</code> → <strong>Reorder</strong> → <strong>Move down</strong>, also <strong>four times</strong>.</li>
+          <li>In the Tree view, expand <code class="cc el">conRight</code>. <em>You should now see</em> its children top to bottom: lblPlaceholder, conBorrowerCard, conCoverage, conOffice, lblLoading, galPurposes, lblNoContacts.</li>
+          <li>Right-click <code class="cc el">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong>. Repeat until it has moved down <strong>four times</strong>.</li>
+          <li>Right-click <code class="cc el">conOffice</code> → <strong>Reorder</strong> → <strong>Move down</strong>, also <strong>four times</strong>.</li>
         </ol>
         <div class="note check"><b>Check before moving on</b>conRight's children now read, top to bottom: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galPurposes · lblNoContacts · conCoverage · conOffice</strong> — and in Preview the purpose groups sit between the card and "BMO coverage team".</div>
         <button class="done" type="button">Mark step done</button>
@@ -421,14 +425,14 @@ Set(varLoading, false)</code></div>
         <p class="do">Cosmetic drift from the guide's spec. Each row is the same motion from the verdict pane: Tree view → click the control in column one → property dropdown → type the property in column two → paste column three into the formula bar → Enter:</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>Control</th><th>Property</th><th>Set to</th><th>Why</th></tr>
-          <tr><td><code class="cc">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td><td>it's at the default (13) — the name should outrank the RIM line</td></tr>
-          <tr><td rowspan="4"><code class="cc">lblNoResults</code></td><td><code class="cc">Color</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code></td><td rowspan="4">it's default dark, left-aligned, auto-sized — the guide's empty-state is grey, centered, 13px in a 40px row</td></tr>
+          <tr><td><code class="cc el">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td><td>it's at the default (13) — the name should outrank the RIM line</td></tr>
+          <tr><td rowspan="4"><code class="cc el">lblNoResults</code></td><td><code class="cc">Color</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code></td><td rowspan="4">it's default dark, left-aligned, auto-sized — the guide's empty-state is grey, centered, 13px in a 40px row</td></tr>
           <tr><td><code class="cc">Align</code></td><td><code class="cc">Align.Center</code></td></tr>
           <tr><td><code class="cc">Size</code></td><td><code class="cc">13</code></td></tr>
           <tr><td><code class="cc">Height</code></td><td><code class="cc">40</code></td></tr>
-          <tr><td><code class="cc">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td><td>it has no height, so conCoverage's 216px math is slightly off</td></tr>
+          <tr><td><code class="cc el">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td><td>it has no height, so conCoverage's 216px math is slightly off</td></tr>
         </table></div>
-        <div class="note tip"><b>Optional, purely cosmetic</b>Your <code>conLeft</code> uses gap 12 / padding 16 where the guide says gap <code class="cc">8</code> / padding <code class="cc">12</code>. Both look fine — change only if you want pixel-parity with the guide. The app checker's accessibility notes (missing TabIndex / AccessibleLabel) are advisory; for an internal tool you can ignore them, or set <code class="cc">TabIndex</code> → <code class="cc">0</code> on the six email labels to make them keyboard-reachable.</div>
+        <div class="note tip"><b>Optional, purely cosmetic</b>Your <code class="el">conLeft</code> uses gap 12 / padding 16 where the guide says gap <code class="cc">8</code> / padding <code class="cc">12</code>. Both look fine — change only if you want pixel-parity with the guide. The app checker's accessibility notes (missing TabIndex / AccessibleLabel) are advisory; for an internal tool you can ignore them, or set <code class="cc">TabIndex</code> → <code class="cc">0</code> on the six email labels to make them keyboard-reachable.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -436,14 +440,14 @@ Set(varLoading, false)</code></div>
     <details class="step" id="f6">
       <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">Re-test the new pieces</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">F5 from <code class="cc">scrMain</code>. These six exercise everything this page changed (L4's seed data provides the shapes):</p>
+        <p class="do">F5 from <code class="cc el">scrMain</code>. These six exercise everything this page changed (L4's seed data provides the shapes):</p>
         <ul>
           <li>Select the L4 test borrower → navy purpose headings appear between the card and the coverage block; <strong>only</strong> purposes with contacts show.</li>
           <li><strong>Test Contact One</strong> appears under both Audit Confirmations <em>and</em> Legal Notices.</li>
           <li><strong>Test Contact Two</strong> (inactive) appears nowhere.</li>
           <li>A borrower without matrix rows → <strong>"No contacts recorded for this borrower"</strong>; coverage and office blocks still show.</li>
           <li>The right panel fills its full width — card and blocks edge-to-edge (F2).</li>
-          <li>App checker → the <code>scrMain.OnVisible</code> errors and the <code>varLoading</code> warning are gone; no delegation warnings on <code class="cc">galBorrowers</code>.</li>
+          <li>App checker → the <code>scrMain.OnVisible</code> errors and the <code>varLoading</code> warning are gone; no delegation warnings on <code class="cc el">galBorrowers</code>.</li>
         </ul>
         <p class="do">All six green → run the main guide's full <a href="IBD_Contact_Repository_Build_Guide.html#s15">S15 checklist (fifteen items)</a>, then delete the L4 test rows and publish via <a href="IBD_Contact_Repository_Build_Guide.html#s16">S16</a>. 🏁</p>
         <div class="note check"><b>Done</b>Six for six here, fifteen for fifteen on S15 — the build matches the spec and the guide.</div>
