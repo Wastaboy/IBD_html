@@ -178,6 +178,16 @@
     ③ The <strong>purpose-grouped contacts section (S8–S11) hasn't been built</strong> — the spec's centerpiece.
     ④ <code>conRight</code> has <code>LayoutAlignItems</code> set to <strong>Center</strong> again — the squeeze bug from your first build: everything on the right floats narrow and centered instead of filling the panel.</div>
     <div class="note why"><b>How this page works</b>F-steps are fixes to what exists; the four S-steps reproduced from the main guide build what's missing — in full, so you never have to switch pages mid-build. Same copy buttons, same chips, same done-tracking (progress here is separate from the main guide's).</div>
+    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button. Every inline chip like <code class="cc">galBorrowers</code> is tap-to-copy — the ⧉ mark is the reminder. Paste, never retype.</div>
+    <div class="pane">
+      <div class="ph">Setting any Power Apps property — the same three pastes, always</div>
+      <ol>
+        <li><strong>Select the control</strong> in the Tree view (left rail — its name is always a chip on this page).</li>
+        <li><strong>Pick the property</strong>: click the property dropdown at the top-left of the formula bar and type the property chip, e.g. <code class="cc">LayoutAlignItems</code>.</li>
+        <li><strong>Paste the value</strong> into the formula bar, e.g. <code class="cc">LayoutAlignItems.Stretch</code>. Enter. Next row.</li>
+      </ol>
+      <p>Two translations, same as the main guide: the right-panel's <em>Flexible height/width</em> toggle <strong>is</strong> the <code class="cc">FillPortions</code> property (<code class="cc">0</code> = off / fixed size · <code class="cc">1</code> = on / fill the space), and the panel's <em>Align (horizontal)</em> is <code class="cc">LayoutAlignItems</code>.</p>
+    </div>
   </section>
 
   <section class="block" id="fixes1">
@@ -186,10 +196,26 @@
     <details class="step" id="f1" open>
       <summary><span class="dot"></span><span class="num">F1</span><span class="stitle">Connect the right three lists</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) First, confirm the three IBD lists exist in SharePoint.</strong> Open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → gear → <strong>Site contents</strong> → look for <code class="cc">Borrower Contact Directory</code>, <code class="cc">Communication Purpose Master</code>, <code class="cc">Contact Communication Matrix</code>.</p>
+        <p class="do"><strong>a) First, confirm the three IBD lists exist in SharePoint</strong> — one click per line:</p>
+        <ol class="steps2">
+          <li>In the browser, open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code>. <em>You should now see</em> the BMO site's home page.</li>
+          <li>Click the <strong>gear icon</strong> (top-right) → click <strong>Site contents</strong>. <em>You should now see</em> the "Contents" page listing every list on the site.</li>
+          <li>Look for all three: <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code>.</li>
+        </ol>
         <div class="note warn"><b>Not there?</b>Then stop here and build them first — <a href="IBD_Contact_Repository_Build_Guide.html#l1">Phase 0.5 of the main guide (L1–L4)</a> creates all three click-by-click, seeds the six purposes and the test data. Come back to F1-b when Site contents shows all three.</div>
-        <p class="do"><strong>b) Remove the four wrong connections.</strong> In Power Apps Studio: left rail → <strong>Data</strong>. For each of <code class="cc">BMO Email tracker</code>, <code class="cc">BMO Resources</code>, <code class="cc">BMO Status list</code> and <code class="cc">CustomGallerySample</code>: hover it → click the <strong>⋯</strong> that appears → <strong>Remove</strong>. <em>You should now see</em> only <code>Master List of Exposures</code> left under Data.</p>
-        <p class="do"><strong>c) Add the right three.</strong> Still in Data: <strong>Add data</strong> → search <code class="cc">SharePoint</code> → pick the connector → site <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → tick exactly three: <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code> → <strong>Connect</strong>.</p>
+        <p class="do"><strong>b) Remove the four wrong connections.</strong> Open your app in Power Apps Studio (make.powerapps.com → Apps → <code class="cc">IBD Client Contact Repository</code> → ✏️ Edit), then:</p>
+        <ol class="steps2">
+          <li>In the left rail, click the <strong>Data</strong> icon (cylinder). <em>You should now see</em> the app's data sources: Master List of Exposures, BMO Email tracker, BMO Resources, BMO Status list, CustomGallerySample.</li>
+          <li>Hover <code class="cc">BMO Email tracker</code> → click the <strong>⋯</strong> that appears on its row → click <strong>Remove</strong> (confirm if asked). <em>You should now see</em> it disappear from the list.</li>
+          <li>Repeat the hover → <strong>⋯</strong> → <strong>Remove</strong> for <code class="cc">BMO Resources</code>, then <code class="cc">BMO Status list</code>, then <code class="cc">CustomGallerySample</code>. <em>You should now see</em> only <code>Master List of Exposures</code> left under Data.</li>
+        </ol>
+        <p class="do"><strong>c) Add the right three.</strong> Still on the Data rail:</p>
+        <ol class="steps2">
+          <li>Click <strong>Add data</strong> (top of the Data pane). <em>You should now see</em> a search box over connector suggestions.</li>
+          <li>Type <code class="cc">SharePoint</code> → under "Connectors", click <strong>SharePoint</strong> (sign in if asked). <em>You should now see</em> a "Connect to a SharePoint site" panel with recent sites and a URL box.</li>
+          <li>Click the site if it's listed, or paste <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> into the URL box → <strong>Connect</strong>. <em>You should now see</em> "Choose a list" with checkboxes.</li>
+          <li>Tick exactly three: <code class="cc">Borrower Contact Directory</code> · <code class="cc">Communication Purpose Master</code> · <code class="cc">Contact Communication Matrix</code> → click <strong>Connect</strong>. <em>You should now see</em> the three appear under Data.</li>
+        </ol>
         <div class="note check"><b>Check before moving on</b>The Data rail lists exactly four sources: Master List of Exposures and the three IBD lists. Nothing named "BMO Email tracker / Resources / Status list", no CustomGallerySample.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
@@ -198,7 +224,11 @@
     <details class="step" id="f2">
       <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Un-squeeze the right panel</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Select <code class="cc">conRight</code> in the Tree view → property dropdown → <code class="cc">LayoutAlignItems</code> → replace <code>Center</code> with:</p>
+        <ol class="steps2">
+          <li>In the <strong>Tree view</strong> (left rail), click <code class="cc">conRight</code>. <em>You should now see</em> it highlighted on the canvas and its name in the property dropdown at the top-left of the formula bar.</li>
+          <li>Click that <strong>property dropdown</strong> → type <code class="cc">LayoutAlignItems</code> → select it. <em>You should now see</em> the formula bar showing <code>LayoutAlignItems.Center</code>.</li>
+          <li>Select everything in the formula bar and paste over it:</li>
+        </ol>
         <p class="fxlabel">conRight · LayoutAlignItems</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>LayoutAlignItems.Stretch</code></div>
         <div class="note why"><b>Same bug as round one</b>Center makes every child shrink to its minimum width and float in the middle — the card, coverage and office blocks end up in a skinny centered column. Stretch makes them fill the panel edge-to-edge. If a layout ever looks pinched, this property is always the first suspect.</div>
@@ -210,7 +240,12 @@
     <details class="step" id="f3">
       <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Install the real selection formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Your <code class="cc">galBorrowers</code> → <code class="cc">OnSelect</code> still holds the old one-liner. Replace it entirely with this — it fills <code class="cc">colMatrix</code> with the selected borrower's matrix rows, each enriched with the full contact record (this is what makes your two app-checker errors and the "unused varLoading" warning disappear):</p>
+        <p class="do">Your <code class="cc">galBorrowers</code> <code class="cc">OnSelect</code> still holds the old one-liner. This paste fills <code class="cc">colMatrix</code> with the selected borrower's matrix rows, each enriched with the full contact record — it's what makes your two app-checker errors and the "unused varLoading" warning disappear:</p>
+        <ol class="steps2">
+          <li>In the <strong>Tree view</strong>, click <code class="cc">galBorrowers</code> (inside conLeft). <em>You should now see</em> the gallery selected on the canvas.</li>
+          <li>Click the <strong>property dropdown</strong> (top-left of the formula bar) → type <code class="cc">OnSelect</code> → select it. <em>You should now see</em> the formula bar showing <code>Set(varBorrower, ThisItem)</code>.</li>
+          <li>Click into the formula bar → select <strong>everything</strong> (Ctrl+A) → paste:</li>
+        </ol>
         <p class="fxlabel">galBorrowers · OnSelect — replace everything</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem);
 Set(varLoading, true);
@@ -382,7 +417,7 @@ Set(varLoading, false)</code></div>
     <details class="step" id="f5">
       <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">Small true-ups</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Cosmetic drift from the guide's spec — three quick property pastes:</p>
+        <p class="do">Cosmetic drift from the guide's spec. Each row is the same motion from the verdict pane: Tree view → click the control in column one → property dropdown → type the property in column two → paste column three into the formula bar → Enter:</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>Control</th><th>Property</th><th>Set to</th><th>Why</th></tr>
           <tr><td><code class="cc">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td><td>it's at the default (13) — the name should outrank the RIM line</td></tr>
