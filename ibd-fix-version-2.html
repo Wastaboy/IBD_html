@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F3B6E">
+<title>IBD Fix — Version 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3B6E; --navy-deep:#142a52; --ink:#0f1f3d;
+    --amber:#E08A1E; --amber-soft:#fbe8cd;
+    --paper:#F4F5F8; --card:#fff; --line:#e3e6ee; --line-soft:#eef1f7;
+    --navy-tint:#eef0f6; --faint:#97a1b4;
+    --text:#1b2436; --muted:#5b6678;
+    --code-bg:#0f1f3d; --code-text:#e9edf7;
+    --ok:#1f8a52; --ok-soft:#e3f3ea;
+    --green:#228b57; --red:#c83737; --gray:#788291;
+    --radius:14px; --tap:46px; --sh-sm:0 1px 2px rgba(16,31,61,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:24px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+
+  header.mast{background:radial-gradient(120% 140% at 100% 0%, rgba(224,138,30,.22), transparent 55%),linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;padding:calc(28px + env(safe-area-inset-top)) 0 26px;border-bottom:3px solid var(--amber)}
+  .mast-inner{display:flex;gap:18px;align-items:center}
+  .mast-copy{flex:1;min-width:0}
+  .brandmark{flex:none;width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,#274982,#1a345f);border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);display:grid;place-items:center}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:500;margin:0 0 10px}
+  .mast h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:42px;line-height:1.12;margin:0 0 8px;letter-spacing:-.01em}
+  .mast p.sub{margin:0;color:#c7d2e8;font-size:21px;max-width:48ch}
+  .mast .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .mast .meta span{font-family:"IBM Plex Mono",monospace;font-size:16px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);padding:5px 9px;border-radius:999px;color:#dde6f5}
+  .mast .meta span b{color:#fff;font-weight:600}
+  @media(max-width:480px){ .brandmark{width:50px;height:50px} .mast h1{font-size:34px} }
+
+  .sticky{position:sticky;top:0;z-index:40;background:rgba(244,245,248,.86);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .progress{height:5px;background:var(--line);overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--amber));transition:width .35s ease}
+  .progtext{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding:6px 0 8px;display:flex;justify-content:space-between;align-items:center}
+  .progtext button{background:none;border:none;color:var(--navy);font-family:inherit;font-size:15px;cursor:pointer;text-decoration:underline;padding:4px}
+
+  section.block{margin:26px 0}
+  section.block > h2.sec{font-family:"IBM Plex Serif",serif;font-size:29px;font-weight:600;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em;scroll-margin-top:120px}
+  section.block > p.lead{margin:0 0 14px;color:var(--muted);font-size:21px}
+
+  .tldr{background:#fffdf8;border:1px dashed #ecd6ad;border-radius:12px;padding:13px 15px;margin:0 0 15px;font-size:20px}
+  .tldr b{display:block;font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#a4651a;margin-bottom:4px}
+
+  details.step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:12px 0;overflow:hidden;scroll-margin-top:118px;box-shadow:var(--sh-sm)}
+  details.step[open]{box-shadow:0 6px 24px -12px rgba(16,31,61,.28);border-color:#d4dae8}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:var(--tap);user-select:none;-webkit-tap-highlight-color:transparent}
+  summary::-webkit-details-marker{display:none}
+  summary .num{flex:none;min-width:30px;height:30px;padding:0 5px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:18px}
+  details.isdone summary .num{background:var(--ok)}
+  summary .stitle{flex:1;font-weight:600;font-size:22px;line-height:1.3}
+  summary .chev{flex:none;color:var(--muted);transition:transform .2s ease}
+  details[open] summary .chev{transform:rotate(90deg)}
+  summary .dot{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid var(--line)}
+  details.isdone summary .dot{background:var(--ok);border-color:var(--ok)}
+  .body{padding:2px 16px 18px;border-top:1px solid var(--line-soft)}
+  .body > *:first-child{margin-top:14px}
+  .body p{margin:0 0 12px}
+  p.do{margin:0 0 12px}
+  .body ul,.body ol{margin:0 0 12px;padding-left:22px}.body li{margin:0 0 8px}
+  ol.steps2{counter-reset:s2;list-style:none;padding-left:0}
+  ol.steps2 > li{position:relative;padding:2px 0 10px 40px;margin:0}
+  ol.steps2 > li::before{counter-increment:s2;content:counter(s2);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:8px;background:var(--navy-tint);color:var(--navy);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;display:grid;place-items:center;border:1px solid #dbe3f5}
+
+  dl.props{margin:0 0 13px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  dl.props > div{display:grid;grid-template-columns:210px 1fr;border-top:1px solid var(--line-soft)}
+  dl.props > div:first-child{border-top:none}
+  dl.props dt{background:#f7f9fc;padding:9px 12px;font-family:"IBM Plex Mono",monospace;font-size:18px;color:var(--navy);font-weight:500;border-right:1px solid var(--line-soft)}
+  dl.props dd{margin:0;padding:9px 12px;font-size:20px}
+  dl.props dd code{font-family:"IBM Plex Mono",monospace;font-size:18px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  @media(max-width:430px){dl.props > div{grid-template-columns:130px 1fr}dl.props dt{font-size:15px;padding:8px 9px}dl.props dd{font-size:18px;padding:8px 10px}}
+
+  .fxlabel{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin:0 0 5px;font-weight:500}
+  .fx{position:relative;margin:0 0 13px}
+  .fx code{display:block;background:var(--code-bg);color:var(--code-text);font-family:"IBM Plex Mono",monospace;font-size:18px;line-height:1.55;padding:14px 84px 14px 16px;border-radius:11px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #1c3360}
+  .fx .copy{position:absolute;top:8px;right:8px;height:34px;min-width:34px;padding:0 11px;border:none;border-radius:8px;background:rgba(224,138,30,.95);color:#1b1206;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .fx .copy:active{transform:scale(.96)}
+  .fx .copy.copied{background:var(--ok);color:#fff}
+  .fxgroup{border:1px solid var(--line);border-radius:12px;padding:12px 13px 2px;margin:0 0 14px;background:#fcfdff}
+  .fxgroup > .gh{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;color:var(--navy);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .fxgroup > .gh::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--amber)}
+
+  .pane{background:#f4f6fb;border:1px solid #dbe2f1;border-left:4px solid var(--navy);border-radius:11px;padding:12px 14px;margin:0 0 13px}
+  .pane > .ph{font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);font-weight:600;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .pane > .ph::before{content:"\2699";font-size:16px;line-height:1}
+  .pane ol,.pane ul{margin:0;padding-left:20px}.pane li{margin:0 0 6px;font-size:19px}
+  .pane p{margin:0 0 8px;font-size:19px}
+  .pane code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#e7ecf7;color:var(--navy);padding:1px 6px;border-radius:5px}
+
+  .note{border-radius:11px;padding:12px 14px;margin:0 0 13px;font-size:20px;border:1px solid;line-height:1.55}
+  .note b{display:block;font-size:17px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;font-family:"IBM Plex Mono",monospace}
+  .note.why{background:#eef2fb;border-color:#d5def3;color:#23365e}.note.why b{color:var(--navy)}
+  .note.warn{background:#fbe8cd33;border-color:var(--amber-soft);color:#6b4410}.note.warn b{color:#a4651a}
+  .note.tip{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.tip b{color:var(--ok)}
+  .note.check{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.check b{color:var(--ok)}
+  .note.check b::before{content:"✅ ";}
+  .note code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px}
+
+  /* tap-to-copy chips: every code chip outside a dark .fx box is copyable */
+  code.cc{cursor:copy;position:relative;-webkit-tap-highlight-color:transparent}
+  code.cc::after{content:"⧉";font-size:.78em;margin-left:5px;opacity:.55}
+  code.cc.copied{background:var(--ok) !important;color:#fff !important}
+  code.cc.copied::after{content:"✓";opacity:1}
+
+  .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
+  .done:active{background:var(--line-soft)}
+  details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  table.cols{width:100%;border-collapse:collapse;margin:0 0 13px;background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:19px}
+  table.cols th,table.cols td{border-top:1px solid var(--line-soft);padding:8px 11px;text-align:left;vertical-align:top}
+  table.cols tr:first-child th{border-top:none}
+  table.cols th{background:#f7f9fc;font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  table.cols td:first-child{font-weight:600;white-space:nowrap}
+  table.cols code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:0 0 13px}
+  .tablewrap table.cols{margin:0}
+
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 13px}
+  .flow .fnode{border:1.5px solid var(--navy);border-radius:10px;padding:7px 11px;background:var(--navy-tint);font-size:17px;font-weight:600;color:var(--navy);text-align:center;line-height:1.35}
+  .flow .fnode small{display:block;font-weight:400;color:var(--muted);font-size:15px}
+  .flow .fnode.hot{border-color:var(--amber);background:#fdf6ea;color:#8a5200}
+  .flow .farrow{color:var(--faint);font-size:20px}
+
+  footer{margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:18px;text-align:center;line-height:1.6}
+  footer a{color:var(--navy);font-weight:600}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-inner">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="46" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="16" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/>
+        <path d="M17 24l5 5 9-11" stroke="rgba(224,138,30,.95)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="mast-copy">
+      <p class="kicker">IBD · Client Contact Repository · Fix version 2</p>
+      <h1>Second review, second fix list</h1>
+      <p class="sub">Audit of the app exported <strong>15 July, evening</strong>. Big progress: the right lists are connected, the selection formula is in, the panel is un-squeezed. Two traps caught you this round — the <strong>gallery template</strong> (again) and a <strong>wrong column type</strong> in SharePoint — plus one formula bug that was the guide's fault, not yours. Nine steps, in order, and you're at the finish line.</p>
+      <div class="meta">
+        <span><b>1</b> SharePoint fix</span>
+        <span><b>8</b> Studio steps</span>
+        <span><b>~35</b> min</span>
+        <span>then re-test ✅</span>
+        <span><a href="IBD_Contact_Repository_Build_Guide.html" style="color:#fff;text-decoration:underline">↩ full build guide</a></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="sticky">
+  <div class="wrap">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="progtext"><span id="progLabel">0 of 9 steps done</span><button id="reset" type="button">Reset</button></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section class="block" id="verdict">
+    <h2 class="sec">The verdict</h2>
+    <div class="note tip"><b>Fixed since review №1 — genuinely well done</b>All four correct lists connected, and L1–L3 were executed well (the Matrix's lookups, the additional Borrower field, the Directory columns — all right). The full <code>ClearCollect(colMatrix, …)</code> selection formula is installed and exact. <code>conRight</code> is back on Stretch. <code>lblLoading</code> and <code>galPurposes</code> exist with the right Visible and TemplateSize.</div>
+    <div class="note warn"><b>The five problems this round</b>
+    ① <strong>galPurposes' template is empty</strong> — <code>lblPurposeHeader</code> was never created <em>inside</em> it. The same template trap as round one: the label must be inserted with the gallery's first row selected.
+    ② <strong>galContacts sits <em>next to</em> galPurposes</strong>, directly in conRight, instead of <em>inside</em> galPurposes' template. The nesting is the whole mechanism — one contact list <em>per purpose row</em>. As a sibling it can't work.
+    ③ <strong>galContacts was inserted with a sample layout, not Blank</strong> — the evidence is a leftover <code>Label8</code> reading <code>ThisItem.SampleHeading</code> and <code>CustomGallerySample</code> re-appearing in your data sources.
+    ④ <strong>Active Status in SharePoint is a Choice column, not Yes/No</strong> — L1 specified Yes/No; the contacts filter expects a true/false. This one's a two-minute SharePoint fix.
+    ⑤ <strong>galPurposes' Items has a bug that was the guide's fault</strong> — a name collision the guide has since corrected; you built from the pre-fix version. One paste fixes it.
+    Plus the leftovers from review №1 you haven't reached yet: the block reorder, the three cosmetic true-ups, and S10/S11.</div>
+    <div class="note why"><b>Tap any chip to copy</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). Property workflow, same as always: select the control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
+  </section>
+
+  <section class="block" id="fixes">
+    <h2 class="sec">The nine steps</h2>
+
+    <details class="step" id="f1" open>
+      <summary><span class="dot"></span><span class="num">F1</span><span class="stitle">SharePoint: remake Active Status as Yes/No</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">SharePoint can't convert a Choice column to Yes/No, so delete and recreate — painless because only the two test contacts exist:</p>
+        <ol class="steps2">
+          <li>Open <code class="cc">Borrower Contact Directory</code> in SharePoint. <em>You should now see</em> the list with your two test contacts.</li>
+          <li>Click the <strong>Active Status</strong> column header → <strong>Column settings</strong> → <strong>Edit</strong>. <em>You should now see</em> the edit panel slide in from the right.</li>
+          <li>Scroll to the bottom of the panel → click <strong>Delete</strong> → confirm. <em>You should now see</em> the column disappear.</li>
+          <li><strong>+ Add column</strong> → <strong>Yes/No</strong>. <em>You should now see</em> the "Create a column" panel.</li>
+          <li><strong>Name</strong> → paste <code class="cc">Active Status</code> → <strong>Default value</strong> dropdown → <strong>Yes</strong> → <strong>Save</strong>.</li>
+          <li>Fix the two test rows: <strong>Test Contact One</strong> → Active Status <strong>Yes</strong> · <strong>Test Contact Two</strong> → <strong>No</strong> (edit each row: hover → ✏️ or open the item → change → Save).</li>
+        </ol>
+        <div class="note why"><b>Why Yes/No matters</b>The contacts filter is <code>ContactRec.'Active Status'</code> — a clean true/false test. Against a Choice column that's a type error, and "fixing" it by comparing strings would leave a typo-shaped hole ("active" vs "Active"). The column type is the contract.</div>
+        <div class="note check"><b>Check before moving on</b>The Directory shows Active Status as Yes/No toggles; Contact One = Yes, Contact Two = No.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f2">
+      <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Studio: refresh the fixed list &amp; clear the wreckage</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Open the app in Studio → left rail → <strong>Data</strong>. Hover <code class="cc">Borrower Contact Directory</code> → <strong>⋯</strong> → <strong>Refresh</strong>, so Power Apps picks up the remade Active Status column.</li>
+          <li>Hover <code class="cc">CustomGallerySample</code> → <strong>⋯</strong> → <strong>Remove</strong>. (It sneaked back in when a gallery was inserted with a sample layout — F4 explains how to avoid that.)</li>
+          <li>In the <strong>Tree view</strong>, right-click <code class="cc">galContacts</code> (the one sitting directly under conRight, with <code>Label8</code> inside) → <strong>Delete</strong>. <em>You should now see</em> it and Label8 gone. It has to be rebuilt <em>inside</em> galPurposes — a gallery can't be moved into another gallery's template, only created there.</li>
+        </ol>
+        <div class="note check"><b>Check before moving on</b>Data shows exactly four sources; the Tree view under conRight has no galContacts and no Label8.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f3">
+      <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Paste the corrected galPurposes formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Your Items formula is the guide's old version, which had a genuine bug (a bare <code>Title</code> inside the inner Filter gets captured by the Matrix rows' own blank Title — every purpose counts zero, so no headings ever render). Select <code class="cc">galPurposes</code> → property dropdown → <code class="cc">Items</code> → select everything → paste:</p>
+        <p class="fxlabel">galPurposes · Items — the As PurposeRow alias is the fix</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Communication Purpose Master' As PurposeRow,
+    CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></div>
+        <div class="note check"><b>Check before moving on</b>No red underline on the formula. (Headings still won't show — the template is empty until F4.)</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f4">
+      <summary><span class="dot"></span><span class="num">F4</span><span class="stitle">Put the purpose heading INSIDE the template</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <div class="note warn"><b>The trap that's caught you twice — read before clicking</b>Select the gallery, then click <em>once more into its first row</em> until a <strong>pencil icon</strong> appears on that row — <em>that</em> is the template being selected. Only then Insert. If the new control lands <em>next to</em> the gallery in the Tree view instead of <em>under</em> it, it's outside — delete it and try again. Placed right, it repeats once per row automatically.</div>
+        <ol class="steps2">
+          <li>In the Tree view click <code class="cc">galPurposes</code>, then click into the gallery's first row on the canvas until the pencil shows.</li>
+          <li>Insert → <strong>Text label</strong> → rename to <code class="cc">lblPurposeHeader</code>. <em>You should now see</em> it nested <strong>under galPurposes</strong> in the Tree view.</li>
+        </ol>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">24</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">15</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+        </dl>
+        <div class="note check"><b>Check before moving on</b>Select your test borrower in Preview: navy purpose headings appear — Audit Confirmations, Legal Notices, Covenant Reporting. (F3 + F4 together make this happen.)</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f5">
+      <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">Rebuild galContacts — inside the template, BLANK layout</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Click into <code class="cc">galPurposes</code>' first row again until the pencil shows (the template must be selected, same as F4).</li>
+          <li>Insert → <strong>Vertical gallery</strong> → in the layout picker choose <strong>Blank</strong>. <em>You should now see</em> an empty gallery — <strong>no</strong> placeholder text. If you see sample headings/text, you picked a sample layout (that's what re-added CustomGallerySample last time): press Ctrl+Z and pick Blank.</li>
+          <li>Rename it <code class="cc">galContacts</code>. <em>You should now see</em> it nested under galPurposes in the Tree view, below lblPurposeHeader.</li>
+        </ol>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">100</code> for now — F7 replaces it</dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">92</code></dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code></dd></div>
+        </dl>
+        <div class="note why"><b>Why this formula now works end-to-end</b><code>lblPurposeHeader</code> exists (F4), <code>colMatrix</code> fills on selection (your OnSelect is already right), and <code>ContactRec.'Active Status'</code> is a real Yes/No again (F1). Three fixes, one working line.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f6">
+      <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">The four contact labels</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">All four go <em>inside the galContacts template</em> — click into <em>its</em> first row until the pencil shows (a template inside a template; same rule, one level deeper). Fixed anchors, identical in every row.</p>
+        <p class="do">First → rename to <code class="cc">lblContactName</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
+        </dl>
+        <p class="do">Second → rename to <code class="cc">lblContactJob</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <p class="do">Third → rename to <code class="cc">lblContactEmail</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">20</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+          <div><dt><code class="cc">Underline</code></dt><dd><code class="cc">true</code></dd></div>
+          <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
+        </dl>
+        <p class="do">Fourth → rename to <code class="cc">lblContactPhones</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+        </dl>
+        <div class="note check"><b>Check before moving on</b>Each heading lists its contacts: bold name, grey job, tappable navy email, phones. Test Contact One under both Audit Confirmations and Legal Notices; Test Contact Two nowhere.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f7">
+      <summary><span class="dot"></span><span class="num">F7</span><span class="stitle">Self-sizing formulas</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">Two pastes replace the placeholder numbers so each purpose group grows with its contact count:</p>
+        <p class="fxlabel">galContacts · Height — replaces the 100</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></div>
+        <p class="fxlabel">galPurposes · TemplateSize — replaces the 140</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>lblPurposeHeader.Height + galContacts.Height + 16</code></div>
+        <div class="note check"><b>Check before moving on</b>A one-contact purpose takes one row of space; more contacts, more space — no clipping, no gaps.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f8">
+      <summary><span class="dot"></span><span class="num">F8</span><span class="stitle">"No contacts" label &amp; block order</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a)</strong> Select <code class="cc">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc">lblNoContacts</code>:</p>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
+          <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">40</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></dd></div>
+        </dl>
+        <p class="do"><strong>b) Reorder the blocks.</strong> In the Tree view, conRight currently reads: lblPlaceholder · conBorrowerCard · conCoverage · conOffice · lblLoading · galPurposes · lblNoContacts. Right-click <code class="cc">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong> <strong>four times</strong>; then <code class="cc">conOffice</code> → Move down <strong>four times</strong>.</p>
+        <div class="note check"><b>Check before moving on</b>conRight now reads: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galPurposes · lblNoContacts · conCoverage · conOffice</strong> — purposes between the card and the coverage team.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f9">
+      <summary><span class="dot"></span><span class="num">F9</span><span class="stitle">True-ups &amp; the re-test</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a)</strong> Three property pastes still pending from review №1:</p>
+        <div class="tablewrap"><table class="cols">
+          <tr><th>Control</th><th>Property</th><th>Set to</th></tr>
+          <tr><td><code class="cc">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td></tr>
+          <tr><td><code class="cc">lblNoResults</code></td><td><code class="cc">Color</code> · <code class="cc">Align</code> · <code class="cc">Size</code> · <code class="cc">Height</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code> · <code class="cc">Align.Center</code> · <code class="cc">13</code> · <code class="cc">40</code></td></tr>
+          <tr><td><code class="cc">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td></tr>
+        </table></div>
+        <p class="do"><strong>b)</strong> F5 (Preview) and run:</p>
+        <ul>
+          <li>Test borrower → headings for Audit Confirmations + Legal Notices only; Test Contact One under both; Contact Two nowhere.</li>
+          <li>Flip Contact Two to Active in SharePoint, reselect → they appear under Audit Confirmations and Covenant Reporting; flip back.</li>
+          <li>Borrower without matrix rows → "No contacts recorded"; coverage/office still show.</li>
+          <li>Tap a contact email → mail draft opens.</li>
+          <li>App checker → no formula errors anywhere.</li>
+        </ul>
+        <p class="do">All green → the main guide's full <a href="IBD_Contact_Repository_Build_Guide.html#s15">S15 checklist</a>, delete the test rows, publish via <a href="IBD_Contact_Repository_Build_Guide.html#s16">S16</a>. 🏁</p>
+        <div class="note check"><b>Done</b>This was the last structural piece — after this the app matches the spec end to end.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    IBD Fix — Version 2 · audit of the 15 July evening export · Owner: BMO<br>
+    <a href="IBD_Contact_Repository_Build_Guide.html">Full build guide</a> · <a href="build-review-1.html">Build review №1</a>
+  </footer>
+</main>
+<script>
+(function(){
+  "use strict";
+  var mem={};
+  var store={
+    get:function(k){try{return localStorage.getItem(k);}catch(e){return (k in mem)?mem[k]:null;}},
+    set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
+    del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
+  };
+  var KEY="ibdFixV2_v1";
+
+  function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+  function copyText(text,onDone){
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(onDone,function(){fallbackCopy(text);onDone();});}
+    else{fallbackCopy(text);onDone();}
+  }
+  document.querySelectorAll(".fx .copy").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var code=btn.parentElement.querySelector("code");
+      copyText(code?code.textContent:"",function(){
+        btn.classList.add("copied");btn.textContent="✓";
+        setTimeout(function(){btn.classList.remove("copied");btn.textContent="Copy";},1300);
+      });
+    });
+  });
+  document.querySelectorAll("code.cc").forEach(function(chip){
+    chip.setAttribute("title","Tap to copy");
+    chip.addEventListener("click",function(){
+      copyText(chip.textContent,function(){
+        chip.classList.add("copied");
+        setTimeout(function(){chip.classList.remove("copied");},1100);
+      });
+    });
+  });
+
+  var steps=Array.prototype.slice.call(document.querySelectorAll("details.step"));
+  var total=steps.length;
+  var bar=document.getElementById("bar");
+  var label=document.getElementById("progLabel");
+  function loadDone(){var raw=store.get(KEY);if(!raw)return {};try{return JSON.parse(raw)||{};}catch(e){return {};}}
+  function saveDone(obj){store.set(KEY,JSON.stringify(obj));}
+  var doneMap=loadDone();
+  function refreshProgress(){
+    var n=0;
+    steps.forEach(function(d){if(d.classList.contains("isdone"))n++;});
+    bar.style.width=(total?Math.round(n/total*100):0)+"%";
+    label.textContent=n+" of "+total+" steps done";
+  }
+  steps.forEach(function(d){
+    if(doneMap[d.id])d.classList.add("isdone");
+    var btn=d.querySelector(".done");
+    function syncBtn(){btn.textContent=d.classList.contains("isdone")?"✓ Done — tap to undo":"Mark step done";}
+    syncBtn();
+    btn.addEventListener("click",function(){d.classList.toggle("isdone");doneMap[d.id]=d.classList.contains("isdone");saveDone(doneMap);syncBtn();refreshProgress();});
+  });
+  refreshProgress();
+  document.getElementById("reset").addEventListener("click",function(){
+    steps.forEach(function(d){d.classList.remove("isdone");d.querySelector(".done").textContent="Mark step done";});
+    doneMap={};store.del(KEY);refreshProgress();
+  });
+})();
+</script>
+</body>
+</html>
