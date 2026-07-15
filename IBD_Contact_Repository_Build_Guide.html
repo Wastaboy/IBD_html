@@ -243,25 +243,42 @@
   <section class="block" id="phase05">
     <h2 class="sec">Phase 0.5 — Build the three lists</h2>
     <p class="lead">The contact repository itself. Straight from the spec (§5–§7), every column type locked so the app formulas later are single-variant. Build them in this order — L3's lookups need L1 and L2 to exist first.</p>
+    <div class="note warn"><b>SharePoint has two skins — this guide covers both</b>Microsoft ships a <em>modern</em> UI (panels sliding in from the right) and a <em>classic</em> one (full white settings pages with blue links), and tenants mix them. Every instruction below gives the modern path as numbered clicks with a "you should now see…" after each. Where the skins differ — creating lookup columns, making a column not-required — a <strong>classic fallback</strong> box sits in the same step. Rule of thumb: if your screen doesn't match the words, don't improvise — find the fallback box.</div>
 
     <details class="step" id="l1">
       <summary><span class="dot"></span><span class="num">L1</span><span class="stitle">Create the Borrower Contact Directory</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) Create the list.</strong> Open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code> → gear icon (top-right) → <strong>Site contents</strong> → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <p class="do"><strong>a) Create the list</strong> — one click per line:</p>
+        <ol class="steps2">
+          <li>In the browser, open <code class="cc">https://bbkonline.sharepoint.com/sites/BMO</code>. <em>You should now see</em> the BMO site's home page.</li>
+          <li>Click the <strong>gear icon</strong> (top-right corner of the page) → in the menu that drops down, click <strong>Site contents</strong>. <em>You should now see</em> a page titled "Contents" listing every list and library on the site (the Master List of Exposures is in there).</li>
+          <li>Click <strong>+ New</strong> (toolbar, top-left of the content area) → click <strong>List</strong> in its menu. <em>You should now see</em> a "Create a list" dialog with tiles.</li>
+          <li>Click the <strong>Blank list</strong> tile. <em>You should now see</em> a panel asking for Name and Description.</li>
+          <li>Click into the <strong>Name</strong> box and paste:</li>
+        </ol>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Borrower Contact Directory</code></div>
-        <p class="do">Leave "Show in site navigation" ticked → <strong>Create</strong>.</p>
-        <p class="do"><strong>b) The Title column holds the contact's full name.</strong> Nothing to change — you'll simply type the person's full name in Title when adding contacts. (Optional clarity: gear → <strong>List settings</strong> → <strong>Title</strong> → Description → <code class="cc">Contact Full Name</code>.)</p>
-        <p class="do"><strong>c) Add the seven columns</strong>, in the list view via <strong>+ Add column</strong>, one row of this table at a time. For each: pick the type from the menu, paste the Name, apply the settings in the third cell, <strong>Save</strong>:</p>
+        <ol class="steps2" start="6">
+          <li>Leave Description empty, leave "Show in site navigation" ticked → click <strong>Create</strong>. <em>You should now see</em> the new, empty list: a toolbar with <strong>+ New</strong>, and one column header, <strong>Title</strong>.</li>
+        </ol>
+        <p class="do"><strong>b) The Title column holds the contact's full name.</strong> Nothing to change — you'll simply type the person's full name into Title when adding contacts.</p>
+        <p class="do"><strong>c) Your first "+ Add column", walked through once.</strong> Every column in this guide is created with this same motion, so here it is in full for the first one (<code class="cc">Contact Email</code>):</p>
+        <ol class="steps2">
+          <li>In the column-header row (where <strong>Title</strong> sits), click <strong>+ Add column</strong> — it's the right-most item in that row. <em>You should now see</em> a dropdown menu of column types: Text, Choice, Date and time, Multiple lines of text, Person, Number, Yes/No, Hyperlink, Currency, Image, Lookup…</li>
+          <li>Click <strong>Text</strong>. <em>You should now see</em> a panel slide in from the right titled "Create a column", with a Name box at the top and a blue <strong>Save</strong> button at the very bottom.</li>
+          <li>Click into <strong>Name</strong> and paste <code class="cc">Contact Email</code>.</li>
+          <li>Touch nothing else → click <strong>Save</strong> (bottom of the panel). <em>You should now see</em> the panel close and a <strong>Contact Email</strong> header appear next to Title.</li>
+        </ol>
+        <p class="do"><strong>d) The remaining six columns</strong> — same four clicks each: <strong>+ Add column</strong> → the type in column two → paste the Name → apply what the Settings cell says (still inside the panel, before Save) → <strong>Save</strong>:</p>
         <div class="tablewrap"><table class="cols">
-          <tr><th>Name (paste)</th><th>+ Add column → type</th><th>Settings</th></tr>
-          <tr><td><code class="cc">Contact Email</code></td><td>Text</td><td>defaults as-is</td></tr>
-          <tr><td><code class="cc">Mobile Number</code></td><td>Text</td><td>defaults as-is (text, not number — phone numbers keep leading zeros and "+" prefixes)</td></tr>
-          <tr><td><code class="cc">Office Number</code></td><td>Text</td><td>defaults as-is</td></tr>
-          <tr><td><code class="cc">Job Title</code></td><td>Text</td><td>defaults as-is</td></tr>
-          <tr><td><code class="cc">Active Status</code></td><td>Yes/No</td><td>Default value → <strong>Yes</strong> — new contacts are active unless someone flips them off</td></tr>
-          <tr><td><code class="cc">Preferred Language</code></td><td>Choice</td><td>Delete the sample choices; add two: <code class="cc">English</code> and <code class="cc">Arabic</code>. "Can add values manually" → off</td></tr>
-          <tr><td><code class="cc">Notes</code></td><td>Multiple lines of text</td><td>defaults as-is</td></tr>
+          <tr><th>Name (paste)</th><th>+ Add column → type</th><th>Settings — inside the panel, before Save</th></tr>
+          <tr><td><code class="cc">Mobile Number</code></td><td>Text</td><td>nothing — straight to Save (text, not Number — phone numbers keep leading zeros and "+" prefixes)</td></tr>
+          <tr><td><code class="cc">Office Number</code></td><td>Text</td><td>nothing — straight to Save</td></tr>
+          <tr><td><code class="cc">Job Title</code></td><td>Text</td><td>nothing — straight to Save</td></tr>
+          <tr><td><code class="cc">Active Status</code></td><td>Yes/No</td><td>the <strong>Default value</strong> dropdown in the panel → <strong>Yes</strong> — new contacts are active unless someone flips them off</td></tr>
+          <tr><td><code class="cc">Preferred Language</code></td><td>Choice</td><td>the panel shows three sample choices (Choice 1/2/3): click each one's <strong>✕</strong> to delete it → click <strong>+ Add Choice</strong> and type <code class="cc">English</code> → <strong>+ Add Choice</strong> again and type <code class="cc">Arabic</code> → scroll down in the panel and set <strong>"Can add values manually"</strong> to off (unticked)</td></tr>
+          <tr><td><code class="cc">Notes</code></td><td>Multiple lines of text</td><td>nothing — straight to Save</td></tr>
         </table></div>
+        <div class="note tip"><b>Panel looks different? (classic skin)</b>If "+ Add column" isn't in your header row, or a type opens a full white page instead of a side panel: gear → <strong>List settings</strong> → under the <strong>Columns</strong> section click <strong>Create column</strong>. Same information, different clothes — the name goes in "Column name", the type is a radio-button list, choice values go one-per-line in a text box, the Yes/No default is a dropdown at the bottom, and <strong>OK</strong> saves.</div>
         <div class="note why"><b>Why Active Status is Yes/No, not Choice</b>The app filters on it (<code>ContactRec.'Active Status'</code> — S9). A Yes/No column makes that a clean boolean; a Choice column would force a string comparison and a place for typos ("active" vs "Active"). The spec doesn't dictate the type — this guide does, so the formula later is exact.</div>
         <div class="note warn"><b>No borrower information in this list</b>Spec §5's rule and §2's core principle: a contact row is a person, nothing else. Which borrower they belong to lives <em>only</em> in the Matrix (L3) — never add a borrower column here.</div>
         <div class="note check"><b>Check before moving on</b>The list shows columns: Title, Contact Email, Mobile Number, Office Number, Job Title, Active Status, Preferred Language, Notes — exactly these, exactly these spellings.</div>
@@ -272,10 +289,15 @@
     <details class="step" id="l2">
       <summary><span class="dot"></span><span class="num">L2</span><span class="stitle">Create the Communication Purpose Master &amp; seed the six purposes</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a) Create the list.</strong> Site contents → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <p class="do"><strong>a) Create the list</strong> — the same six clicks as L1-a: gear (top-right) → <strong>Site contents</strong> → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> tile → paste into <strong>Name</strong>:</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Communication Purpose Master</code></div>
-        <p class="do"><strong>Create</strong>. No extra columns — Title <em>is</em> the purpose name. That's the whole schema.</p>
-        <p class="do"><strong>b) Seed the six purposes.</strong> Six times: <strong>+ New</strong> → paste one name into <strong>Title</strong> → <strong>Save</strong>:</p>
+        <p class="do">→ <strong>Create</strong>. <em>You should now see</em> the empty list with just a <strong>Title</strong> header. Add <strong>no</strong> columns — Title <em>is</em> the purpose name. That's the whole schema.</p>
+        <p class="do"><strong>b) Seed the six purposes.</strong> For each of the six boxes below:</p>
+        <ol class="steps2">
+          <li>Click <strong>+ New</strong> (toolbar, top-left). <em>You should now see</em> a "New item" form slide in from the right with a single Title field.</li>
+          <li>Click into <strong>Title</strong> → paste one purpose name → click <strong>Save</strong> (top-left of the form). <em>You should now see</em> the new row in the list.</li>
+          <li>Repeat until all six are rows.</li>
+        </ol>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Audit Confirmations</code></div>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Daily Transaction Advices</code></div>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Legal Notices</code></div>
@@ -292,33 +314,53 @@
       <summary><span class="dot"></span><span class="num">L3</span><span class="stitle">Create the Contact Communication Matrix</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <div class="note warn"><b>Build this list last</b>Its three lookup columns point at the Master List, L1 and L2 — they must all exist before you start here.</div>
-        <p class="do"><strong>a) Create the list.</strong> Site contents → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> → Name:</p>
+        <p class="do"><strong>a) Create the list</strong> — the same six clicks as L1-a: gear (top-right) → <strong>Site contents</strong> → <strong>+ New</strong> → <strong>List</strong> → <strong>Blank list</strong> tile → paste into <strong>Name</strong>:</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Contact Communication Matrix</code></div>
-        <p class="do"><strong>b) Make Title optional.</strong> Matrix rows are pure links (who × which borrower × what purpose) — they don't need a name. Gear → <strong>List settings</strong> → under Columns click <strong>Title</strong> → "Require that this column contains information" → <strong>No</strong> → OK.</p>
-        <p class="do"><strong>c) The Borrower RIM lookup.</strong> Back in the list view: <strong>+ Add column</strong> → <strong>Lookup</strong>, then fill the panel exactly:</p>
-        <dl class="props">
-          <div><dt>Name</dt><dd><code class="cc">Borrower RIM</code></dd></div>
-          <div><dt>Select a list as a source</dt><dd><code class="cc">Master List of Exposures</code></dd></div>
-          <div><dt>Select a column from the list above</dt><dd><code class="cc">RIM</code></dd></div>
-          <div><dt>More options → Add a column to show each of these additional fields</dt><dd>tick <code class="cc">Borrower</code> — this creates the read-only <em>Borrower RIM: Borrower</em> column automatically</dd></div>
-        </dl>
+        <p class="do">→ <strong>Create</strong>. <em>You should now see</em> the empty list with just a <strong>Title</strong> header.</p>
+        <p class="do"><strong>b) Make Title optional.</strong> Matrix rows are pure links (who × which borrower × what purpose) — they don't need a name, and if Title stays required, every data-entry row will nag for one. Click by click:</p>
+        <ol class="steps2">
+          <li>Click the <strong>gear icon</strong> (top-right) → click <strong>List settings</strong>. <em>You should now see</em> a full-page white settings screen (this is the classic skin — normal) titled "Settings", made of blue links in sections: General Settings, Permissions and Management…</li>
+          <li>Scroll to the middle of the page until you see a section headed <strong>Columns</strong> — a small table where <strong>Title</strong> is the first blue link.</li>
+          <li>Click <strong>Title</strong>. <em>You should now see</em> a page headed "Edit Column: Contact Communication Matrix".</li>
+          <li>Find the line <strong>"Require that this column contains information:"</strong> with Yes/No radio buttons — click <strong>No</strong>.</li>
+          <li>Click <strong>OK</strong> (bottom-right of the page). <em>You should now see</em> the Settings page again.</li>
+          <li>Get back to the list: click the list's name in the breadcrumb at the top of the page (or reopen it from Site contents). <em>You should now see</em> the list view with its Title header again.</li>
+        </ol>
+        <p class="do"><strong>c) The Borrower RIM lookup.</strong> A lookup column doesn't store a value of its own — each matrix row will <em>point at</em> one row of the Master List, and show that row's RIM. Nine clicks:</p>
+        <ol class="steps2">
+          <li>In the column-header row, click <strong>+ Add column</strong> (right-most item, next to Title). <em>You should now see</em> the dropdown menu of column types.</li>
+          <li>Click <strong>Lookup</strong> — it's near the <em>bottom</em> of the menu; scroll the menu if you don't see it. <em>You should now see</em> the "Create a column" panel slide in from the right. Top to bottom it has: a <strong>Name</strong> box, a <strong>Description</strong> box, a dropdown labeled <strong>"Select a list as a source"</strong>, a second dropdown labeled <strong>"Select a column from the list above"</strong>, a collapsed <strong>More options</strong> link, and a blue <strong>Save</strong> at the bottom.</li>
+          <li>Click into <strong>Name</strong> → paste <code class="cc">Borrower RIM</code>.</li>
+          <li>Click the <strong>"Select a list as a source"</strong> dropdown. <em>You should now see</em> every list on the site.</li>
+          <li>Click <code class="cc">Master List of Exposures</code>.</li>
+          <li>Click the <strong>"Select a column from the list above"</strong> dropdown. <em>You should now see</em> the Master List's columns (only the types a lookup can display — Borrower, RIM, Office…).</li>
+          <li>Click <code class="cc">RIM</code>.</li>
+          <li>Click <strong>More options</strong> (small text under the dropdowns — it expands). <em>You should now see</em>, under the heading <strong>"Add a column to show each of these additional fields"</strong>, a checkbox per Master List column. Tick <strong>Borrower</strong>. Leave everything else unticked; leave "Allow multiple values" off.</li>
+          <li>Click <strong>Save</strong> (bottom of the panel). <em>You should now see</em> <strong>TWO</strong> new column headers appear: <strong>Borrower RIM</strong> and <strong>Borrower RIM: Borrower</strong> — the second one is the read-only additional field. Two columns from one Save is correct, not a mistake.</li>
+        </ol>
+        <div class="note warn"><b>No "Lookup" in the + Add column menu? (classic skin)</b>Some tenants hide it there. Take the classic path instead — same result: gear → <strong>List settings</strong> → scroll to the <strong>Columns</strong> section → click <strong>Create column</strong> (blue link under the column table). On the white page that opens: "Column name" → paste <code class="cc">Borrower RIM</code> → under "The type of information in this column is:" pick the radio <strong>Lookup (information already on this site)</strong> → the page reloads its lower half: "Get information from:" dropdown → <code class="cc">Master List of Exposures</code> → "In this column:" dropdown → <code class="cc">RIM</code> → further down, under "Add a column to show each of these additional fields", tick <strong>Borrower</strong> → <strong>OK</strong> at the bottom.</div>
         <div class="note why"><b>Where's the spec's separate "Borrower Name (Lookup)"?</b>It's the additional field you just ticked. One lookup carrying both RIM and name means they can <em>never</em> point at two different borrowers — two independent lookups could. Same data, one less way to corrupt it. (Spec §2: no borrower information duplicated — the name is projected from the Master List, not stored here.)</div>
-        <p class="do"><strong>d) The Contact lookup.</strong> <strong>+ Add column</strong> → <strong>Lookup</strong>:</p>
-        <dl class="props">
-          <div><dt>Name</dt><dd><code class="cc">Contact</code></dd></div>
-          <div><dt>Select a list as a source</dt><dd><code class="cc">Borrower Contact Directory</code></dd></div>
-          <div><dt>Select a column from the list above</dt><dd><code class="cc">Title</code></dd></div>
-        </dl>
-        <p class="do"><strong>e) The Purpose lookup.</strong> <strong>+ Add column</strong> → <strong>Lookup</strong>:</p>
-        <dl class="props">
-          <div><dt>Name</dt><dd><code class="cc">Purpose</code></dd></div>
-          <div><dt>Select a list as a source</dt><dd><code class="cc">Communication Purpose Master</code></dd></div>
-          <div><dt>Select a column from the list above</dt><dd><code class="cc">Title</code></dd></div>
-        </dl>
+        <p class="do"><strong>d) The Contact lookup</strong> — the same panel, five clicks (no More options this time):</p>
+        <ol class="steps2">
+          <li><strong>+ Add column</strong> → <strong>Lookup</strong>. <em>You should now see</em> the same "Create a column" panel as in c).</li>
+          <li><strong>Name</strong> → paste <code class="cc">Contact</code>.</li>
+          <li><strong>"Select a list as a source"</strong> dropdown → <code class="cc">Borrower Contact Directory</code>.</li>
+          <li><strong>"Select a column from the list above"</strong> dropdown → <code class="cc">Title</code>.</li>
+          <li><strong>Save</strong>. <em>You should now see</em> one new <strong>Contact</strong> header (one this time — no additional field was ticked).</li>
+        </ol>
+        <p class="do"><strong>e) The Purpose lookup</strong> — same five clicks with different values:</p>
+        <ol class="steps2">
+          <li><strong>+ Add column</strong> → <strong>Lookup</strong>.</li>
+          <li><strong>Name</strong> → paste <code class="cc">Purpose</code>.</li>
+          <li><strong>"Select a list as a source"</strong> dropdown → <code class="cc">Communication Purpose Master</code>.</li>
+          <li><strong>"Select a column from the list above"</strong> dropdown → <code class="cc">Title</code>.</li>
+          <li><strong>Save</strong>. <em>You should now see</em> a new <strong>Purpose</strong> header.</li>
+        </ol>
         <div class="note why"><b>Why Purpose is a Lookup, not a Choice</b>A Choice column's values live inside the column — adding a purpose means editing the column and republishing nothing but still touching schema. A Lookup reads L2, so purpose #7 is a row somebody types. That's spec §9 for free.</div>
-        <p class="do"><strong>f) Notes.</strong> <strong>+ Add column</strong> → <strong>Multiple lines of text</strong> → Name:</p>
+        <p class="do"><strong>f) Notes.</strong> <strong>+ Add column</strong> → <strong>Multiple lines of text</strong> → <strong>Name</strong> → paste → <strong>Save</strong>, nothing else in the panel:</p>
         <div class="fx"><button class="copy" type="button">Copy</button><code>Notes</code></div>
-        <div class="note check"><b>Check before moving on</b>Columns read: Title (optional), Borrower RIM, Borrower RIM: Borrower <em>(auto-created, read-only)</em>, Contact, Purpose, Notes. Open <strong>+ New</strong> once: Borrower RIM offers RIM numbers, Contact offers people from L1, Purpose offers the six purposes. Cancel without saving.</div>
+        <p class="do"><strong>g) The smoke test.</strong> Read your column-header row left to right — it should say exactly: <strong>Title · Borrower RIM · Borrower RIM: Borrower · Contact · Purpose · Notes</strong>. Then click <strong>+ New</strong>: the form should offer <strong>Borrower RIM</strong> as a dropdown of RIM numbers, <strong>Contact</strong> as a dropdown of the people from L1, and <strong>Purpose</strong> as a dropdown of the six purposes. Click <strong>Cancel</strong> (don't save) — L4 does the real data entry.</p>
+        <div class="note check"><b>Check before moving on</b>Header row matches g) word for word, and all three dropdowns in the + New form offered real values. If any dropdown was empty, its source list (Master List / L1 / L2) is missing rows or the lookup points at the wrong list — reopen that column via gear → List settings → Columns → its name, and compare against c)/d)/e).</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -327,6 +369,7 @@
       <summary><span class="dot"></span><span class="num">L4</span><span class="stitle">Seed test data (deletable later)</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <p class="do">Empty lists can't verify an app (and S15's checklist needs specific shapes of data). Two minutes of seeding now saves an hour of "is it broken or just empty?" later.</p>
+        <p class="do">Entering rows works exactly like L2-b: open the list → <strong>+ New</strong> → the item form slides in from the right → fill the fields → <strong>Save</strong> (top-left of the form). Dropdown columns (Active Status, Preferred Language, and all three Matrix lookups) are picked, not typed.</p>
         <p class="do"><strong>a) Two contacts</strong> in <code class="cc">Borrower Contact Directory</code> (+ New each):</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>Column</th><th>Contact 1</th><th>Contact 2</th></tr>
