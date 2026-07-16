@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script src="gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F3B6E">
+<title>IBD Final Build — Polish &amp; Publish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3B6E; --navy-deep:#142a52; --ink:#0f1f3d;
+    --amber:#E08A1E; --amber-soft:#fbe8cd;
+    --paper:#F4F5F8; --card:#fff; --line:#e3e6ee; --line-soft:#eef1f7;
+    --navy-tint:#eef0f6; --faint:#97a1b4;
+    --text:#1b2436; --muted:#5b6678;
+    --code-bg:#0f1f3d; --code-text:#e9edf7;
+    --ok:#1f8a52; --ok-soft:#e3f3ea;
+    --green:#228b57; --red:#c83737; --gray:#788291;
+    --radius:14px; --tap:46px; --sh-sm:0 1px 2px rgba(16,31,61,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:24px;line-height:1.62;-webkit-font-smoothing:antialiased;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+
+  header.mast{background:radial-gradient(120% 140% at 100% 0%, rgba(224,138,30,.22), transparent 55%),linear-gradient(160deg,var(--navy) 0%,var(--navy-deep) 100%);color:#fff;padding:calc(28px + env(safe-area-inset-top)) 0 26px;border-bottom:3px solid var(--amber)}
+  .mast-inner{display:flex;gap:18px;align-items:center}
+  .mast-copy{flex:1;min-width:0}
+  .brandmark{flex:none;width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,#274982,#1a345f);border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);display:grid;place-items:center}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:500;margin:0 0 10px}
+  .mast h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:42px;line-height:1.12;margin:0 0 8px;letter-spacing:-.01em}
+  .mast p.sub{margin:0;color:#c7d2e8;font-size:21px;max-width:48ch}
+  .mast .meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .mast .meta span{font-family:"IBM Plex Mono",monospace;font-size:16px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);padding:5px 9px;border-radius:999px;color:#dde6f5}
+  .mast .meta span b{color:#fff;font-weight:600}
+  @media(max-width:480px){ .brandmark{width:50px;height:50px} .mast h1{font-size:34px} }
+
+  .sticky{position:sticky;top:0;z-index:40;background:rgba(244,245,248,.86);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .progress{height:5px;background:var(--line);overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--amber));transition:width .35s ease}
+  .progtext{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--muted);padding:6px 0 8px;display:flex;justify-content:space-between;align-items:center}
+  .progtext button{background:none;border:none;color:var(--navy);font-family:inherit;font-size:15px;cursor:pointer;text-decoration:underline;padding:4px}
+
+  section.block{margin:26px 0}
+  section.block > h2.sec{font-family:"IBM Plex Serif",serif;font-size:29px;font-weight:600;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em;scroll-margin-top:120px}
+  section.block > p.lead{margin:0 0 14px;color:var(--muted);font-size:21px}
+
+  .tldr{background:#fffdf8;border:1px dashed #ecd6ad;border-radius:12px;padding:13px 15px;margin:0 0 15px;font-size:20px}
+  .tldr b{display:block;font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#a4651a;margin-bottom:4px}
+
+  details.step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:12px 0;overflow:hidden;scroll-margin-top:118px;box-shadow:var(--sh-sm)}
+  details.step[open]{box-shadow:0 6px 24px -12px rgba(16,31,61,.28);border-color:#d4dae8}
+  summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 16px;min-height:var(--tap);user-select:none;-webkit-tap-highlight-color:transparent}
+  summary::-webkit-details-marker{display:none}
+  summary .num{flex:none;min-width:30px;height:30px;padding:0 5px;border-radius:9px;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:18px}
+  details.isdone summary .num{background:var(--ok)}
+  summary .stitle{flex:1;font-weight:600;font-size:22px;line-height:1.3}
+  summary .chev{flex:none;color:var(--muted);transition:transform .2s ease}
+  details[open] summary .chev{transform:rotate(90deg)}
+  summary .dot{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid var(--line)}
+  details.isdone summary .dot{background:var(--ok);border-color:var(--ok)}
+  .body{padding:2px 16px 18px;border-top:1px solid var(--line-soft)}
+  .body > *:first-child{margin-top:14px}
+  .body p{margin:0 0 12px}
+  p.do{margin:0 0 12px}
+  .body ul,.body ol{margin:0 0 12px;padding-left:22px}.body li{margin:0 0 8px}
+  ol.steps2{counter-reset:s2;list-style:none;padding-left:0}
+  ol.steps2 > li{position:relative;padding:2px 0 10px 40px;margin:0}
+  ol.steps2 > li::before{counter-increment:s2;content:counter(s2);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:8px;background:var(--navy-tint);color:var(--navy);font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;display:grid;place-items:center;border:1px solid #dbe3f5}
+
+  dl.props{margin:0 0 13px;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  dl.props > div{display:grid;grid-template-columns:210px 1fr;border-top:1px solid var(--line-soft)}
+  dl.props > div:first-child{border-top:none}
+  dl.props dt{background:#f7f9fc;padding:9px 12px;font-family:"IBM Plex Mono",monospace;font-size:18px;color:var(--navy);font-weight:500;border-right:1px solid var(--line-soft)}
+  dl.props dd{margin:0;padding:9px 12px;font-size:20px}
+  dl.props dd code{font-family:"IBM Plex Mono",monospace;font-size:18px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  @media(max-width:430px){dl.props > div{grid-template-columns:130px 1fr}dl.props dt{font-size:15px;padding:8px 9px}dl.props dd{font-size:18px;padding:8px 10px}}
+
+  .fxlabel{font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;margin:0 0 5px;font-weight:500}
+  .fx{position:relative;margin:0 0 13px}
+  .fx code{display:block;background:var(--code-bg);color:var(--code-text);font-family:"IBM Plex Mono",monospace;font-size:18px;line-height:1.55;padding:14px 84px 14px 16px;border-radius:11px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;border:1px solid #1c3360}
+  .fx .copy{position:absolute;top:8px;right:8px;height:34px;min-width:34px;padding:0 11px;border:none;border-radius:8px;background:rgba(224,138,30,.95);color:#1b1206;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .fx .copy:active{transform:scale(.96)}
+  .fx .copy.copied{background:var(--ok);color:#fff}
+
+  .pane{background:#f4f6fb;border:1px solid #dbe2f1;border-left:4px solid var(--navy);border-radius:11px;padding:12px 14px;margin:0 0 13px}
+  .pane > .ph{font-family:"IBM Plex Mono",monospace;font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);font-weight:600;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .pane > .ph::before{content:"\2699";font-size:16px;line-height:1}
+  .pane ol,.pane ul{margin:0;padding-left:20px}.pane li{margin:0 0 6px;font-size:19px}
+  .pane p{margin:0 0 8px;font-size:19px}
+  .pane code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#e7ecf7;color:var(--navy);padding:1px 6px;border-radius:5px}
+
+  .note{border-radius:11px;padding:12px 14px;margin:0 0 13px;font-size:20px;border:1px solid;line-height:1.55}
+  .note b{display:block;font-size:17px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;font-family:"IBM Plex Mono",monospace}
+  .note.why{background:#eef2fb;border-color:#d5def3;color:#23365e}.note.why b{color:var(--navy)}
+  .note.warn{background:#fbe8cd33;border-color:var(--amber-soft);color:#6b4410}.note.warn b{color:#a4651a}
+  .note.tip{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.tip b{color:var(--ok)}
+  .note.check{background:var(--ok-soft);border-color:#c9e6d6;color:#1c5236}.note.check b{color:var(--ok)}
+  .note.check b::before{content:"✅ ";}
+  .note code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:5px}
+
+  /* tap-to-copy chips: every code chip outside a dark .fx box is copyable */
+  code.cc{cursor:copy;position:relative;-webkit-tap-highlight-color:transparent}
+  code.cc::after{content:"⧉";font-size:.78em;margin-left:5px;opacity:.55}
+  code.cc.copied{background:var(--ok) !important;color:#fff !important}
+  code.cc.copied::after{content:"✓";opacity:1}
+
+  /* element chips: names of controls that live in the Tree view */
+  code.el{background:#e8edf8 !important;color:#1F3B6E !important;border:1px solid #c9d6ef;font-weight:600}
+  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
+
+  .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
+  .done:active{background:var(--line-soft)}
+  details.isdone .done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+  table.cols{width:100%;border-collapse:collapse;margin:0 0 13px;background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:19px}
+  table.cols th,table.cols td{border-top:1px solid var(--line-soft);padding:8px 11px;text-align:left;vertical-align:top}
+  table.cols tr:first-child th{border-top:none}
+  table.cols th{background:#f7f9fc;font-family:"IBM Plex Mono",monospace;font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);font-weight:600}
+  table.cols td:first-child{font-weight:600;white-space:nowrap}
+  table.cols code{font-family:"IBM Plex Mono",monospace;font-size:17px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:0 0 13px}
+  .tablewrap table.cols{margin:0}
+
+  footer{margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:18px;text-align:center;line-height:1.6}
+  footer a{color:var(--navy);font-weight:600}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-inner">
+    <div class="brandmark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="46" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 32l10-18 10 18" stroke="rgba(255,255,255,.5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="24" cy="32" r="4.5" stroke="rgba(224,138,30,.95)" stroke-width="2.4"/>
+      </svg>
+    </div>
+    <div class="mast-copy">
+      <p class="kicker">IBD · Client Contact Repository · Final build</p>
+      <h1>Polish, publish, and put it on the homepage</h1>
+      <p class="sub">The app works end to end — this is the victory lap. Three polish touches (the borrower list gets a <strong>hover highlight</strong>, plus a proper name, icon and description), then the publishing chain: <strong>publish → share → grab the web link → post it on the BMO SharePoint homepage</strong> as a button anyone can click.</p>
+      <div class="meta">
+        <span><b>6</b> steps</span>
+        <span><b>~20</b> min</span>
+        <span>Studio + Power Apps portal + SharePoint</span>
+        <span><a href="IBD_Contact_Repository_Build_Guide.html" style="color:#fff;text-decoration:underline">↩ full build guide</a></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="sticky">
+  <div class="wrap">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="progtext"><span id="progLabel">0 of 6 steps done</span><button id="reset" type="button">Reset</button></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section class="block" id="plan">
+    <h2 class="sec">What's left</h2>
+    <div class="note tip"><b>Where you are</b>Fix version 3 is applied, the checker is clean, and the app answers its question: pick a borrower, see who to contact and for what. Everything on this page is polish and plumbing — nothing here can break the build.</div>
+    <div class="note why"><b>The one technical trick on this page</b>A canvas-app gallery has no "hover" property on its rows — <code>TemplateFill</code> can't react to the mouse. The standard trick: lay a <strong>transparent button</strong> over each row. Buttons <em>do</em> have <code>HoverFill</code> and <code>PressedFill</code>, the transparent face lets your labels show through, and its <code>OnSelect</code> passes the click to the gallery. One control, and the whole row tints on hover.</div>
+    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">btnRowHover</code> is an <em>element</em> — a control in your Tree view; a plain grey chip is a name or value you paste. Property workflow, same as always: select the ▣ control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
+  </section>
+
+  <section class="block" id="steps">
+    <h2 class="sec">The six steps</h2>
+
+    <details class="step" id="p1" open>
+      <summary><span class="dot"></span><span class="num">P1</span><span class="stitle">Hover highlight on the borrower list</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>In the <strong>Tree view</strong>, select <code class="cc el">galBorrowers</code>, then click <em>once more into its first row</em> on the canvas until the <strong>pencil icon</strong> appears — the template must be selected (the same rule as every gallery insert).</li>
+          <li>Insert → search for <strong>Button</strong> → pick the one under <strong>Classic</strong> (the classic button has the hover properties; the modern one hides them). <em>You should now see</em> a button inside the row, nested <strong>under galBorrowers</strong> in the Tree view.</li>
+          <li>Rename it <code class="cc el">btnRowHover</code>.</li>
+        </ol>
+        <dl class="props">
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">""</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">Parent.TemplateHeight</code></dd></div>
+          <div><dt><code class="cc">Fill</code></dt><dd><code class="cc">RGBA(0, 0, 0, 0)</code></dd></div>
+          <div><dt><code class="cc">HoverFill</code></dt><dd><code class="cc">RGBA(31, 59, 110, 0.06)</code></dd></div>
+          <div><dt><code class="cc">PressedFill</code></dt><dd><code class="cc">RGBA(31, 59, 110, 0.12)</code></dd></div>
+          <div><dt><code class="cc">BorderStyle</code></dt><dd><code class="cc">BorderStyle.None</code></dd></div>
+          <div><dt><code class="cc">BorderThickness</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">RadiusTopLeft</code> · <code class="cc">RadiusTopRight</code> · <code class="cc">RadiusBottomLeft</code> · <code class="cc">RadiusBottomRight</code></dt><dd><code class="cc">8</code> (each)</dd></div>
+          <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Select(Parent)</code></dd></div>
+        </dl>
+        <div class="note why"><b>How it works</b>The button is invisible glass over the whole row: <code>Fill</code> transparent, so the name and RIM labels show through from underneath. Hover the row → the glass tints navy at 6%; press → 12%. Clicking the glass runs <code>Select(Parent)</code>, which fires the gallery's OnSelect exactly as before — your selection formula, the highlight, everything unchanged. The selected-row tint from <code>TemplateFill</code> still shows through too, so a selected row stays marked and darkens a touch more under the mouse.</div>
+        <div class="note warn"><b>If the labels stopped showing</b>The button must sit <em>on top</em> (last under galBorrowers in the Tree view — newly inserted controls land there). If you see a grey block hiding the text, the Fill didn't take — it must be <code>RGBA(0, 0, 0, 0)</code>, not a color.</div>
+        <div class="note check"><b>Check before moving on</b>Preview (F5) → sweep the mouse down the list: each row tints as you pass, the selected row keeps its highlight, clicking any row still loads the contacts on the right.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="p2">
+      <summary><span class="dot"></span><span class="num">P2</span><span class="stitle">Name, icon &amp; description — the app's public face</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">The icon and name are what people see on the SharePoint button's target page and in their Power Apps list — thirty seconds now, looks professional forever:</p>
+        <ol class="steps2">
+          <li>In Studio: <strong>Settings</strong> (gear, top bar) → <strong>General</strong>. <em>You should now see</em> Name, Description, and the icon picker.</li>
+          <li><strong>Name</strong> → confirm it reads <code class="cc">IBD Client Contact Repository</code> (rename if it still carries a draft name).</li>
+          <li><strong>Description</strong> → paste: <code class="cc">Look up any borrower and see their key contacts by communication purpose, plus the BMO coverage team and office contacts. View-only.</code></li>
+          <li><strong>Icon</strong> → pick the <strong>people / contacts</strong> glyph → <strong>Background color</strong> → paste <code class="cc">#1F3B6E</code>. <em>You should now see</em> the preview tile turn navy.</li>
+        </ol>
+        <div class="note check"><b>Check before moving on</b>The preview tile in Settings shows a navy tile, a people icon, and the full app name.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="p3">
+      <summary><span class="dot"></span><span class="num">P3</span><span class="stitle">Save &amp; publish</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Top-right of Studio → <strong>Save</strong> (the disk icon, or Ctrl+S). <em>You should now see</em> "All changes saved".</li>
+          <li>Next to it → <strong>Publish</strong> (the up-arrow icon) → <strong>Publish this version</strong>. <em>You should now see</em> a confirmation that the version is live.</li>
+        </ol>
+        <div class="note why"><b>Save ≠ publish</b>Saving makes a new version only you can see; publishing is what pushes it to everyone with the link. Every future tweak needs both clicks — a saved-but-unpublished change is the classic "but I fixed that already" mystery.</div>
+        <div class="note check"><b>Check before moving on</b>The Publish dialog shows today's date as the Live version.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="p4">
+      <summary><span class="dot"></span><span class="num">P4</span><span class="stitle">Share the app with the team</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do">A published app is still invisible to colleagues until it's shared — the homepage link would give them a "you need permission" wall. From the maker portal:</p>
+        <ol class="steps2">
+          <li>Go to <code class="cc">make.powerapps.com</code> → left rail → <strong>Apps</strong>. <em>You should now see</em> IBD Client Contact Repository in the list.</li>
+          <li>Hover it → <strong>⋯</strong> → <strong>Share</strong>. <em>You should now see</em> the share panel.</li>
+          <li>In <strong>Enter a name…</strong> add the people or the team's security group who should use it. Leave <strong>Co-owner unchecked</strong> — they're users, not editors.</li>
+          <li>Skip the email notification if you prefer — the homepage button (P6) is the announcement.</li>
+          <li><strong>Share</strong>.</li>
+        </ol>
+        <div class="note warn"><b>SharePoint permissions are NOT auto-granted</b>The share panel lists the four SharePoint lists under "Data permissions" but sharing the app does <em>not</em> grant access to them — users also need at least <strong>Read</strong> on the BMO site (<code>bbkonline.sharepoint.com/sites/BMO</code>). Members of the site already have it. If someone outside the site will use the app, add them to the site's <strong>Visitors</strong> group first, or they'll see empty galleries and connection errors.</div>
+        <div class="note check"><b>Check before moving on</b>The share panel lists everyone who should have the app, all as User (not Co-owner).</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="p5">
+      <summary><span class="dot"></span><span class="num">P5</span><span class="stitle">Copy the app's web link</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Still in <code class="cc">make.powerapps.com</code> → <strong>Apps</strong> → hover the app → <strong>⋯</strong> → <strong>Details</strong>. <em>You should now see</em> the app's details page.</li>
+          <li>On the <strong>Details</strong> tab, find <strong>Web link</strong> — a long URL beginning <code>https://apps.powerapps.com/play/…</code>.</li>
+          <li>Click the <strong>copy</strong> icon next to it. That URL is the app — paste it anywhere, it opens the published version in the browser player.</li>
+          <li>Paste it somewhere safe for the next step (Notepad is fine). Sanity-check it first: open a new tab, paste, Enter — the app should load.</li>
+        </ol>
+        <div class="note why"><b>Why this link and not the Studio URL</b>The Studio address bar URL opens the <em>editor</em>. The Details-page web link opens the <em>player</em> — read-only, always the latest published version, and safe to hand to anyone you shared with in P4.</div>
+        <div class="note check"><b>Check before moving on</b>The link opens the app in a fresh browser tab, showing the search screen.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="p6">
+      <summary><span class="dot"></span><span class="num">P6</span><span class="stitle">Post the button on the SharePoint homepage</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <ol class="steps2">
+          <li>Open the BMO site homepage → top right → <strong>Edit</strong>. <em>You should now see</em> the page switch to edit mode with section outlines.</li>
+          <li>Hover just below where you want the button (near the top works best) → click the circled <strong>+</strong> → search <code class="cc">Button</code> → click the <strong>Button</strong> web part. <em>You should now see</em> an empty button drop onto the page with a property pane on the right.</li>
+          <li><strong>Label</strong> → paste <code class="cc">📇 IBD Client Contact Repository</code></li>
+          <li><strong>Link</strong> → paste the web link from P5.</li>
+          <li>Alignment → <strong>Left</strong> (or match the section's style).</li>
+          <li>Top right → <strong>Republish</strong>. <em>You should now see</em> the homepage live with the button on it.</li>
+        </ol>
+        <div class="note why"><b>Prefer it embedded instead of linked?</b>There's also a <strong>Microsoft Power Apps</strong> web part that runs the app <em>inside</em> the homepage. It's tempting, but the app is designed for a full window — inside a web part it gets a cramped letterbox, and every homepage visit loads the app for every visitor. The button is the right call: one click, full screen, loads only when wanted.</div>
+        <div class="note check"><b>The final test — do this from a colleague's chair</b>Ask one person you shared with (not you) to open the homepage → click the button → search a borrower → tap an email link. If that works on their account, everything works: app permissions, list permissions, published version, homepage link. 🏁</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" id="after">
+    <h2 class="sec">Owning it from here</h2>
+    <div class="note tip"><b>The maintenance loop</b>Data changes (new borrowers, contacts, matrix rows) appear in the app automatically — it reads the lists live, nothing to redeploy. Only <em>app</em> changes need the P3 double-click: <strong>Save, then Publish</strong>. New team members: add them in the P4 share panel <em>and</em> make sure they can read the BMO site.</div>
+  </section>
+
+  <footer>
+    IBD Final Build — polish &amp; publish · Owner: BMO<br>
+    <a href="IBD_Contact_Repository_Build_Guide.html">Full build guide</a> · <a href="build-review-1.html">Build review №1</a> · <a href="ibd-fix-version-2.html">Fix version 2</a> · <a href="ibd-fix-version-3.html">Fix version 3</a>
+  </footer>
+</main>
+<script>
+(function(){
+  "use strict";
+  var mem={};
+  var store={
+    get:function(k){try{return localStorage.getItem(k);}catch(e){return (k in mem)?mem[k]:null;}},
+    set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
+    del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
+  };
+  var KEY="ibdFinalV1_v1";
+
+  function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+  function copyText(text,onDone){
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(onDone,function(){fallbackCopy(text);onDone();});}
+    else{fallbackCopy(text);onDone();}
+  }
+  document.querySelectorAll(".fx .copy").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var code=btn.parentElement.querySelector("code");
+      copyText(code?code.textContent:"",function(){
+        btn.classList.add("copied");btn.textContent="✓";
+        setTimeout(function(){btn.classList.remove("copied");btn.textContent="Copy";},1300);
+      });
+    });
+  });
+  document.querySelectorAll("code.cc").forEach(function(chip){
+    chip.setAttribute("title","Tap to copy");
+    chip.addEventListener("click",function(){
+      copyText(chip.textContent,function(){
+        chip.classList.add("copied");
+        setTimeout(function(){chip.classList.remove("copied");},1100);
+      });
+    });
+  });
+
+  var steps=Array.prototype.slice.call(document.querySelectorAll("details.step"));
+  var total=steps.length;
+  var bar=document.getElementById("bar");
+  var label=document.getElementById("progLabel");
+  function loadDone(){var raw=store.get(KEY);if(!raw)return {};try{return JSON.parse(raw)||{};}catch(e){return {};}}
+  function saveDone(obj){store.set(KEY,JSON.stringify(obj));}
+  var doneMap=loadDone();
+  function refreshProgress(){
+    var n=0;
+    steps.forEach(function(d){if(d.classList.contains("isdone"))n++;});
+    bar.style.width=(total?Math.round(n/total*100):0)+"%";
+    label.textContent=n+" of "+total+" steps done";
+  }
+  steps.forEach(function(d){
+    if(doneMap[d.id])d.classList.add("isdone");
+    var btn=d.querySelector(".done");
+    function syncBtn(){btn.textContent=d.classList.contains("isdone")?"✓ Done — tap to undo":"Mark step done";}
+    syncBtn();
+    btn.addEventListener("click",function(){d.classList.toggle("isdone");doneMap[d.id]=d.classList.contains("isdone");saveDone(doneMap);syncBtn();refreshProgress();});
+  });
+  refreshProgress();
+  document.getElementById("reset").addEventListener("click",function(){
+    steps.forEach(function(d){d.classList.remove("isdone");d.querySelector(".done").textContent="Mark step done";});
+    doneMap={};store.del(KEY);refreshProgress();
+  });
+})();
+</script>
+</body>
+</html>
