@@ -5,7 +5,7 @@
 <script src="gate.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1F3B6E">
-<title>IBD Fix — Version 2</title>
+<title>IBD Fix — Version 3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
@@ -113,7 +113,7 @@
 
   /* element chips: names of controls that live in the Tree view */
   code.el{background:#e8edf8 !important;color:#1F3B6E !important;border:1px solid #c9d6ef;font-weight:600}
-  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
+  code.el::before{content:"▣ ";font-size:.72em;opacity:.6}
 
   .done{-webkit-appearance:none;appearance:none;width:100%;min-height:var(--tap);margin-top:6px;border:1.5px solid var(--navy);border-radius:11px;background:#fff;color:var(--navy);font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:8px}
   .done:active{background:var(--line-soft)}
@@ -151,13 +151,13 @@
       </svg>
     </div>
     <div class="mast-copy">
-      <p class="kicker">IBD · Client Contact Repository · Fix version 2</p>
-      <h1>Second review, second fix list</h1>
-      <p class="sub">Audit of the app exported <strong>15 July, evening</strong>. Big progress: the right lists are connected, the selection formula is in, the panel is un-squeezed. Two traps caught you this round — the <strong>gallery template</strong> (again) and a <strong>wrong column type</strong> in SharePoint — plus one formula bug that was the guide's fault, not yours. Nine steps, in order, and you're at the finish line.</p>
+      <p class="kicker">IBD · Client Contact Repository · Fix version 3</p>
+      <h1>Third review: one bug, one missing piece</h1>
+      <p class="sub">Audit of the app exported <strong>16 July</strong> — the "(3)" export. The new right-panel architecture is genuinely good: borrower card, coverage team, office contacts, and <strong>every column reference checks out</strong> against the real SharePoint schema. Two things sink it: the selection formula dies on a <strong>name-shadowing bug</strong> (the same trap as last round, in a new spot), and the contact matrix it collects is <strong>never shown</strong> — there's no gallery for it. Seven steps, all in Studio, no SharePoint changes this time.</p>
       <div class="meta">
-        <span><b>1</b> SharePoint fix</span>
-        <span><b>8</b> Studio steps</span>
-        <span><b>~35</b> min</span>
+        <span><b>0</b> SharePoint fixes</span>
+        <span><b>7</b> Studio steps</span>
+        <span><b>~30</b> min</span>
         <span>then re-test ✅</span>
         <span><a href="IBD_Contact_Repository_Build_Guide.html" style="color:#fff;text-decoration:underline">↩ full build guide</a></span>
       </div>
@@ -168,7 +168,7 @@
 <div class="sticky">
   <div class="wrap">
     <div class="progress"><i id="bar"></i></div>
-    <div class="progtext"><span id="progLabel">0 of 9 steps done</span><button id="reset" type="button">Reset</button></div>
+    <div class="progtext"><span id="progLabel">0 of 7 steps done</span><button id="reset" type="button">Reset</button></div>
   </div>
 </div>
 
@@ -176,134 +176,116 @@
 
   <section class="block" id="verdict">
     <h2 class="sec">The verdict</h2>
-    <div class="note tip"><b>Fixed since review №1 — genuinely well done</b>All four correct lists connected, and L1–L3 were executed well (the Matrix's lookups, the additional Borrower field, the Directory columns — all right). The full <code>ClearCollect(colMatrix, …)</code> selection formula is installed and exact. <code class="el">conRight</code> is back on Stretch. <code class="el">lblLoading</code> and <code class="el">galPurposes</code> exist with the right Visible and TemplateSize.</div>
-    <div class="note warn"><b>The five problems this round</b>
-    ① <strong>galPurposes' template is empty</strong> — <code class="el">lblPurposeHeader</code> was never created <em>inside</em> it. The same template trap as round one: the label must be inserted with the gallery's first row selected.
-    ② <strong>galContacts sits <em>next to</em> galPurposes</strong>, directly in conRight, instead of <em>inside</em> galPurposes' template. The nesting is the whole mechanism — one contact list <em>per purpose row</em>. As a sibling it can't work.
-    ③ <strong>galContacts was inserted with a sample layout, not Blank</strong> — the evidence is a leftover <code class="el">Label8</code> reading <code>ThisItem.SampleHeading</code> and <code>CustomGallerySample</code> re-appearing in your data sources.
-    ④ <strong>Active Status in SharePoint is a Choice column, not Yes/No</strong> — L1 specified Yes/No; the contacts filter expects a true/false. This one's a two-minute SharePoint fix.
-    ⑤ <strong>galPurposes' Items has a bug that was the guide's fault</strong> — a name collision the guide has since corrected; you built from the pre-fix version. One paste fixes it.
-    Plus the leftovers from review №1 you haven't reached yet: the block reorder, the three cosmetic true-ups, and S10/S11.</div>
-    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">galPurposes</code> is an <em>element</em> — a control in your Tree view; a plain grey chip is a name or value you paste. Property workflow, same as always: select the ▣ control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
+    <div class="note tip"><b>What this build gets right — a lot</b>The single-screen layout with auto-layout containers is clean and correct. The borrower card (<code class="el">conBorrowerCard</code> with its AutoHeight name and the limit/exposure/utilization line), the <strong>BMO coverage team</strong> block, and the <strong>borrower office contacts</strong> block are all new this round — and every single column reference in them is right: the RSM lookups with <code>.Value</code>, the person column with <code>.DisplayName</code> and <code>.Email</code>, all three office email fields. The search formula (name <em>or</em> numeric RIM) is fully delegable and passes the checker clean. Selection highlight, conditional visibility, tappable mailto emails — all correct.</div>
+    <div class="note warn"><b>The problems this round</b>
+    ① <strong>The selection formula errors out</strong> — inside the <code>LookUp</code>, <code>ThisRecord.Contact</code> doesn't mean what it looks like it means. <code>ThisRecord</code> gets captured by the LookUp's own row (a Directory row, which has no Contact column), so the App checker shows <em>three red errors</em> and <code>colMatrix</code> fails on every tap. Same bug family as fix №2's F3 — name shadowing.
+    ② <strong>colMatrix is collected and then thrown away</strong> — nothing on the screen displays it. The purposes/contacts galleries from fix №2 are gone from this build, and no replacement exists. The core question of the app — <em>who do I contact, for what</em> — never renders.
+    ③ <strong>CustomGallerySample is back</strong> in your data sources — the fingerprint of a gallery inserted with a sample layout at some point.
+    ④ <strong>Checker hygiene</strong>: a performance flag on <code class="el">lblNoResults</code>, two missing accessible labels, six missing tab stops — plus the three cosmetic true-ups from review №1, still pending.</div>
+    <div class="note why"><b>The plan: a flat contact gallery, not the nested one</b>The nested purposes-gallery design has burned you twice, and this build quietly dropped it. So this round prescribes the simpler architecture: <strong>one flat gallery</strong> straight off <code>colMatrix</code>, each row showing <em>purpose · name · job · email · phones</em>, sorted by purpose. One template level, no gallery-in-gallery, same information. (The grouped-headings version still lives in <a href="ibd-fix-version-2.html">fix №2</a> if you ever want it back.)</div>
+    <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Dark boxes have a <strong>Copy</strong> button; every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">galMatrix</code> is an <em>element</em> — a control in your Tree view; a plain grey chip is a name or value you paste. Property workflow, same as always: select the ▣ control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
   </section>
 
   <section class="block" id="fixes">
-    <h2 class="sec">The nine steps</h2>
+    <h2 class="sec">The seven steps</h2>
 
     <details class="step" id="f1" open>
-      <summary><span class="dot"></span><span class="num">F1</span><span class="stitle">SharePoint: remake Active Status as Yes/No</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">F1</span><span class="stitle">Fix the selection formula — the shadowing bug</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">SharePoint can't convert a Choice column to Yes/No, so delete and recreate — painless because only the two test contacts exist:</p>
-        <ol class="steps2">
-          <li>Open <code class="cc">Borrower Contact Directory</code> in SharePoint. <em>You should now see</em> the list with your two test contacts.</li>
-          <li>Click the <strong>Active Status</strong> column header → <strong>Column settings</strong> → <strong>Edit</strong>. <em>You should now see</em> the edit panel slide in from the right.</li>
-          <li>Scroll to the bottom of the panel → click <strong>Delete</strong> → confirm. <em>You should now see</em> the column disappear.</li>
-          <li><strong>+ Add column</strong> → <strong>Yes/No</strong>. <em>You should now see</em> the "Create a column" panel.</li>
-          <li><strong>Name</strong> → paste <code class="cc">Active Status</code> → <strong>Default value</strong> dropdown → <strong>Yes</strong> → <strong>Save</strong>.</li>
-          <li>Fix the two test rows: <strong>Test Contact One</strong> → Active Status <strong>Yes</strong> · <strong>Test Contact Two</strong> → <strong>No</strong> (edit each row: hover → ✏️ or open the item → change → Save).</li>
-        </ol>
-        <div class="note why"><b>Why Yes/No matters</b>The contacts filter is <code>ContactRec.'Active Status'</code> — a clean true/false test. Against a Choice column that's a type error, and "fixing" it by comparing strings would leave a typo-shaped hole ("active" vs "Active"). The column type is the contract.</div>
-        <div class="note check"><b>Check before moving on</b>The Directory shows Active Status as Yes/No toggles; Contact One = Yes, Contact Two = No.</div>
+        <p class="do">Your OnSelect reads <code>LookUp('Borrower Contact Directory', ID = ThisRecord.Contact.Id)</code>. Inside a LookUp, <code>ThisRecord</code> means <em>the LookUp's own row</em> — a Directory row. The Directory has no <code>Contact</code> column, hence "Name isn't valid: 'Contact' isn't recognized" and the two follow-on errors. The fix is the same medicine as fix №2's F3: give the outer rows a name with <code>As</code>, then use that name.</p>
+        <p class="do">Select <code class="cc el">galBorrowers</code> → property dropdown → <code class="cc">OnSelect</code> → select everything → paste:</p>
+        <p class="fxlabel">galBorrowers · OnSelect — the As MatrixRow alias is the fix</p>
+        <div class="fx"><button class="copy" type="button">Copy</button><code>Set(varBorrower, ThisItem);
+Set(varLoading, true);
+ClearCollect(colMatrix,
+    AddColumns(
+        Filter('Contact Communication Matrix',
+            'Borrower RIM'.Id = varBorrower.ID) As MatrixRow,
+        ContactRec,
+        LookUp('Borrower Contact Directory', ID = MatrixRow.Contact.Id)
+    )
+);
+Set(varLoading, false)</code></div>
+        <div class="note why"><b>Why the alias works</b><code>As MatrixRow</code> names each Matrix row explicitly. Inside the LookUp, bare <code>ID</code> still means the Directory row's ID (innermost scope — that's what you want), and <code>MatrixRow.Contact.Id</code> unambiguously reaches the outer row. No name can get captured by the wrong scope. This is the second time shadowing has bitten — the rule of thumb: <em>the moment one record-scope formula sits inside another, alias the outer one with As.</em></div>
+        <div class="note warn"><b>One yellow flag will remain — that's expected</b>The checker will still show a <em>Medium</em> delegation warning on <code>'Borrower RIM'.Id</code>. That comparison can't be sent to SharePoint, so Power Apps downloads the first 500 rows of the whole Matrix and filters locally. Harmless at your current data size — F7 has the insurance settings and the long-term fix if the Matrix ever grows big.</div>
+        <div class="note check"><b>Check before moving on</b>App checker (the stethoscope icon, top right) → the three red <strong>Formula</strong> errors are gone. No red underline in the formula bar.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="f2">
-      <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Studio: refresh the fixed list &amp; clear the wreckage</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">F2</span><span class="stitle">Remove CustomGallerySample — again</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
-          <li>Open the app in Studio → left rail → <strong>Data</strong>. Hover <code class="cc">Borrower Contact Directory</code> → <strong>⋯</strong> → <strong>Refresh</strong>, so Power Apps picks up the remade Active Status column.</li>
-          <li>Hover <code class="cc">CustomGallerySample</code> → <strong>⋯</strong> → <strong>Remove</strong>. (It sneaked back in when a gallery was inserted with a sample layout — F4 explains how to avoid that.)</li>
-          <li>In the <strong>Tree view</strong>, right-click <code class="cc el">galContacts</code> (the one sitting directly under conRight, with <code class="el">Label8</code> inside) → <strong>Delete</strong>. <em>You should now see</em> it and Label8 gone. It has to be rebuilt <em>inside</em> galPurposes — a gallery can't be moved into another gallery's template, only created there.</li>
+          <li>Left rail → <strong>Data</strong>. Hover <code class="cc">CustomGallerySample</code> → <strong>⋯</strong> → <strong>Remove</strong>.</li>
         </ol>
-        <div class="note check"><b>Check before moving on</b>Data shows exactly four sources; the Tree view under conRight has no galContacts and no Label8.</div>
+        <div class="note why"><b>Where it keeps coming from</b>It appears whenever a gallery is inserted with a <em>sample layout</em> instead of <strong>Blank</strong>. It's harmless but it's clutter, and its presence is the tell that a sample layout snuck in. F3 inserts a gallery the right way — if you ever see this source reappear, you picked a sample layout: Ctrl+Z and choose Blank.</div>
+        <div class="note check"><b>Check before moving on</b>Data shows exactly four sources: Master List of Exposures, Contact Communication Matrix, Communication Purpose Master, Borrower Contact Directory. (Purpose Master is unused in the flat design — leave it connected; it's harmless and fix №2's grouped design uses it.)</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="f3">
-      <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Paste the corrected galPurposes formula</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">F3</span><span class="stitle">Insert galMatrix — the missing contacts gallery</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Your Items formula is the guide's old version, which had a genuine bug (a bare <code>Title</code> inside the inner Filter gets captured by the Matrix rows' own blank Title — every purpose counts zero, so no headings ever render). Select <code class="cc el">galPurposes</code> → property dropdown → <code class="cc">Items</code> → select everything → paste:</p>
-        <p class="fxlabel">galPurposes · Items — the As PurposeRow alias is the fix</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>Filter('Communication Purpose Master' As PurposeRow,
-    CountRows(Filter(colMatrix, Purpose.Value = PurposeRow.Title)) > 0)</code></div>
-        <div class="note check"><b>Check before moving on</b>No red underline on the formula. (Headings still won't show — the template is empty until F4.)</div>
+        <ol class="steps2">
+          <li>In the <strong>Tree view</strong>, select <code class="cc el">conRight</code>.</li>
+          <li>Insert → <strong>Vertical gallery</strong> → in the layout picker choose <strong>Blank</strong>. <em>You should now see</em> an empty gallery with no placeholder text, nested under conRight at the bottom. (Sample text visible? That's the CustomGallerySample trap — Ctrl+Z, pick Blank.)</li>
+          <li>Rename it <code class="cc el">galMatrix</code>.</li>
+        </ol>
+        <dl class="props">
+          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Sort(Filter(colMatrix, ContactRec.'Active Status'), Purpose.Value)</code></dd></div>
+          <div><dt><code class="cc">FillPortions</code></dt><dd><code class="cc">1</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading</code></dd></div>
+          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">108</code></dd></div>
+          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
+          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code></dd></div>
+          <div><dt><code class="cc">AccessibleLabel</code></dt><dd><code class="cc">"Contacts for the selected borrower"</code></dd></div>
+          <div><dt><code class="cc">TabIndex</code></dt><dd><code class="cc">0</code></dd></div>
+        </dl>
+        <div class="note why"><b>Why these Items</b><code>colMatrix</code> is filled by F1's formula: each row is a Matrix entry <em>plus</em> a <code>ContactRec</code> record carrying the full Directory row. The Filter drops inactive contacts (<code>'Active Status'</code> is the Yes/No column you remade in fix №2 F1); the Sort clusters rows by purpose so the flat list still reads grouped. A contact serving two purposes appears twice — once per purpose. That's the data model working, not a bug.</div>
+        <div class="note check"><b>Check before moving on</b>No red underline on Items. The gallery is empty on canvas — normal; colMatrix only fills when a borrower is tapped in Preview, and the template is still empty until F4.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="f4">
-      <summary><span class="dot"></span><span class="num">F4</span><span class="stitle">Put the purpose heading INSIDE the template</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">F4</span><span class="stitle">The five labels inside galMatrix's template</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <div class="note warn"><b>The trap that's caught you twice — read before clicking</b>Select the gallery, then click <em>once more into its first row</em> until a <strong>pencil icon</strong> appears on that row — <em>that</em> is the template being selected. Only then Insert. If the new control lands <em>next to</em> the gallery in the Tree view instead of <em>under</em> it, it's outside — delete it and try again. Placed right, it repeats once per row automatically.</div>
-        <ol class="steps2">
-          <li>In the Tree view click <code class="cc el">galPurposes</code>, then click into the gallery's first row on the canvas until the pencil shows.</li>
-          <li>Insert → <strong>Text label</strong> → rename to <code class="cc el">lblPurposeHeader</code>. <em>You should now see</em> it nested <strong>under galPurposes</strong> in the Tree view.</li>
-        </ol>
+        <div class="note warn"><b>The template trap — third time's the charm</b>Select <code class="cc el">galMatrix</code>, then click <em>once more into its first row</em> on the canvas until a <strong>pencil icon</strong> appears on that row — <em>that</em> is the template being selected. Only then Insert. Each label must land <strong>under galMatrix</strong> in the Tree view; if it lands next to the gallery instead, it's outside — delete it and try again. Placed right, it repeats once per row automatically.</div>
+        <p class="do">Five Text labels, in order. First → rename to <code class="cc el">lblMxPurpose</code>:</p>
         <dl class="props">
-          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Title</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">4</code></dd></div>
-          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
-          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">24</code></dd></div>
-          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">15</code></dd></div>
+          <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.Purpose.Value</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">4</code></dd></div>
+          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
+          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
+          <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
-          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(31, 59, 110, 1)</code></dd></div>
+          <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(164, 101, 26, 1)</code></dd></div>
         </dl>
-        <div class="note check"><b>Check before moving on</b>Select your test borrower in Preview: navy purpose headings appear — Audit Confirmations, Legal Notices, Covenant Reporting. (F3 + F4 together make this happen.)</div>
-        <button class="done" type="button">Mark step done</button>
-      </div>
-    </details>
-
-    <details class="step" id="f5">
-      <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">Rebuild galContacts — inside the template, BLANK layout</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
-      <div class="body">
-        <ol class="steps2">
-          <li>Click into <code class="cc el">galPurposes</code>' first row again until the pencil shows (the template must be selected, same as F4).</li>
-          <li>Insert → <strong>Vertical gallery</strong> → in the layout picker choose <strong>Blank</strong>. <em>You should now see</em> an empty gallery — <strong>no</strong> placeholder text. If you see sample headings/text, you picked a sample layout (that's what re-added CustomGallerySample last time): press Ctrl+Z and pick Blank.</li>
-          <li>Rename it <code class="cc el">galContacts</code>. <em>You should now see</em> it nested under galPurposes in the Tree view, below lblPurposeHeader.</li>
-        </ol>
-        <dl class="props">
-          <div><dt><code class="cc">Items</code></dt><dd><code class="cc">Filter(colMatrix, Purpose.Value = lblPurposeHeader.Text &amp;&amp; ContactRec.'Active Status')</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">0</code> · <code class="cc">32</code></dd></div>
-          <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth</code></dd></div>
-          <div><dt><code class="cc">Height</code></dt><dd><code class="cc">100</code> for now — F7 replaces it</dd></div>
-          <div><dt><code class="cc">TemplateSize</code></dt><dd><code class="cc">92</code></dd></div>
-          <div><dt><code class="cc">TemplatePadding</code></dt><dd><code class="cc">0</code></dd></div>
-          <div><dt><code class="cc">ShowScrollbar</code></dt><dd><code class="cc">false</code></dd></div>
-        </dl>
-        <div class="note why"><b>Why this formula now works end-to-end</b><code class="el">lblPurposeHeader</code> exists (F4), <code>colMatrix</code> fills on selection (your OnSelect is already right), and <code>ContactRec.'Active Status'</code> is a real Yes/No again (F1). Three fixes, one working line.</div>
-        <button class="done" type="button">Mark step done</button>
-      </div>
-    </details>
-
-    <details class="step" id="f6">
-      <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">The four contact labels</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
-      <div class="body">
-        <p class="do">All four go <em>inside the galContacts template</em> — click into <em>its</em> first row until the pencil shows (a template inside a template; same rule, one level deeper). Fixed anchors, identical in every row.</p>
-        <p class="do">First → rename to <code class="cc el">lblContactName</code>:</p>
+        <p class="do">Second → rename to <code class="cc el">lblMxName</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.Title</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">6</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">24</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">22</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
           <div><dt><code class="cc">FontWeight</code></dt><dd><code class="cc">FontWeight.Semibold</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(27, 36, 54, 1)</code></dd></div>
         </dl>
-        <p class="do">Second → rename to <code class="cc el">lblContactJob</code>:</p>
+        <p class="do">Third → rename to <code class="cc el">lblMxJob</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Job Title'</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">28</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <p class="do">Third → rename to <code class="cc el">lblContactEmail</code>:</p>
+        <p class="do">Fourth → rename to <code class="cc el">lblMxEmail</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">ThisItem.ContactRec.'Contact Email'</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">46</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">64</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">20</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
@@ -311,38 +293,26 @@
           <div><dt><code class="cc">Underline</code></dt><dd><code class="cc">true</code></dd></div>
           <div><dt><code class="cc">OnSelect</code></dt><dd><code class="cc">Launch("mailto:" &amp; Self.Text)</code></dd></div>
           <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(Self.Text)</code></dd></div>
+          <div><dt><code class="cc">TabIndex</code></dt><dd><code class="cc">0</code></dd></div>
         </dl>
-        <p class="do">Fourth → rename to <code class="cc el">lblContactPhones</code>:</p>
+        <p class="do">Fifth → rename to <code class="cc el">lblMxPhones</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"M: " &amp; ThisItem.ContactRec.'Mobile Number' &amp; "   ·   O: " &amp; ThisItem.ContactRec.'Office Number'</code></dd></div>
-          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">66</code></dd></div>
+          <div><dt><code class="cc">X</code> · <code class="cc">Y</code></dt><dd><code class="cc">12</code> · <code class="cc">84</code></dd></div>
           <div><dt><code class="cc">Width</code></dt><dd><code class="cc">Parent.TemplateWidth - 24</code></dd></div>
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">18</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">12</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
         </dl>
-        <div class="note check"><b>Check before moving on</b>Each heading lists its contacts: bold name, grey job, tappable navy email, phones. Test Contact One under both Audit Confirmations and Legal Notices; Test Contact Two nowhere.</div>
+        <div class="note check"><b>Check before moving on</b>All five labels sit <strong>under galMatrix</strong> in the Tree view. Preview (F5 key) → tap your test borrower → contact cards render: amber purpose, bold name, grey job, navy tappable email, phones.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
-    <details class="step" id="f7">
-      <summary><span class="dot"></span><span class="num">F7</span><span class="stitle">Self-sizing formulas</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="f5">
+      <summary><span class="dot"></span><span class="num">F5</span><span class="stitle">"No contacts" label &amp; block order</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Two pastes replace the placeholder numbers so each purpose group grows with its contact count:</p>
-        <p class="fxlabel">galContacts · Height — replaces the 100</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>CountRows(galContacts.AllItems) * galContacts.TemplateHeight + 8</code></div>
-        <p class="fxlabel">galPurposes · TemplateSize — replaces the 140</p>
-        <div class="fx"><button class="copy" type="button">Copy</button><code>lblPurposeHeader.Height + galContacts.Height + 16</code></div>
-        <div class="note check"><b>Check before moving on</b>A one-contact purpose takes one row of space; more contacts, more space — no clipping, no gaps.</div>
-        <button class="done" type="button">Mark step done</button>
-      </div>
-    </details>
-
-    <details class="step" id="f8">
-      <summary><span class="dot"></span><span class="num">F8</span><span class="stitle">"No contacts" label &amp; block order</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
-      <div class="body">
-        <p class="do"><strong>a)</strong> Select <code class="cc el">conRight</code> → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblNoContacts</code>:</p>
+        <p class="do"><strong>a)</strong> Select <code class="cc el">conRight</code> (the container itself, not the gallery) → Insert → <strong>Text label</strong> → rename to <code class="cc el">lblNoContacts</code>:</p>
         <dl class="props">
           <div><dt><code class="cc">Text</code></dt><dd><code class="cc">"No contacts recorded for this borrower"</code></dd></div>
           <div><dt><code class="cc">Align</code></dt><dd><code class="cc">Align.Center</code></dd></div>
@@ -350,42 +320,66 @@
           <div><dt><code class="cc">Height</code></dt><dd><code class="cc">40</code></dd></div>
           <div><dt><code class="cc">Size</code></dt><dd><code class="cc">13</code></dd></div>
           <div><dt><code class="cc">Color</code></dt><dd><code class="cc">RGBA(91, 102, 120, 1)</code></dd></div>
-          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; CountRows(colMatrix) = 0</code></dd></div>
+          <div><dt><code class="cc">Visible</code></dt><dd><code class="cc">!IsBlank(varBorrower) &amp;&amp; !varLoading &amp;&amp; galMatrix.AllItemsCount = 0</code></dd></div>
         </dl>
-        <p class="do"><strong>b) Reorder the blocks.</strong> In the Tree view, conRight currently reads: lblPlaceholder · conBorrowerCard · conCoverage · conOffice · lblLoading · galPurposes · lblNoContacts. Right-click <code class="cc el">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong> <strong>four times</strong>; then <code class="cc el">conOffice</code> → Move down <strong>four times</strong>.</p>
-        <div class="note check"><b>Check before moving on</b>conRight now reads: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galPurposes · lblNoContacts · conCoverage · conOffice</strong> — purposes between the card and the coverage team.</div>
+        <p class="do"><strong>b) Reorder the blocks.</strong> In the Tree view, conRight currently reads: lblPlaceholder · conBorrowerCard · conCoverage · conOffice · lblLoading · galMatrix · lblNoContacts. Right-click <code class="cc el">conCoverage</code> → <strong>Reorder</strong> → <strong>Move down</strong> <strong>four times</strong>; then <code class="cc el">conOffice</code> → Move down <strong>four times</strong>.</p>
+        <div class="note check"><b>Check before moving on</b>conRight now reads: <strong>lblPlaceholder · conBorrowerCard · lblLoading · galMatrix · lblNoContacts · conCoverage · conOffice</strong> — the contact list between the borrower card and the coverage team, taking all the spare height (that's the FillPortions 1).</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
-    <details class="step" id="f9">
-      <summary><span class="dot"></span><span class="num">F9</span><span class="stitle">True-ups &amp; the re-test</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+    <details class="step" id="f6">
+      <summary><span class="dot"></span><span class="num">F6</span><span class="stitle">Checker sweep — perf, accessibility, leftovers</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do"><strong>a)</strong> Three property pastes still pending from review №1:</p>
+        <p class="do">Twelve small property pastes. The first row fixes a real performance flag (the checker's own advice: <code>AllItemsCount</code> instead of <code>CountRows(AllItems)</code>); the middle rows are the checker's accessibility list; the last three are the cosmetic true-ups outstanding since review №1.</p>
         <div class="tablewrap"><table class="cols">
           <tr><th>Control</th><th>Property</th><th>Set to</th></tr>
+          <tr><td><code class="cc el">lblNoResults</code></td><td><code class="cc">Visible</code></td><td><code class="cc">!IsBlank(txtSearch.Text) &amp;&amp; galBorrowers.AllItemsCount = 0</code></td></tr>
+          <tr><td><code class="cc el">txtSearch</code></td><td><code class="cc">DelayOutput</code></td><td><code class="cc">true</code></td></tr>
+          <tr><td><code class="cc el">txtSearch</code></td><td><code class="cc">AccessibleLabel</code></td><td><code class="cc">"Search by RIM or borrower name"</code></td></tr>
+          <tr><td><code class="cc el">galBorrowers</code></td><td><code class="cc">AccessibleLabel</code> · <code class="cc">TabIndex</code></td><td><code class="cc">"Borrower search results"</code> · <code class="cc">0</code></td></tr>
+          <tr><td><code class="cc el">lblRSM1Email</code></td><td><code class="cc">TabIndex</code></td><td><code class="cc">0</code></td></tr>
+          <tr><td><code class="cc el">lblRSM2Email</code></td><td><code class="cc">TabIndex</code></td><td><code class="cc">0</code></td></tr>
+          <tr><td><code class="cc el">lblRimOfficerEmail</code></td><td><code class="cc">TabIndex</code></td><td><code class="cc">0</code></td></tr>
+          <tr><td><code class="cc el">lblOfficeEmail1</code> · <code class="cc el">lblOfficeEmail2</code> · <code class="cc el">lblOfficeEmail3</code></td><td><code class="cc">TabIndex</code></td><td><code class="cc">0</code> (each)</td></tr>
+          <tr><td><code class="cc el">lblRSM2</code></td><td><code class="cc">Visible</code></td><td><code class="cc">!IsBlank(varBorrower.'BMO RSM 2'.Value)</code></td></tr>
           <tr><td><code class="cc el">lblRowName</code></td><td><code class="cc">Size</code></td><td><code class="cc">15</code></td></tr>
           <tr><td><code class="cc el">lblNoResults</code></td><td><code class="cc">Color</code> · <code class="cc">Align</code> · <code class="cc">Size</code> · <code class="cc">Height</code></td><td><code class="cc">RGBA(91, 102, 120, 1)</code> · <code class="cc">Align.Center</code> · <code class="cc">13</code> · <code class="cc">40</code></td></tr>
           <tr><td><code class="cc el">lblRimOfficer</code></td><td><code class="cc">Height</code></td><td><code class="cc">22</code></td></tr>
         </table></div>
-        <p class="do"><strong>b)</strong> F5 (Preview) and run:</p>
+        <div class="note why"><b>Why DelayOutput matters here</b>Right now every keystroke in the search box re-runs the SharePoint filter — type "Northwind" and that's nine queries. <code>DelayOutput</code> makes the box wait until you pause typing (~half a second), then fire once. Free performance, one toggle.</div>
+        <div class="note why"><b>Why the RSM 2 Visible guard</b>Borrowers with a single RSM currently show a dangling <code>"RSM 2  ·  "</code> with nothing after it. The guard hides the whole line when the lookup is empty — the email line below it already guards itself.</div>
+        <div class="note check"><b>Check before moving on</b>App checker → <strong>Accessibility</strong> section is empty; <strong>Performance</strong> section is empty.</div>
+        <button class="done" type="button">Mark step done</button>
+      </div>
+    </details>
+
+    <details class="step" id="f7">
+      <summary><span class="dot"></span><span class="num">F7</span><span class="stitle">Delegation insurance &amp; the re-test</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <div class="body">
+        <p class="do"><strong>a)</strong> Raise the data row limit so the one remaining delegation warning has headroom: <strong>Settings</strong> (gear, top bar) → <strong>General</strong> → <strong>Data row limit</strong> → <code class="cc">2000</code>.</p>
+        <div class="note warn"><b>What that warning actually means — and the real fix if you ever need it</b>The Matrix filter compares <code>'Borrower RIM'.Id</code>, which SharePoint can't evaluate server-side, so Power Apps pulls the first 2,000 Matrix rows and filters on the device. Fine for hundreds of rows; wrong answers past 2,000 (rows silently missing). If the Matrix ever heads that way: add a plain <strong>Number</strong> column <code>RIM Number</code> to the Matrix, fill it per row, and filter with <code>RIM Number = varBorrower.RIM</code> — plain number equality delegates fully and the warning disappears.</div>
+        <p class="do"><strong>b)</strong> F5 (Preview) and run the list:</p>
         <ul>
-          <li>Test borrower → headings for Audit Confirmations + Legal Notices only; Test Contact One under both; Contact Two nowhere.</li>
-          <li>Flip Contact Two to Active in SharePoint, reselect → they appear under Audit Confirmations and Covenant Reporting; flip back.</li>
-          <li>Borrower without matrix rows → "No contacts recorded"; coverage/office still show.</li>
-          <li>Tap a contact email → mail draft opens.</li>
-          <li>App checker → no formula errors anywhere.</li>
+          <li>App checker → <strong>zero formula errors</strong>; at most the one Medium delegation warning on OnSelect.</li>
+          <li>Search: type a partial borrower name → results filter after a brief pause (that's DelayOutput working). Garbage text → "No borrowers found", centred and grey.</li>
+          <li>Tap the test borrower → loading flash, then contact cards sorted by purpose: amber purpose · bold name · grey job · navy email · phones. Coverage team and office contacts below.</li>
+          <li>A contact tied to two purposes appears twice, once per purpose — by design.</li>
+          <li>An <strong>inactive</strong> contact appears nowhere. (Flip them Active in SharePoint, reselect the borrower → they appear. Flip back.)</li>
+          <li>Tap a contact email → mail draft opens. Same for RSM / RIM officer / office emails.</li>
+          <li>Borrower with no Matrix rows → "No contacts recorded for this borrower"; card, coverage and office blocks still render.</li>
+          <li>Borrower with one RSM → no dangling "RSM 2 ·" line.</li>
         </ul>
-        <p class="do">All green → the main guide's full <a href="IBD_Contact_Repository_Build_Guide.html#s15">S15 checklist</a>, delete the test rows, publish via <a href="IBD_Contact_Repository_Build_Guide.html#s16">S16</a>. 🏁</p>
-        <div class="note check"><b>Done</b>This was the last structural piece — after this the app matches the spec end to end.</div>
+        <p class="do">All green → the main guide's <a href="IBD_Contact_Repository_Build_Guide.html#s15">S15 checklist</a>, delete the test rows, publish via <a href="IBD_Contact_Repository_Build_Guide.html#s16">S16</a>. 🏁</p>
+        <div class="note check"><b>Done</b>With F1's data fix and F3–F5's display, the app finally answers its own question end to end: pick a borrower, see exactly who to contact and for what.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
   </section>
 
   <footer>
-    IBD Fix — Version 2 · audit of the 15 July evening export · Owner: BMO<br>
-    <a href="IBD_Contact_Repository_Build_Guide.html">Full build guide</a> · <a href="build-review-1.html">Build review №1</a> · <a href="ibd-fix-version-3.html">Fix version 3</a>
+    IBD Fix — Version 3 · audit of the 16 July "(3)" export · Owner: BMO<br>
+    <a href="IBD_Contact_Repository_Build_Guide.html">Full build guide</a> · <a href="build-review-1.html">Build review №1</a> · <a href="ibd-fix-version-2.html">Fix version 2</a>
   </footer>
 </main>
 <script>
@@ -397,7 +391,7 @@
     set:function(k,v){try{localStorage.setItem(k,v);}catch(e){mem[k]=v;}},
     del:function(k){try{localStorage.removeItem(k);}catch(e){delete mem[k];}}
   };
-  var KEY="ibdFixV2_v1";
+  var KEY="ibdFixV3_v1";
 
   function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
   function copyText(text,onDone){
