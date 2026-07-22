@@ -49,6 +49,20 @@ Notes: multi-borrower contacts → "Allow multiple selection" on the column;
 Geometry-affecting size bumps (row labels 12–15) deliberately excluded — they
 would cascade into the fixed-anchor row math (TemplateSize, Y offsets).
 
+## Revision — 2026-07-22, later the same morning
+
+The user corrected the requirement: the client meant the **Contact Communication
+Matrix**, not the Directory — invert the existing `Borrower RIM` lookup so entry
+is name-in → RIM-out. Part A rewritten: **edit** the existing lookup column
+(display column RIM → Borrower; additional fields: tick RIM, untick Borrower).
+A lookup stores the target row ID, so the flip is presentation-only — all
+existing rows switch instantly, nothing re-entered. Verified every app formula
+uses `'Borrower RIM'.Id` and never `.Value` ⇒ app untouched, no publish.
+Column is deliberately NOT renamed (display-name rename would break the
+OnSelect reference). D4 carries a note for anyone who ran the earlier
+revision's Directory steps (keep or delete that column — harmless either way).
+Part B unchanged.
+
 ## Deliverable
 
 `ibd-update-1.html` — mini guide page in the standard design (html_hustle

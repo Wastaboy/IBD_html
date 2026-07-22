@@ -144,7 +144,7 @@
     <div class="mast-copy">
       <p class="kicker">IBD · Client Contact Repository · Update №1</p>
       <h1>Pick borrowers by name — and a sharper look</h1>
-      <p class="sub">Two independent parts. <strong>Part A</strong> answers the team's request inside SharePoint itself: when filling the <strong>Borrower Contact Directory</strong>, pick the borrower <strong>by name</strong> and the <strong>RIM writes itself</strong> — no numbers to remember. <strong>Part B</strong> is a light visual pass on the app: cards, air, one font. Properties only, no formulas touched.</p>
+      <p class="sub">Two independent parts. <strong>Part A</strong> answers the team's request inside SharePoint itself: the <strong>Contact Communication Matrix</strong>'s borrower lookup gets <strong>inverted</strong> — today you pick a RIM and the name rides along; after this, you pick the <strong>name</strong> and the <strong>RIM writes itself</strong>. One column edit, no data re-entered. <strong>Part B</strong> is a light visual pass on the app: cards, air, one font. Properties only, no formulas touched.</p>
       <div class="meta">
         <span><b>10</b> steps</span>
         <span><b>~25</b> min</span>
@@ -167,69 +167,72 @@
   <section class="block" id="plan">
     <h2 class="sec">Before you start</h2>
     <div class="note tip"><b>The two parts don't depend on each other</b>Part A (D1–D4) happens entirely in SharePoint and changes <em>nothing</em> in the app — no publish needed. Part B (U1–U6) happens entirely in Studio and touches only cosmetic properties — no controls added, no formulas edited, so nothing can break. Do them in either order.</div>
-    <div class="note why"><b>How Part A works — the same trick the Matrix already uses, inverted</b>The Matrix's <code>Borrower RIM</code> column is a <em>lookup</em>: it shows the RIM and carries the name along as a read-only extra. Part A gives the Directory the mirror image: a lookup that shows the <strong>name</strong> (a searchable picker — type a few letters, pick) and carries the <strong>RIM</strong> along as the read-only extra. The RIM is derived from the picked row, so it can't be mistyped — and if a name or RIM ever changes on the Master List, the Directory follows automatically.</div>
+    <div class="note why"><b>How Part A works — flip which side of the lookup shows</b>The Matrix's <code>Borrower RIM</code> column is a <em>lookup</em>: each row stores a pointer to one Master List row, and merely <em>displays</em> one of that row's columns — today, the RIM, with the name riding along as a read-only extra. Part A flips the display: the lookup shows the <strong>name</strong> (a searchable picker — type a few letters, pick) and carries the <strong>RIM</strong> along as the read-only extra. Because the stored pointer never changes, every existing Matrix row switches to names <em>instantly</em>, nothing is re-entered — and a mistyped RIM becomes impossible, since the number is always derived from the picked row.</div>
     <div class="note why"><b>Chips: tap to copy — and the navy ones are controls</b>Every inline chip is tap-to-copy (the ⧉ mark). A <strong>navy chip with a ▣ mark</strong> like <code class="cc el">conLeft</code> is an <em>element</em> — a control in your Tree view; a plain grey chip is a name or value you paste. Property workflow, same as always: select the ▣ control in the Tree view → property dropdown (top-left of the formula bar) → paste the property name → paste the value → Enter.</div>
   </section>
 
   <section class="block" id="parta">
-    <h2 class="sec">Part A — Search by name in the Directory</h2>
-    <p class="lead">Four steps in SharePoint. When they're done, nobody entering a contact ever types a RIM again.</p>
+    <h2 class="sec">Part A — Pick by name in the Matrix</h2>
+    <p class="lead">Four steps in SharePoint — one column <em>edit</em>, not a rebuild. When they're done, nobody entering a Matrix row ever types or hunts a RIM again.</p>
 
     <details class="step" id="d1" open>
-      <summary><span class="dot"></span><span class="num">D1</span><span class="stitle">Add the Borrower lookup column</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">D1</span><span class="stitle">Invert the Borrower RIM lookup</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
-        <p class="do">Open the BMO site → <code class="cc">Borrower Contact Directory</code>. Then, the same lookup recipe as the Matrix build:</p>
+        <p class="do">Open the BMO site → <code class="cc">Contact Communication Matrix</code>. You're <em>editing</em> the existing lookup, not creating anything:</p>
         <ol class="steps2">
-          <li>Click <strong>+ Add column</strong> (right end of the column headers) → pick <strong>Lookup</strong> → <strong>Next</strong>. <em>You should now see</em> the "Create a column" panel.</li>
-          <li>Click into <strong>Name</strong> → paste <code class="cc">Borrower</code>.</li>
-          <li><strong>"Select a list as a source"</strong> dropdown → <code class="cc">Master List of Exposures</code>.</li>
-          <li><strong>"Select a column from the list above"</strong> dropdown → <code class="cc">Borrower</code> — that's the name column (the renamed Title).</li>
-          <li>Expand <strong>More options</strong> → under <strong>"Add a column to show each of these additional fields"</strong> tick <strong>RIM</strong>.</li>
-          <li>Click <strong>Save</strong>. <em>You should now see</em> <strong>TWO</strong> new column headers: <strong>Borrower</strong> and <strong>Borrower: RIM</strong> — the second is the read-only extra that fills itself. Two columns from one Save is correct, not a mistake (same as the Matrix's L3).</li>
+          <li>Click the <strong>Borrower RIM</strong> column header → <strong>Column settings</strong> → <strong>Edit</strong>. <em>You should now see</em> the "Edit column" panel with the lookup's settings, source list already set to Master List of Exposures.</li>
+          <li><strong>"Select a column from the list above"</strong> dropdown → change <strong>RIM</strong> to <code class="cc">Borrower</code> — the name column (the renamed Title).</li>
+          <li>Expand <strong>More options</strong> → in <strong>"Add a column to show each of these additional fields"</strong>: <strong>tick RIM</strong>, and <strong>untick Borrower</strong> (the name now <em>is</em> the main column — carrying it twice is clutter).</li>
+          <li>Click <strong>Save</strong>. <em>You should now see</em> three things at once: the <strong>Borrower RIM</strong> column now shows <em>names</em> on every existing row, a new read-only <strong>Borrower RIM: RIM</strong> column shows the numbers, and the old <strong>Borrower RIM: Borrower</strong> column is gone.</li>
         </ol>
-        <div class="note warn"><b>Can't find RIM in the additional-fields list?</b>Only some column types can ride along on a lookup (text, number, date). RIM is a Number, so it <em>is</em> there — if it's missing, the source dropdown is pointing at the wrong list. Check step 3 before anything else.</div>
-        <div class="note tip"><b>Want the borrower to be mandatory?</b>Edit the column later (column header → <strong>Column settings</strong> → <strong>Edit</strong>) → <strong>More options</strong> → toggle <strong>"Require that this column contains information"</strong>. Leave it <em>off</em> until D2's backfill is done, or every old row will nag on every edit.</div>
-        <div class="note check"><b>Check before moving on</b>The list shows the two new headers, both still empty on every existing row — D2 fills them.</div>
+        <div class="pane"><div class="ph">Classic skin? Same edit, older clothes</div>
+          <ol>
+            <li>Gear (top right) → <strong>List settings</strong> → under <strong>Columns</strong> click <strong>Borrower RIM</strong>.</li>
+            <li><strong>"In this column:"</strong> dropdown → <code>Borrower</code>.</li>
+            <li>In <strong>"Add a column to show each of these additional fields:"</strong> tick <strong>RIM</strong>, untick <strong>Borrower</strong> → <strong>OK</strong>.</li>
+          </ol>
+        </div>
+        <div class="note why"><b>Why nothing needs re-entering</b>A lookup stores a <em>pointer</em> to the Master List row — which column it displays is presentation only. Changing the display from RIM to Borrower rewrites nothing: all existing rows switch to names the moment you Save, and the RIM extra fills itself from the same pointer.</div>
+        <div class="note warn"><b>Do NOT rename the column while you're in there</b>Tempting as "Borrower RIM" now sounds wrong for a column full of names — the app's OnSelect formula references <code>'Borrower RIM'</code> by that exact display name, and renaming it breaks the contact loading until the formula is edited too. Keep the name; it's odd for a moment and safe forever. (If the client insists on renaming, say the word — it's a two-line follow-up with one formula edit.)</div>
+        <div class="note check"><b>Check before moving on</b>Every existing Matrix row shows a borrower <em>name</em> where the RIM used to be, with the RIM sitting in the new read-only column beside it — and you didn't touch a single row.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="d2">
-      <summary><span class="dot"></span><span class="num">D2</span><span class="stitle">Backfill the existing contacts</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">D2</span><span class="stitle">Enter a row by name</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
-          <li>Toolbar → <strong>Edit in grid view</strong>. <em>You should now see</em> the list turn into an editable grid.</li>
-          <li>Click the first row's empty <strong>Borrower</strong> cell → type the first letters of that contact's borrower → the dropdown narrows as you type → pick. <em>You should now see</em> the <strong>Borrower: RIM</strong> cell fill by itself — it's read-only, don't try to type in it.</li>
-          <li>Repeat for every contact → <strong>Exit grid view</strong> (same button).</li>
+          <li>Click <strong>+ New</strong>. <em>You should now see</em> the item form — and <strong>Borrower RIM</strong> is now a <em>name</em> picker: type a few letters of any borrower → the dropdown narrows as you type → pick.</li>
+          <li>Pick <strong>Contact</strong> and <strong>Purpose</strong> as usual → <strong>Save</strong>.</li>
+          <li><em>You should now see</em> the new row with the borrower's name <em>and</em> its RIM — you never touched a number. (Delete the test row if it was a dummy.)</li>
         </ol>
-        <div class="note tip"><b>A contact who serves more than one borrower?</b>The Matrix still holds who-serves-whom-for-what — this column is just the Directory's own tag. If one person genuinely belongs to several borrowers, edit the column and toggle <strong>"Allow multiple selection"</strong>; the RIM column then lists each picked borrower's RIM.</div>
-        <div class="note check"><b>Check before moving on</b>Every contact row shows a borrower name <em>and</em> a RIM — and not one of those numbers was typed by hand.</div>
+        <div class="note check"><b>Check before moving on</b>The whole point, proven: name in, RIM out — derived, not typed, so it can't be wrong.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="d3">
-      <summary><span class="dot"></span><span class="num">D3</span><span class="stitle">Put the new columns where the eye lands</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">D3</span><span class="stitle">Put the RIM where the eye lands</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
         <ol class="steps2">
-          <li>Drag the <strong>Borrower</strong> column header so it sits right after the contact's name (<strong>Title</strong>). If dragging fights you: column header → <strong>Column settings</strong> → <strong>Move left / Move right</strong>.</li>
-          <li>Drag <strong>Borrower: RIM</strong> to sit right after <strong>Borrower</strong>.</li>
+          <li>Drag the <strong>Borrower RIM: RIM</strong> column header so it sits right after <strong>Borrower RIM</strong>. If dragging fights you: column header → <strong>Column settings</strong> → <strong>Move left / Move right</strong>.</li>
         </ol>
-        <div class="note check"><b>Check before moving on</b>Reading a row left to right now tells the story in order: person → their borrower → its RIM → the contact details.</div>
+        <div class="note check"><b>Check before moving on</b>Reading a row left to right now tells the story in order: borrower → RIM → contact → purpose.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
 
     <details class="step" id="d4">
-      <summary><span class="dot"></span><span class="num">D4</span><span class="stitle">Verify the flow end to end</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
+      <summary><span class="dot"></span><span class="num">D4</span><span class="stitle">Confirm the app doesn't care</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></summary>
       <div class="body">
+        <p class="do">The app matches Matrix rows with <code>'Borrower RIM'.Id = varBorrower.ID</code> — the stored <em>pointer</em>, never the displayed text (checked: no formula anywhere reads this lookup's <code>.Value</code>). Flipping the display is invisible to it. Prove it in thirty seconds:</p>
         <ol class="steps2">
-          <li>Click <strong>+ New</strong>. In the form, <strong>Borrower</strong> is a dropdown — type a few letters of any borrower → the list narrows → pick.</li>
-          <li>Fill the contact fields as usual → <strong>Save</strong>.</li>
-          <li><em>You should now see</em> the new row with the borrower's name <em>and</em> its RIM — you never touched a number. (Delete the test row if it was a dummy.)</li>
+          <li>Open the published app → search a borrower → select. <em>You should now see</em> the contacts load exactly as before.</li>
+          <li>That's it — Part A needs no Studio work and no publish.</li>
         </ol>
-        <div class="note why"><b>Nothing to publish — the app is untouched</b>The app reads contacts through the Matrix and never looks at this column, so Part A needs no Studio work and no publish. (If the client later wants the borrower shown on the contact cards in the app, it's one label away — say the word.)</div>
-        <div class="note check"><b>Check before moving on</b>Open the app once and search a borrower — everything behaves exactly as before. Part A done.</div>
+        <div class="note tip"><b>Did you already run this page's earlier revision?</b>The first push of this page (same morning) had Part A adding a <code>Borrower</code> lookup to the <em>Borrower Contact Directory</em> instead. If you already created it, it's harmless — keep it as a useful borrower tag on each contact, or remove it: <strong>Borrower</strong> column header → <strong>Column settings</strong> → <strong>Edit</strong> → <strong>Delete</strong> (its "Borrower: RIM" companion disappears with it).</div>
+        <div class="note check"><b>Check before moving on</b>App behaves identically; the Matrix now speaks names. Part A done.</div>
         <button class="done" type="button">Mark step done</button>
       </div>
     </details>
@@ -344,7 +347,7 @@
 
   <section class="block" id="after">
     <h2 class="sec">Owning it from here</h2>
-    <div class="note tip"><b>The maintenance loop, updated</b>New contacts are now entered by picking the borrower's <em>name</em> — the RIM column fills itself and stays in sync with the Master List automatically. Data changes still appear in the app live, nothing to redeploy; only <em>app</em> changes need Save + Publish.</div>
+    <div class="note tip"><b>The maintenance loop, updated</b>New Matrix rows are now entered by picking the borrower's <em>name</em> — the RIM fills itself and stays in sync with the Master List automatically. Data changes still appear in the app live, nothing to redeploy; only <em>app</em> changes need Save + Publish.</div>
   </section>
 
   <footer>
